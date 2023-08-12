@@ -160,9 +160,7 @@ class Produto extends React.Component {
     buscarDados = () => {
         this.setState({ carregando: true });
 
-        // fetch("https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos")
-
-        fetch("http://localhost:8081/api/v1/produtos")
+        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos")
             .then((resposta) => resposta.json())
             .then((dados) => {
                 console.log(dados);
@@ -177,9 +175,8 @@ class Produto extends React.Component {
 
     buscarCategorias = () => {
         this.setState({ carregando: true });
-        // fetch("https://dev-api-okeaa-produto.azurewebsites.net/api/v1/categorias")
 
-        fetch("http://localhost:8081/api/v1/categorias")
+        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/categorias")
             .then((resposta) => resposta.json())
             .then((dados) => {
                 console.log(dados);
@@ -195,9 +192,8 @@ class Produto extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DE UM PRODUTO PELO ID
     carregarProdutos = (codigo) => {
-        // fetch(`https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
 
-        fetch(`http://localhost:8081/api/v1/produto/${codigo}`, {
+        fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -269,9 +265,8 @@ class Produto extends React.Component {
     }
     //DELETE - MÉTODO PARA DELETAR UM PRODUTO
     excluirProduto(codigo) {
-        // fetch(`https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
 
-        fetch(`http://localhost:8081/api/v1/produto/${codigo}`, {
+        fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -291,9 +286,7 @@ class Produto extends React.Component {
         const xml = parser.parseFromString(xmlProduto, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
 
-        // fetch('https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto', {
-
-        fetch('http://localhost:8081/api/v1/cadastrarproduto', {
+        fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto', {
             method: 'POST',
             body: stringXml,
             headers: {
@@ -310,9 +303,7 @@ class Produto extends React.Component {
         const stringXml = new XMLSerializer().serializeToString(xml);
         const codigo = xml.querySelector('codigo').textContent;
 
-        fetch('http://localhost:8081/api/v1/atualizarproduto/' + codigo, {
-            // fetch('https://dev-api-okeaa-produto.azurewebsites.net/api/v1/atualizarproduto/' + codigo, {
-
+        fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarproduto/' + codigo, {
             method: 'POST',
             body: stringXml,
             headers: {

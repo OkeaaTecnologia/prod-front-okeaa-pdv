@@ -89,8 +89,8 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     buscarContato = () => {
-        // fetch(`https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
-        fetch("http://localhost:8080/api/v1/contatos")
+
+        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
             .then(resposta => resposta.json())
             .then(dados => {
                 if (dados.retorno.contatos) {
@@ -107,12 +107,9 @@ class Contato extends React.Component {
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     carregarContato = (cnpj) => {
         console.log("--------------------------------")
-
         const cnpjSemPontuacao = cnpj.replace(/[^\d]+/g, '')  // Remove "." e "/" do CNPJ.
 
-        // fetch("https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contato/" + cnpjSemPontuacao, { method: 'GET' })
-
-        fetch("http://localhost:8080/api/v1/contato/" + cnpjSemPontuacao, { method: 'GET' })
+        fetch("https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/" + cnpjSemPontuacao, { method: 'GET' })
             .then(resposta => resposta.json())
             .then(dados => {
                 console.log("Linha 80", dados)
@@ -162,9 +159,8 @@ class Contato extends React.Component {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlContato, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
-        // fetch('https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato', {
 
-        fetch('http://localhost:8080/api/v1/cadastrarcontato', {
+        fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato', {
             method: 'POST',
             body: stringXml,
             headers: {
@@ -180,9 +176,7 @@ class Contato extends React.Component {
         const stringXml = new XMLSerializer().serializeToString(xml);
         const id = xml.querySelector('id').textContent;
 
-        // fetch('https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/' + id, {
-
-        fetch('http://localhost:8080/api/v1/atualizarcontato/' + id, {
+        fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/' + id, {
             method: 'PUT',
             body: stringXml,
             headers: {
