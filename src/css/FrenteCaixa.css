@@ -75,8 +75,8 @@ body {
   border: 1px solid #6c757d;
 }
 
-.grid-1,
-.grid-2 {
+.grid-pdv-1,
+.grid-pdv-2 {
   position: sticky;
   top: 60px;
   background-color: #fff;

@@ -45,7 +45,7 @@ class CadastroLoja extends React.Component {
   }
 
   buscaLojas = () => {
-    fetch('https://dev-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas')
+    fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas')
       .then(response => response.json())
       .then(data => {
         this.setState({ lojas: data });
@@ -56,7 +56,7 @@ class CadastroLoja extends React.Component {
   };
 
   buscarIdLoja = (idLoja) => {
-    fetch(`https://dev-api-forma-pagamento.azurewebsites.net/api/v1/${idLoja}`)
+    fetch(`https://prod-api-forma-pagamento.azurewebsites.net/api/v1/${idLoja}`)
       .then(response => response.json())
       .then(data => {
         console.log('Resposta da API:', data);
@@ -77,7 +77,7 @@ class CadastroLoja extends React.Component {
   };
 
   deletarLoja = (idLoja) => {
-    fetch(`https://dev-api-forma-pagamento.azurewebsites.net/api/v1/${idLoja}`, {
+    fetch(`https://prod-api-forma-pagamento.azurewebsites.net/api/v1/${idLoja}`, {
       method: 'DELETE',
     })
       .then(response => {
@@ -93,7 +93,7 @@ class CadastroLoja extends React.Component {
   };
 
   adicionarLoja = (selecionaLoja) => {
-    fetch('https://dev-api-forma-pagamento.azurewebsites.net/api/v1/adicionarLoja/', {
+    fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/adicionarLoja/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -194,9 +194,20 @@ class CadastroLoja extends React.Component {
     const { lojas, modalEditarLoja, selecionaLoja } = this.state;
 
     return (
-      <div>
-        <Container>
-          <Table className="table">
+      <div className="grid-cadastro-loja">
+        <Container fluid>
+          <div className="d-flex align-items-center mt-3 mb-3">
+            <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar uma nova loja:</span>
+            <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
+            <Button variant="success" onClick={this.handleCadastrarClick} className="d-flex align-items-center">
+              <BsPersonAdd style={{ marginRight: '0.8rem' }} />
+              Incluir Cadastro
+            </Button>
+          </div>
+        </Container>
+
+        <Container fluid className="pb-5">
+          <Table striped bordered hover responsive="xl" >
             <thead>
               <tr>
                 <th>ID Loja</th>
@@ -228,14 +239,6 @@ class CadastroLoja extends React.Component {
             </tbody>
           </Table>
         </Container>
-        <div className="container-btn d-flex justify-content-center">
-          <Row xs={12} className="justify-content-center mt-3">
-            <Button onClick={this.handleCadastrarClick} className="btn btn-warning btn-lg btn-block">
-              <BsPersonAdd style={{ marginRight: '0.5rem' }} />
-              Cadastrar
-            </Button>
-          </Row>
-        </div>
 
         {/* Modal */}
         <Modal show={modalEditarLoja} onHide={this.fecharModalEditarLoja} size="lg" centered>

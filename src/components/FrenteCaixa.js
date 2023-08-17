@@ -706,6 +706,22 @@ class FrenteCaixa extends React.Component {
 
     };
 
+    //----------------------------------------- API CADASTRAR FORMA DE PAGAMENTO ----------------------------------------------------------
+
+    // cadastrarFormaDePagamento = (xmlFormaPagamento) => {
+    //     const parser = new DOMParser();
+    //     const xml = parser.parseFromString(xmlFormaPagamento, 'text/xml');
+    //     const stringXml = new XMLSerializer().serializeToString(xml);
+
+    //     fetch('http://localhost:8086/api/v1/cadastrarformapagamento', {
+    //         method: 'POST',
+    //         body: stringXml,
+    //         headers: {
+    //             'Content-Type': 'application/xml'
+    //         }
+    //     });
+    // };
+
     //----------------------------------------- API´s PUBLICAS (CEP) ----------------------------------------------------------
 
     buscarCep = (e) => {
@@ -2174,7 +2190,7 @@ class FrenteCaixa extends React.Component {
                     <Form noValidate validated={this.state.validated} onSubmit={this.validaVenda}>
                         <Row className="d-flex">
                             <Col md={6} className="">
-                                <div className="grid-1">
+                                <div className="grid-pdv-1">
                                     <div className="mb-3">
                                         <h5>Vendedor</h5>
                                     </div>
@@ -2509,7 +2525,7 @@ class FrenteCaixa extends React.Component {
                                 </div>
                             </Col>
                             <Col md={6}>
-                                <div className="grid-2">
+                                <div className="grid-pdv-2">
                                     <div className="mb-3">
                                         <h5>Cliente</h5>
                                     </div>

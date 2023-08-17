@@ -2,6 +2,32 @@ body {
   padding-top: 70px; /* ajuste o valor de acordo com a altura da sua barra */
 }
 
+.grid-produto {
+  position: sticky;
+  top: 60px;
+  background-color: #dddddd18;
+  border: 1px solid #0e0e0e56;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  max-width: auto;
+  opacity: 0;
+  transform: translateY(50%);
+  animation: bolha 0.9s ease forwards;
+  z-index: 1;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes bolha {
+  0% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
 .button-container-table {
   display: flex;
   justify-content: center;
@@ -13,20 +39,4 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
-
-.grid-1,
-.grid-2 {
-  position: sticky;
-  top: 60px;
-  background-color: #ddd;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
-  padding: 1rem;
-  max-width: auto;
-  opacity: 0;
-  transform: translateY(50%);
-  animation: bolha 0.9s ease forwards;
-  z-index: 1;
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
 }

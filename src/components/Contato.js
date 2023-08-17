@@ -1,4 +1,5 @@
 import React from "react";
+import '../css/Contato.css'
 
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
@@ -9,9 +10,9 @@ import Row from 'react-bootstrap/Row';
 import { Container } from "react-bootstrap";
 import { FaSync } from 'react-icons/fa';
 import Spinner from 'react-bootstrap/Spinner';
-
-import '../css/Contato.css';
 import { parse } from 'js2xmlparser';
+import { BsPersonAdd } from 'react-icons/bs';
+
 
 
 class Contato extends React.Component {
@@ -89,7 +90,6 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     buscarContato = () => {
-
         fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
             .then(resposta => resposta.json())
             .then(dados => {
@@ -105,11 +105,17 @@ class Contato extends React.Component {
     }
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
-    carregarContato = (cnpj) => {
+    atualizaContato = (id) => {
         console.log("--------------------------------")
-        const cnpjSemPontuacao = cnpj.replace(/[^\d]+/g, '')  // Remove "." e "/" do CNPJ.
 
-        fetch("https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/" + cnpjSemPontuacao, { method: 'GET' })
+        // const cnpjSemPontuacao = cnpj.replace(/[^\d]+/g, '')  // Remove "." e "/" do CNPJ.
+
+        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(resposta => resposta.json())
             .then(dados => {
                 console.log("Linha 80", dados)
@@ -185,8 +191,8 @@ class Contato extends React.Component {
         })
     }
 
-    checkCEP = (e) => {
-        const cep = e.target.value.replace(/\D/g, '');
+    checkCEP = (event) => {
+        const cep = event.target.value.replace(/\D/g, '');
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
             .then(res => res.json())
             .then(data => {
@@ -205,139 +211,157 @@ class Contato extends React.Component {
      *  -------------------- SCRIPT´S DE AÇÕES PARA CADA UM DOS CAMPOS DE CADASTRO E ATUALIZAÇÃO. -------------------- 
      */
 
-    atualizaCodigo = (e) => {
+    atualizaCodigo = (event) => {
+        const codigo = event.target.value;
         this.setState({
-            codigo: e.target.value
+            codigo: codigo
         })
     }
 
-    atualizaNome = (e) => {
+    atualizaNome = (event) => {
+        const nome = event.target.value
         this.setState({
-            nome: e.target.value
+            nome: nome
         })
     }
 
-    atualizaFantasia = (e) => {
+    atualizaFantasia = (event) => {
+        const fantasia = event.target.value
         this.setState({
-            fantasia: e.target.value
+            fantasia: fantasia
         })
     }
 
-    atualizaTipoPessoa = (e) => {
+    atualizaTipoPessoa = (event) => {
         console.log("Entrei em atualizarTipoPessoa")
         this.setState({
-            tipo: e.target.value,
-            tipoPessoa: e.target.value
+            tipo: event.target.value,
+            tipoPessoa: event.target.value
         })
     }
 
-    atualizaContribuinte = (e) => {
+    atualizaContribuinte = (event) => {
+        const contribuinte = event.target.value
         this.setState({
-            contribuinte: e.target.value
+            contribuinte: contribuinte
         })
     }
 
-    atualizaCpfCnpj = (e) => {
+    atualizaCpfCnpj = (event) => {
         console.log("Entrei em atualizarCpfCnpj")
         this.setState({
-            cnpj: e.target.value,
-            cpf_cnpj: e.target.value
+            cnpj: event.target.value,
+            cpf_cnpj: event.target.value
         })
     }
 
-    atualizaIe_Rg = (e) => {
+    atualizaIe_Rg = (event) => {
+        const ie_rg = event.target.value
         this.setState({
-            ie_rg: e.target.value
+            ie_rg: ie_rg
         })
     }
 
-    atualizaEndereco = (e) => {
+    atualizaEndereco = (event) => {
         console.log("Entrei em atualizarEndereco")
         this.setState({
-            logradouro: e.target.value,
-            endereco: e.target.value
+            logradouro: event.target.value,
+            endereco: event.target.value
         });
     };
 
-    atualizaNumero = (e) => {
+    atualizaNumero = (event) => {
+        const numero = event.target.value
         this.setState({
-            numero: e.target.value
+            numero: numero
         })
     }
 
-    atualizaComplemento = (e) => {
+    atualizaComplemento = (event) => {
+        const complemento = event.target.value
         this.setState({
-            complemento: e.target.value
+            complemento: complemento
         })
     }
 
-    atualizaBairro = (e) => {
+    atualizaBairro = (event) => {
+        const bairro = event.target.value
         this.setState({
-            bairro: e.target.value
+            bairro: bairro
         })
     }
 
-    atualizaCep = (e) => {
+    atualizaCep = (event) => {
+        const cep = event.target.value;
+        const cepSemPontuacao = cep.replace(/[^\d]/g, "");
+        const cepFormatado = cepSemPontuacao.replace(/(\d{5})(\d{3})/, "$1-$2");
         this.setState({
-            cep: e.target.value
-        })
+            cep: cepFormatado
+        });
     }
 
-    atualizaCidade = (e) => {
+    atualizaCidade = (event) => {
         console.log("Entrei em atualizarCidade")
         this.setState({
-            localidade: e.target.value,
-            cidade: e.target.value
+            localidade: event.target.value,
+            cidade: event.target.value
         })
     }
 
-    atualizaUf = (e) => {
+    atualizaUf = (event) => {
+        const uf = event.target.value
         this.setState({
-            uf: e.target.value
+            uf: uf
         })
     }
 
-    atualizaFone = (e) => {
+    atualizaFone = (event) => {
+        const fone = event.target.value;
+        const foneSemPontuacao = fone.replace(/[^\d]/g, "");
+        const foneFormatado = foneSemPontuacao.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
         this.setState({
-            fone: e.target.value
+            fone: foneFormatado
+        });
+    }
+
+    atualizaCelular = (event) => {
+        const celular = event.target.value;
+        const celularSemPontuacao = celular.replace(/[^\d]/g, "");
+        const celularFormatado = celularSemPontuacao.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        this.setState({
+            celular: celularFormatado
+        });
+    }
+
+    atualizaEmail = (event) => {
+        this.setState({
+            email: event.target.value
         })
     }
 
-    atualizaCelular = (e) => {
+    // atualizaEmailNfe = (event) => {
+    //     console.log(event.target.value); // Verifica se o valor do campo está sendo capturado corretamente
+
+    //     this.setState({
+    //         emailNfe: event.target.value
+    //     })
+    // }
+
+    atualizaInformacaoContato = (event) => {
         this.setState({
-            celular: e.target.value
+            informacaoContato: event.target.value
         })
     }
 
-    atualizaEmail = (e) => {
+    atualizaLimiteCredito = (event) => {
         this.setState({
-            email: e.target.value
+            limiteCredito: event.target.value
         })
     }
 
-    atualizaEmailNfe = (e) => {
-        console.log(e.target.value); // Verifica se o valor do campo está sendo capturado corretamente
-
+    atualizaDescricao = (event) => {
         this.setState({
-            emailNfe: e.target.value
-        })
-    }
-
-    atualizaInformacaoContato = (e) => {
-        this.setState({
-            informacaoContato: e.target.value
-        })
-    }
-
-    atualizaLimiteCredito = (e) => {
-        this.setState({
-            limiteCredito: e.target.value
-        })
-    }
-
-    atualizaDescricao = (e) => {
-        this.setState({
-            descricao: e.target.value
+            descricao: event.target.value
         })
     }
 
@@ -378,7 +402,7 @@ class Contato extends React.Component {
                 fone: this.state.fone,
                 celular: this.state.celular,
                 email: this.state.email,
-                emailNfe: this.state.emailNfe,
+                // emailNfe: this.state.emailNfe,
                 informacaoContato: this.state.informacaoContato,
                 limiteCredito: this.state.limiteCredito,
                 codigo: this.state.codigo,
@@ -407,7 +431,7 @@ class Contato extends React.Component {
                 fone: this.state.fone,
                 celular: this.state.celular,
                 email: this.state.email,
-                emailNfe: this.state.emailNfe,
+                // emailNfe: this.state.emailNfe,
                 informacaoContato: this.state.informacaoContato,
                 limiteCredito: this.state.limiteCredito,
                 codigo: this.state.codigo,
@@ -428,14 +452,15 @@ class Contato extends React.Component {
             this.setState({ validated: true }); // atribui true na validação
         } else {
             event.preventDefault();
-            this.setState({ validated: true }); // atribui true na validação
+            this.setState({ validated: false }); // atribui true na validação
             this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
             this.buscarContato(); // atualiza a lista de produtos após a exclusão
         }
     }
 
     //Ação para limpar o campos do modal para cadastrar um novo cliente.
-    reset = () => {
+    reset = (event) => {
+        event.preventDefault();
         this.setState(
             {
                 id: 0,
@@ -467,26 +492,24 @@ class Contato extends React.Component {
                 tipoContato: '',
                 descricao: ''
             })
+
         this.abrirModal();
     }
 
     //Ação para fechar o modal de cadastro e atualização.
     fecharModal = () => {
-        this.setState(
-            {
-                modalAberta: false
-            }
-        )
+        this.setState({
+            modalAberta: false
+        });
+
         this.buscarContato()
     }
 
     //Ação para abrir o modal de cadastro e atualização.
     abrirModal = () => {
-        this.setState(
-            {
-                modalAberta: true
-            }
-        )
+        this.setState({
+            modalAberta: true
+        });
     }
 
     /**
@@ -506,267 +529,273 @@ class Contato extends React.Component {
             )
         } else {
             return (
-                <div className="background">
-                    <div className="">
-                        <div className="table-tabela">
-                            <Table striped bordered hover className="" responsive="xl">
-                                <thead>
-                                    <tr>
-                                        <th title="Identificador">ID</th>
-                                        <th title="Código">Código</th>
-                                        <th title="Nome">Nome</th>
-                                        <th title="CPF / CNPJ">CPF/CNPJ</th>
-                                        <th title="Cidade">Cidade</th>
-                                        <th title="Telefone">Telefone</th>
-                                        <th title="Opções">Opções</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        this.state.contatos.map((contatos) =>
-                                            <tr key={contatos.contato.id}>
-                                                <td>{contatos.contato.id}</td>
-                                                <td>{contatos.contato.codigo}</td>
-                                                <td>{contatos.contato.nome}</td>
-                                                <td>{contatos.contato.cnpj}</td>
-                                                <td>{contatos.contato.cidade}</td>
-                                                <td>{contatos.contato.fone}</td>
-                                                <td>
-                                                    <Button variant="warning" onClick={() => this.carregarContato(contatos.contato.cnpj)}>
-                                                        <FaSync />
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    }
-                                    {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
-                                </tbody>
-                            </Table>
+                <div className="grid-contato">
+                    <Container fluid>
+                        <div className="d-flex align-items-center mt-3 mb-3">
+                            <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo contato:</span>
+                            <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
+                            <Button variant="success" onClick={this.reset} className="d-flex align-items-center">
+                                <BsPersonAdd style={{ marginRight: '0.8rem' }} />
+                                Incluir Cadastro
+                            </Button>
                         </div>
-                    </div>
-
-                    <Container>
-                        <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
-                            <Modal.Header closeButton>
-                                <Modal.Title>Cadastro/Atualização de Cliente e Fornecedor</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Form noValidate validated={this.state.validated} onSubmit={this.submit}>
-                                    <Row>
-                                        <Col xs={2} md={2}>
-                                            <Form.Group controlId="id" className="mb-3 form-row" as={Col}>
-                                                <Form.Label type="text">ID</Form.Label>
-                                                <Form.Control type="text" value={this.state.id || ''} readOnly disabled />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={2} md={2}>
-                                            <Form.Group controlId="codigo" className="mb-3">
-                                                <Form.Label>Código</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row className="mb-3">
-                                        <Col>
-                                            <Form.Group controlId="nome" className="mb-3">
-                                                <Form.Label>Nome</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o nome" value={this.state.nome || ''} onChange={this.atualizaNome} required />
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col>
-                                            <Form.Group controlId="fantasia" className="mb-3">
-                                                <Form.Label>Fantasia</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira a fantasia" value={this.state.fantasia || ''} onChange={this.atualizaFantasia} />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="tipo" className="mb-3">
-                                                <Form.Label>Tipo Pessoa</Form.Label>
-                                                <Form.Select type="select" placeholder="Selecione o tipo de contato" value={this.state.tipo || ''} onChange={this.atualizaTipoPessoa} required>
-                                                    <option value="">Selecione o tipo de pessoa</option>
-                                                    <option value="J">Pessoa Jurídica</option>
-                                                    <option value="F">Pessoa Física</option>
-                                                    <option value="E">Estrangeiro</option>
-                                                </Form.Select>
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="cnpj" className="mb-3">
-                                                <Form.Label>CPF/CNPJ</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o CPF / CNPJ" value={this.state.cnpj || ''} onChange={this.atualizaCpfCnpj} required />
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="ie_rg" className="mb-3">
-                                                <Form.Label>IE/RG</Form.Label>
-                                                <Form.Control type="text" placeholder="Digite IE / RG" value={this.state.ie_rg || ''} onChange={this.atualizaIe_Rg} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="descricao" className="mb-3">
-                                                <Form.Label>Tipo Contato</Form.Label>
-                                                <Form.Select as="select" placeholder="Selecione o tipo de contato" value={this.state.descricao || ''} onChange={this.atualizaDescricao} >
-                                                    <option value="">Selecione o tipo de contato</option>
-                                                    <option value="Cliente">Cliente</option>
-                                                    <option value="Fornecedor">Fornecedor</option>
-                                                    <option value="Tecnico">Tecnico</option>
-                                                    <option value="Transportador">Transportador</option>
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col xs={4} md={9}>
-                                            <Form.Group controlId="contribuinte" className="mb-3">
-                                                <Form.Label>Contribuinte</Form.Label>
-                                                <Form.Select as="select" placeholder="Selecione o tipo de pessoa" value={this.state.contribuinte || ''} onChange={this.atualizaContribuinte} required>
-                                                    <option value="">Selecione o tipo de pessoa</option>
-                                                    <option value="1">1 - Contribuinte ICMS</option>
-                                                    <option value="2">2 - Contribuinte isento de Inscrição no Cadastro de Contribuintes</option>
-                                                    <option value="9">9 - Não contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes</option>
-                                                </Form.Select>
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="limiteCredito" className="mb-3">
-                                                <Form.Label>Limite Crédito</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o limite de crédito" value={this.state.limiteCredito || ''} onChange={this.atualizaLimiteCredito} />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="cep" className="mb-3">
-                                                <Form.Label>CEP</Form.Label>
-                                                <Form.Control type="text" placeholder="Digite o CEP" value={this.state.cep || ''} onChange={this.atualizaCep} onBlur={this.checkCEP} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={5} md={4}>
-                                            <Form.Group controlId="endereco" className="mb-3">
-                                                <Form.Label>Endereço</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o endereço" value={this.state.endereco || ''} onChange={this.atualizaEndereco} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={2} md={2}>
-                                            <Form.Group controlId="numero" className="mb-3">
-                                                <Form.Label>Número</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o número" value={this.state.numero || ''} onChange={this.atualizaNumero} ref={this.numeroRef} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={4} md={3}>
-                                            <Form.Group controlId="complemento" className="mb-3">
-                                                <Form.Label>Complemento</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o complemento" value={this.state.complemento || ''} onChange={this.atualizaComplemento} />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col xs={6} md={4}>
-                                            <Form.Group controlId="bairro" className="mb-3">
-                                                <Form.Label>Bairro</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o bairro" value={this.state.bairro || ''} onChange={this.atualizaBairro} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6} md={4}>
-                                            <Form.Group controlId="cidade" className="mb-3">
-                                                <Form.Label>Cidade</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira a cidade" value={this.state.cidade || ''} onChange={this.atualizaCidade} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6} md={4}>
-                                            <Form.Group controlId="uf" className="mb-3">
-                                                <Form.Label>UF</Form.Label>
-                                                <Form.Select as="select" placeholder="Selecione o UF" value={this.state.uf || ''} onChange={this.atualizaUf} >
-                                                    <option value="">Selecione UF</option>
-                                                    <option value="AC">Acre</option>
-                                                    <option value="AL">Alagoas</option>
-                                                    <option value="AP">Amapá</option>
-                                                    <option value="AM">Amazonas</option>
-                                                    <option value="BA">Bahia</option>
-                                                    <option value="CE">Ceará</option>
-                                                    <option value="DF">Distrito Federal</option>
-                                                    <option value="ES">Espírito Santo</option>
-                                                    <option value="GO">Goiás</option>
-                                                    <option value="MA">Maranhão</option>
-                                                    <option value="MT">Mato Grosso</option>
-                                                    <option value="MS">Mato Grosso do Sul</option>
-                                                    <option value="MG">Minas Gerais</option>
-                                                    <option value="PA">Pará</option>
-                                                    <option value="PB">Paraíba</option>
-                                                    <option value="PR">Paraná</option>
-                                                    <option value="PE">Pernambuco</option>
-                                                    <option value="PI">Piauí</option>
-                                                    <option value="RJ">Rio de Janeiro</option>
-                                                    <option value="RN">Rio Grande do Norte</option>
-                                                    <option value="RS">Rio Grande do Sul</option>
-                                                    <option value="RO">Rondônia</option>
-                                                    <option value="RR">Roraima</option>
-                                                    <option value="SC">Santa Catarina</option>
-                                                    <option value="SP">São Paulo</option>
-                                                    <option value="SE">Sergipe</option>
-                                                    <option value="TO">Tocantins</option>
-                                                    <option value="EX">Estrangeiro</option>
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col xs={6} md={2}>
-                                            <Form.Group controlId="fone" className="mb-3">
-                                                <Form.Label>Fone</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o numero do telefone" value={this.state.fone || ''} onChange={this.atualizaFone} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6} md={2}>
-                                            <Form.Group controlId="celular" className="mb-3">
-                                                <Form.Label>Celular</Form.Label>
-                                                <Form.Control type="text" placeholder="Insira o numero do celular" value={this.state.celular || ''} onChange={this.atualizaCelular} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6} md={4}>
-                                            <Form.Group controlId="email" className="mb-3">
-                                                <Form.Label>Email</Form.Label>
-                                                <Form.Control type="email" placeholder="Insira o e-mail" value={this.state.email || ''} onChange={this.atualizaEmail} />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col xs={6} md={4}>
-                                            <Form.Group controlId="emailNfe" className="mb-3">
-                                                <Form.Label>Email NFE</Form.Label>
-                                                <Form.Control type="email" placeholder="Insira o e-mail NFE" value={this.state.emailNfe || ''} onChange={this.atualizaEmailNfe} required />
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Form.Group controlId="informacaoContato" className="mb-3">
-                                        <Form.Label>Informação Contato</Form.Label>
-                                        <Form.Control as="textarea" rows={3} placeholder="Insira a informação do contato" value={this.state.informacaoContato || ''} onChange={this.atualizaInformacaoContato} />
-                                    </Form.Group>
-                                    <Container>
-                                        <Row className="text-center">
-                                            <Col>
-                                                <Form.Group controlId="buttonSalvar" className="mb-3">
-                                                    <div className="button-container d-flex justify-content-center">
-                                                        <Button bsPrefix="btn-salvar-button" variant="primary" type="submit">
-                                                            Salvar
-                                                        </Button>
-                                                        <Button bsPrefix="btn-cancelar-button" variant="warning" onClick={this.fecharModal}>
-                                                            Cancelar
-                                                        </Button>
-                                                    </div>
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </Container>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
                     </Container>
+
+
+                    <Container fluid className="pb-5">
+                        <Table striped bordered hover responsive="xl" >
+                            <thead>
+                                <tr>
+                                    <th title="Identificador">ID</th>
+                                    <th title="Código">Código</th>
+                                    <th title="Nome">Nome</th>
+                                    <th title="CPF / CNPJ">CPF/CNPJ</th>
+                                    <th title="Cidade">Cidade</th>
+                                    <th title="Telefone">Telefone</th>
+                                    <th title="Opções">Opções</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    this.state.contatos.map((contatos) =>
+                                        <tr key={contatos.contato.id}>
+                                            <td>{contatos.contato.id}</td>
+                                            <td>{contatos.contato.codigo}</td>
+                                            <td>{contatos.contato.nome}</td>
+                                            <td>{contatos.contato.cnpj}</td>
+                                            <td>{contatos.contato.cidade}</td>
+                                            <td>{contatos.contato.fone}</td>
+                                            <td>
+                                                <Button variant="warning" onClick={() => this.atualizaContato(contatos.contato.id)}>
+                                                    <FaSync />
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    )
+                                }
+                                {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
+                            </tbody>
+                        </Table>
+                    </Container>
+
+                    <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
+                        <Modal.Header closeButton>
+                            <Modal.Title>Cadastro/Atualização de Cliente e Fornecedor</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form noValidate validated={this.state.validated} onSubmit={this.submit}>
+                                <Row>
+                                    <Col xs={2} md={2}>
+                                        <Form.Group controlId="id" className="mb-3 form-row" as={Col}>
+                                            <Form.Label type="text">ID</Form.Label>
+                                            <Form.Control type="text" value={this.state.id || ''} readOnly disabled />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={2} md={2}>
+                                        <Form.Group controlId="codigo" className="mb-3">
+                                            <Form.Label>Código</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-3">
+                                    <Col>
+                                        <Form.Group controlId="nome" className="mb-3">
+                                            <Form.Label>Nome</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o nome" value={this.state.nome || ''} onChange={this.atualizaNome} required />
+                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col>
+                                        <Form.Group controlId="fantasia" className="mb-3">
+                                            <Form.Label>Fantasia</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira a fantasia" value={this.state.fantasia || ''} onChange={this.atualizaFantasia} />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="tipo" className="mb-3">
+                                            <Form.Label>Tipo Pessoa</Form.Label>
+                                            <Form.Select type="select" placeholder="Selecione o tipo de contato" value={this.state.tipo || ''} onChange={this.atualizaTipoPessoa} required>
+                                                <option value="">Selecione o tipo de pessoa</option>
+                                                <option value="J">Pessoa Jurídica</option>
+                                                <option value="F">Pessoa Física</option>
+                                                <option value="E">Estrangeiro</option>
+                                            </Form.Select>
+                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="cnpj" className="mb-3">
+                                            <Form.Label>CPF/CNPJ</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o CPF / CNPJ" value={this.state.cnpj || ''} onChange={this.atualizaCpfCnpj} required />
+                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="ie_rg" className="mb-3">
+                                            <Form.Label>IE/RG</Form.Label>
+                                            <Form.Control type="text" placeholder="Digite IE / RG" value={this.state.ie_rg || ''} onChange={this.atualizaIe_Rg} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="descricao" className="mb-3">
+                                            <Form.Label>Tipo Contato</Form.Label>
+                                            <Form.Select as="select" placeholder="Selecione o tipo de contato" value={this.state.descricao || ''} onChange={this.atualizaDescricao} >
+                                                <option value="">Selecione o tipo de contato</option>
+                                                <option value="Cliente">Cliente</option>
+                                                <option value="Fornecedor">Fornecedor</option>
+                                                <option value="Tecnico">Tecnico</option>
+                                                <option value="Transportador">Transportador</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={4} md={9}>
+                                        <Form.Group controlId="contribuinte" className="mb-3">
+                                            <Form.Label>Contribuinte</Form.Label>
+                                            <Form.Select as="select" placeholder="Selecione o tipo de pessoa" value={this.state.contribuinte || ''} onChange={this.atualizaContribuinte} required>
+                                                <option value="">Selecione o tipo de pessoa</option>
+                                                <option value="1">1 - Contribuinte ICMS</option>
+                                                <option value="2">2 - Contribuinte isento de Inscrição no Cadastro de Contribuintes</option>
+                                                <option value="9">9 - Não contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes</option>
+                                            </Form.Select>
+                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="limiteCredito" className="mb-3">
+                                            <Form.Label>Limite Crédito</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o limite de crédito" value={this.state.limiteCredito || ''} onChange={this.atualizaLimiteCredito} />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="cep" className="mb-3">
+                                            <Form.Label>CEP</Form.Label>
+                                            <Form.Control type="text" placeholder="Digite o CEP" value={this.state.cep || ''} onChange={this.atualizaCep} onBlur={this.checkCEP} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={5} md={4}>
+                                        <Form.Group controlId="endereco" className="mb-3">
+                                            <Form.Label>Endereço</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o endereço" value={this.state.endereco || ''} onChange={this.atualizaEndereco} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={2} md={2}>
+                                        <Form.Group controlId="numero" className="mb-3">
+                                            <Form.Label>Número</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o número" value={this.state.numero || ''} onChange={this.atualizaNumero} ref={this.numeroRef} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4} md={3}>
+                                        <Form.Group controlId="complemento" className="mb-3">
+                                            <Form.Label>Complemento</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o complemento" value={this.state.complemento || ''} onChange={this.atualizaComplemento} />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={6} md={4}>
+                                        <Form.Group controlId="bairro" className="mb-3">
+                                            <Form.Label>Bairro</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o bairro" value={this.state.bairro || ''} onChange={this.atualizaBairro} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <Form.Group controlId="cidade" className="mb-3">
+                                            <Form.Label>Cidade</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira a cidade" value={this.state.cidade || ''} onChange={this.atualizaCidade} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <Form.Group controlId="uf" className="mb-3">
+                                            <Form.Label>UF</Form.Label>
+                                            <Form.Select as="select" placeholder="Selecione o UF" value={this.state.uf || ''} onChange={this.atualizaUf} >
+                                                <option value="">Selecione UF</option>
+                                                <option value="AC">Acre</option>
+                                                <option value="AL">Alagoas</option>
+                                                <option value="AP">Amapá</option>
+                                                <option value="AM">Amazonas</option>
+                                                <option value="BA">Bahia</option>
+                                                <option value="CE">Ceará</option>
+                                                <option value="DF">Distrito Federal</option>
+                                                <option value="ES">Espírito Santo</option>
+                                                <option value="GO">Goiás</option>
+                                                <option value="MA">Maranhão</option>
+                                                <option value="MT">Mato Grosso</option>
+                                                <option value="MS">Mato Grosso do Sul</option>
+                                                <option value="MG">Minas Gerais</option>
+                                                <option value="PA">Pará</option>
+                                                <option value="PB">Paraíba</option>
+                                                <option value="PR">Paraná</option>
+                                                <option value="PE">Pernambuco</option>
+                                                <option value="PI">Piauí</option>
+                                                <option value="RJ">Rio de Janeiro</option>
+                                                <option value="RN">Rio Grande do Norte</option>
+                                                <option value="RS">Rio Grande do Sul</option>
+                                                <option value="RO">Rondônia</option>
+                                                <option value="RR">Roraima</option>
+                                                <option value="SC">Santa Catarina</option>
+                                                <option value="SP">São Paulo</option>
+                                                <option value="SE">Sergipe</option>
+                                                <option value="TO">Tocantins</option>
+                                                <option value="EX">Estrangeiro</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={12} md={4}>
+                                        <Form.Group controlId="fone" className="mb-3">
+                                            <Form.Label>Fone</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o numero do telefone" value={this.state.fone || ''} onChange={this.atualizaFone} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={12} md={4}>
+                                        <Form.Group controlId="celular" className="mb-3">
+                                            <Form.Label>Celular</Form.Label>
+                                            <Form.Control type="text" placeholder="Insira o numero do celular" value={this.state.celular || ''} onChange={this.atualizaCelular} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={12} md={4}>
+                                        <Form.Group controlId="email" className="mb-3">
+                                            <Form.Label>Email</Form.Label>
+                                            <Form.Control type="email" placeholder="Insira o e-mail" value={this.state.email || ''} onChange={this.atualizaEmail} />
+                                        </Form.Group>
+                                    </Col>
+                                    {/* <Col xs={12} md={4}>
+                                        <Form.Group controlId="emailNfe" className="mb-3">
+                                            <Form.Label>Email NFE</Form.Label>
+                                            <Form.Control type="email" placeholder="Insira o e-mail NFE" value={this.state.emailNfe || ''} onChange={this.atualizaEmailNfe} required />
+                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col> */}
+                                </Row>
+                                <Form.Group controlId="informacaoContato" className="mb-3">
+                                    <Form.Label>Informação Contato</Form.Label>
+                                    <Form.Control as="textarea" rows={3} placeholder="Insira a informação do contato" value={this.state.informacaoContato || ''} onChange={this.atualizaInformacaoContato} />
+                                </Form.Group>
+                                <Row className="text-center">
+                                    <Col>
+                                        <Form.Group controlId="buttonSalvar" className="mb-3">
+                                            <div className="button-container d-flex justify-content-center">
+                                                <Button bsPrefix="btn-salvar-button" variant="primary" type="submit">
+                                                    Salvar
+                                                </Button>
+                                                <Button bsPrefix="btn-cancelar-button" variant="warning" onClick={this.fecharModal}>
+                                                    Cancelar
+                                                </Button>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </Form>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             )
         }
