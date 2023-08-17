@@ -520,10 +520,10 @@ class Contato extends React.Component {
             return (
                 <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
-                        <Spinner variant="warning" animation="grow" role="status" style={{ border: '1px solid black' }} />
+                        <div class="custom-loader"></div>
                     </div>
                     <div >
-                        <div style={{ fontWeight: 'bold', color: 'white' }}>Carregando contatos...</div>
+                        <div className="text-loading text-white">Carregando contatos...</div>
                     </div>
                 </div>
             )
@@ -534,10 +534,10 @@ class Contato extends React.Component {
                         <div className="d-flex align-items-center mt-3 mb-3">
                             <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo contato:</span>
                             <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-                            <Button variant="success" onClick={this.reset} className="d-flex align-items-center">
-                                <BsPersonAdd style={{ marginRight: '0.8rem' }} />
+                            <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-contato">
+                                <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                 Incluir Cadastro
-                            </Button>
+                            </button>
                         </div>
                     </Container>
 
@@ -783,12 +783,12 @@ class Contato extends React.Component {
                                     <Col>
                                         <Form.Group controlId="buttonSalvar" className="mb-3">
                                             <div className="button-container d-flex justify-content-center">
-                                                <Button bsPrefix="btn-salvar-button" variant="primary" type="submit">
+                                                <button type="submit" className="botao-cadastro-contato">
                                                     Salvar
-                                                </Button>
-                                                <Button bsPrefix="btn-cancelar-button" variant="warning" onClick={this.fecharModal}>
+                                                </button>
+                                                <button onClick={this.fecharModal} className="botao-cancelar-contato">
                                                     Cancelar
-                                                </Button>
+                                                </button>
                                             </div>
                                         </Form.Group>
                                     </Col>
