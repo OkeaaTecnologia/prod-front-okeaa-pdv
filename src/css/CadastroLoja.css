@@ -16,3 +16,40 @@
   z-index: 1;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
 }
+
+.botao-cadastro-loja {
+  color: #ffffff !important;
+  font-size: 16px;
+  text-shadow: 0px 0px 0px #fda21e;
+  box-shadow: 0px 0px 0px #fda21e;
+  padding: 8px 40px;
+  border-radius: 40px;
+  border: 0px solid #fda21e;
+  background: #fda21e;
+}
+.botao-cadastro-loja:hover {
+  color: #ffffff !important;
+  background: #c98300;
+}
+
+.botao-cancelar-loja {
+  color: #ffffff !important;
+  font-size: 16px;
+  text-shadow: 0px 0px 0px #6d6d6d;
+  box-shadow: 0px 0px 0px #6d6d6d;
+  padding: 8px 40px;
+  border-radius: 40px;
+  border: 0px solid #6d6d6d;
+  background: #6d6d6d;
+}
+
+.botao-cancelar-loja:hover {
+  color: #ffffff !important;
+  background: #949494;
+}
+
+.modal-loja-header,
+.modal-loja-body,
+.modal-loja-footer {
+  background-color: rgba(114, 114, 114, 0.048);
+}

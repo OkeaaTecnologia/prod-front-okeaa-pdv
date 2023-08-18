@@ -199,10 +199,11 @@ class CadastroLoja extends React.Component {
           <div className="d-flex align-items-center mt-3 mb-3">
             <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar uma nova loja:</span>
             <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-            <Button variant="success" onClick={this.handleCadastrarClick} className="d-flex align-items-center">
+            <button onClick={this.handleCadastrarClick} className="d-flex align-items-center botao-cadastro-loja">
               <BsPersonAdd style={{ marginRight: '0.8rem' }} />
               Incluir Cadastro
-            </Button>
+            </button>
+            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '2.5rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>Cadastro de loja</span>
           </div>
         </Container>
 
@@ -242,10 +243,10 @@ class CadastroLoja extends React.Component {
 
         {/* Modal */}
         <Modal show={modalEditarLoja} onHide={this.fecharModalEditarLoja} size="lg" centered>
-          <Modal.Header closeButton>
+          <Modal.Header closeButton className="modal-loja-header">
             <Modal.Title>{selecionaLoja ? 'Editar Loja' : 'Adicionar Nova Loja'}</Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{ padding: '20px' }}>
+          <Modal.Body className="modal-loja-body">
             {selecionaLoja && (
               <div>
                 <Row>
@@ -292,9 +293,9 @@ class CadastroLoja extends React.Component {
               </div>
             )}
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="outline-secondary" className="mr-2" onClick={this.fecharModalEditarLoja}>Cancelar</Button>
-            <Button variant="secondary" className="mr-2" onClick={() => this.salvarLoja()}>Salvar</Button>
+          <Modal.Footer className="modal-loja-footer">
+            <button className="botao-cancelar-loja" onClick={this.fecharModalEditarLoja}>Cancelar</button>
+            <button className="botao-cadastro-loja" onClick={() => this.salvarLoja()}>Salvar</button>
           </Modal.Footer>
         </Modal>
       </div>

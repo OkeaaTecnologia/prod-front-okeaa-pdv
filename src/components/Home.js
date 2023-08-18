@@ -56,7 +56,7 @@ function Home() {
                     </Card.Text>
 
                 </Card.Body>
-                <Button variant="secondary" onClick={() => handleRedirect('/CadastroLoja')}>Acessar</Button>
+                <Button variant="secondary" onClick={() => handleRedirect('/Loja')}>Acessar</Button>
             </Card>
         </div>
     );

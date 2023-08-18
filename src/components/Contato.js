@@ -538,6 +538,7 @@ class Contato extends React.Component {
                                 <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                 Incluir Cadastro
                             </button>
+                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '2.5rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>Cadastro de contato e fornecedor</span>
                         </div>
                     </Container>
 
@@ -579,10 +580,10 @@ class Contato extends React.Component {
                     </Container>
 
                     <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
-                        <Modal.Header closeButton>
+                        <Modal.Header closeButton className="modal-contato-header">
                             <Modal.Title>Cadastro/Atualização de Cliente e Fornecedor</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body>
+                        <Modal.Body className="modal-contato-body">
                             <Form noValidate validated={this.state.validated} onSubmit={this.submit}>
                                 <Row>
                                     <Col xs={2} md={2}>

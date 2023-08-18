@@ -144,3 +144,8 @@
   color: #ffffff !important;
   background: #949494;
 }
+
+.modal-contato-header,
+.modal-contato-body {
+  background-color: rgba(114, 114, 114, 0.048);
+}
