@@ -1,18 +1,18 @@
 import React from "react";
 import '../css/Contato.css'
 
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import Table from 'react-bootstrap/Table';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import { Form } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import { Table } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import { Container } from "react-bootstrap";
-import { FaSync } from 'react-icons/fa';
-import Spinner from 'react-bootstrap/Spinner';
-import { parse } from 'js2xmlparser';
-import { BsPersonAdd } from 'react-icons/bs';
 
+import { BsPersonAdd } from 'react-icons/bs';
+import { BsShieldFillExclamation } from 'react-icons/bs';
+import { FaSync } from 'react-icons/fa';
+import { parse } from 'js2xmlparser';
 
 
 class Contato extends React.Component {
@@ -55,7 +55,8 @@ class Contato extends React.Component {
             localidade: '',
             carregando: true,
             modalAberta: false,
-            validated: false
+            validated: false,
+            cpfValido: '',
         }
 
         this.numeroRef = React.createRef();
@@ -90,7 +91,12 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     buscarContato = () => {
-        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
+        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(resposta => resposta.json())
             .then(dados => {
                 if (dados.retorno.contatos) {
@@ -106,10 +112,6 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     atualizaContato = (id) => {
-        console.log("--------------------------------")
-
-        // const cnpjSemPontuacao = cnpj.replace(/[^\d]+/g, '')  // Remove "." e "/" do CNPJ.
-
         fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/${id}`, {
             method: 'GET',
             headers: {
@@ -120,41 +122,49 @@ class Contato extends React.Component {
             .then(dados => {
                 console.log("Linha 80", dados)
                 if (dados.retorno.contatos) {
+
+                    const contato = dados.retorno.contatos[0].contato;
+                    const tiposContato = contato.tiposContato.map(item => ({
+                        tipoContato: item.tipoContato,
+                        descricao: item.tipoContato.descricao
+                    }));
+
+                    console.log(tiposContato); // Adicione o console.log aqui
+
                     this.setState({
-                        id: dados.retorno.contatos[0].contato.id,
-                        codigo: dados.retorno.contatos[0].contato.codigo,
-                        nome: dados.retorno.contatos[0].contato.nome,
-                        fantasia: dados.retorno.contatos[0].contato.fantasia,
-                        tipo: dados.retorno.contatos[0].contato.tipo,
-                        cnpj: dados.retorno.contatos[0].contato.cnpj,
-                        ie_rg: dados.retorno.contatos[0].contato.ie_rg,
-                        endereco: dados.retorno.contatos[0].contato.endereco,
-                        numero: dados.retorno.contatos[0].contato.numero,
-                        bairro: dados.retorno.contatos[0].contato.bairro,
-                        cep: dados.retorno.contatos[0].contato.cep,
-                        cidade: dados.retorno.contatos[0].contato.cidade,
-                        complemento: dados.retorno.contatos[0].contato.complemento,
-                        uf: dados.retorno.contatos[0].contato.uf,
-                        fone: dados.retorno.contatos[0].contato.fone,
-                        email: dados.retorno.contatos[0].contato.email,
-                        situacao: dados.retorno.contatos[0].contato.situacao,
-                        contribuinte: dados.retorno.contatos[0].contato.contribuinte,
-                        site: dados.retorno.contatos[0].contato.site,
-                        celular: dados.retorno.contatos[0].contato.celular,
-                        dataAlteracao: dados.retorno.contatos[0].contato.dataAlteracao,
-                        dataInclusao: dados.retorno.contatos[0].contato.dataInclusao,
-                        sexo: dados.retorno.contatos[0].contato.sexo,
-                        clienteDesde: dados.retorno.contatos[0].contato.clienteDesde,
-                        limiteCredito: dados.retorno.contatos[0].contato.limiteCredito,
-                        dataNascimento: dados.retorno.contatos[0].contato.dataNascimento,
-                        tiposContato: [],
-                        tipoContato: dados.retorno.contatos[0].contato.tipoContato,
-                        descricao: dados.retorno.contatos[0].contato.descricao
+                        id: contato.id,
+                        codigo: contato.codigo,
+                        nome: contato.nome,
+                        fantasia: contato.fantasia,
+                        tipo: contato.tipo,
+                        cnpj: contato.cnpj,
+                        ie_rg: contato.ie_rg,
+                        endereco: contato.endereco,
+                        numero: contato.numero,
+                        bairro: contato.bairro,
+                        cep: contato.cep,
+                        cidade: contato.cidade,
+                        complemento: contato.complemento,
+                        uf: contato.uf,
+                        fone: contato.fone,
+                        email: contato.email,
+                        situacao: contato.situacao,
+                        contribuinte: contato.contribuinte,
+                        site: contato.site,
+                        celular: contato.celular,
+                        dataAlteracao: contato.dataAlteracao,
+                        dataInclusao: contato.dataInclusao,
+                        sexo: contato.sexo,
+                        clienteDesde: contato.clienteDesde,
+                        limiteCredito: contato.limiteCredito,
+                        dataNascimento: contato.dataNascimento,
+                        tiposContato: tiposContato,
                     })
                 } else {
                     this.setState({ contatos: [] })
                 }
                 this.setState({ carregando: false });
+
                 this.abrirModal();
             })
             .catch(error => console.error(error));
@@ -233,10 +243,10 @@ class Contato extends React.Component {
     }
 
     atualizaTipoPessoa = (event) => {
-        console.log("Entrei em atualizarTipoPessoa")
+        const tipo = event.target.value
         this.setState({
-            tipo: event.target.value,
-            tipoPessoa: event.target.value
+            tipo: tipo,
+            tipoPessoa: tipo
         })
     }
 
@@ -248,25 +258,182 @@ class Contato extends React.Component {
     }
 
     atualizaCpfCnpj = (event) => {
-        console.log("Entrei em atualizarCpfCnpj")
-        this.setState({
-            cnpj: event.target.value,
-            cpf_cnpj: event.target.value
-        })
+        const cnpj = event.target.value;
+        const cpfCnpjSemPontuacao = cnpj.replace(/[^\d]/g, "");
+
+        // Verifica se é um CPF válido
+        if (cpfCnpjSemPontuacao.length === 11) {
+            if (!this.validarCPF(cpfCnpjSemPontuacao)) {
+                this.setState({
+                    cnpj: cnpj,
+                    cpfValido: false, // Define a flag de CPF válido como false
+                    cnpjValido: false // Define a flag de CNPJ válido como false
+                });
+                return; // Retorna antecipadamente para evitar ações adicionais
+            }
+
+            const cpfFormatado = cpfCnpjSemPontuacao.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            this.setState({
+                cnpj: cpfFormatado,
+                cpfValido: true, // Define a flag de CPF válido como true
+                cnpjValido: false // Define a flag de CNPJ válido como false
+            });
+        }
+        // Verifica se é um CNPJ válido
+        else if (cpfCnpjSemPontuacao.length === 14) {
+            if (!this.validarCNPJ(cpfCnpjSemPontuacao)) {
+                this.setState({
+                    cnpj: cnpj,
+                    cpfValido: false, // Define a flag de CPF válido como false
+                    cnpjValido: false // Define a flag de CNPJ válido como false
+                });
+                return; // Retorna antecipadamente para evitar ações adicionais
+            }
+
+            const cnpjFormatado = cpfCnpjSemPontuacao.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+            this.setState({
+                cnpj: cnpjFormatado,
+                cpfValido: false, // Define a flag de CPF válido como false
+                cnpjValido: true // Define a flag de CNPJ válido como true
+            });
+        }
+        // Caso contrário, mantém o valor original e define as flags de validação como false
+        else {
+            this.setState({
+                cnpj: cnpj,
+                cpfValido: false,
+                cnpjValido: false
+            });
+        }
+    };
+
+    validarCPF(cpf) {
+        cpf = cpf.replace(/[^\d]/g, ""); // Remove caracteres não numéricos
+
+        if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+            return false; // CPF inválido se não tiver 11 dígitos ou se todos os dígitos forem iguais
+        }
+
+        let soma = 0;
+        let resto;
+
+        for (let i = 1; i <= 9; i++) {
+            soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        }
+
+        resto = (soma * 10) % 11;
+
+        if (resto === 10 || resto === 11) {
+            resto = 0;
+        }
+
+        if (resto !== parseInt(cpf.substring(9, 10))) {
+            return false; // CPF inválido se o dígito verificador não bater
+        }
+
+        soma = 0;
+
+        for (let i = 1; i <= 10; i++) {
+            soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        }
+
+        resto = (soma * 10) % 11;
+
+        if (resto === 10 || resto === 11) {
+            resto = 0;
+        }
+
+        if (resto !== parseInt(cpf.substring(10, 11))) {
+            return false; // CPF inválido se o dígito verificador não bater
+        }
+
+        return true; // CPF válido
+    }
+
+    validarCNPJ(cnpj) {
+
+        if (!cnpj) {
+            return true; // Retorna true se o CPF estiver vazio
+        }
+
+        cnpj = cnpj.replace(/[^\d]/g, ""); // Remove caracteres não numéricos
+
+        if (cnpj.length !== 14) {
+            return false; // CNPJ inválido se não tiver 14 dígitos
+        }
+
+        let tamanho = cnpj.length - 2;
+        let numeros = cnpj.substring(0, tamanho);
+        const digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let pos = tamanho - 7;
+
+        for (let i = tamanho; i >= 1; i--) {
+            soma += parseInt(numeros.charAt(tamanho - i), 10) * pos--;
+            if (pos < 2) {
+                pos = 9;
+            }
+        }
+
+        let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+        if (resultado !== parseInt(digitos.charAt(0), 10)) {
+            return false; // CNPJ inválido se o primeiro dígito verificador não bater
+        }
+
+        tamanho += 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+
+        for (let i = tamanho; i >= 1; i--) {
+            soma += parseInt(numeros.charAt(tamanho - i), 10) * pos--;
+            if (pos < 2) {
+                pos = 9;
+            }
+        }
+
+        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+        if (resultado !== parseInt(digitos.charAt(1), 10)) {
+            return false; // CNPJ inválido se o segundo dígito verificador não bater
+        }
+
+        return true; // CNPJ válido
     }
 
     atualizaIe_Rg = (event) => {
-        const ie_rg = event.target.value
+        const ie_rg = event.target.value;
+        const formattedValue = this.formatIeRg(ie_rg, this.state.tipo);
         this.setState({
-            ie_rg: ie_rg
-        })
+            ie_rg: formattedValue
+        });
+    }
+
+    formatIeRg = (value, tipo) => {
+        // console.log("tipo: ", tipo)
+        if (tipo === 'J') {
+            // Formatação para Inscrição Estadual
+            const match = value.match(/^(\d{2})(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                return `${match[1]}.${match[2]}.${match[3]}.${match[4]}`;
+            }
+        } else if (value.length === 9) {
+            // Formatação para RG
+            const match = value.match(/^(\d{2})(\d{3})(\d{3})(\d{1})$/);
+            if (match) {
+                return `${match[1]}.${match[2]}.${match[3]}-${match[4]}`;
+            }
+        }
+
+        return value;
     }
 
     atualizaEndereco = (event) => {
-        console.log("Entrei em atualizarEndereco")
+        const endereco = event.target.value
         this.setState({
-            logradouro: event.target.value,
-            endereco: event.target.value
+            logradouro: endereco,
+            endereco: endereco
         });
     };
 
@@ -301,10 +468,10 @@ class Contato extends React.Component {
     }
 
     atualizaCidade = (event) => {
-        console.log("Entrei em atualizarCidade")
+        const cidade = event.target.value
         this.setState({
-            localidade: event.target.value,
-            cidade: event.target.value
+            localidade: cidade,
+            cidade: cidade
         })
     }
 
@@ -334,8 +501,9 @@ class Contato extends React.Component {
     }
 
     atualizaEmail = (event) => {
+        const email = event.target.value
         this.setState({
-            email: event.target.value
+            email: email
         })
     }
 
@@ -348,20 +516,23 @@ class Contato extends React.Component {
     // }
 
     atualizaInformacaoContato = (event) => {
+        const informacaoContato = event.target.value
         this.setState({
-            informacaoContato: event.target.value
+            informacaoContato: informacaoContato
         })
     }
 
     atualizaLimiteCredito = (event) => {
+        const limiteCredito = event.target.value
         this.setState({
-            limiteCredito: event.target.value
+            limiteCredito: limiteCredito
         })
     }
 
     atualizaDescricao = (event) => {
+        const descricao = event.target.value
         this.setState({
-            descricao: event.target.value
+            descricao: descricao
         })
     }
 
@@ -372,25 +543,14 @@ class Contato extends React.Component {
     //Ações do botão SUBMIT (Cadastrar).
     submit = (event) => {
         event.preventDefault();
-        console.log("logradouro: ", this.state.logradouro);
-        console.log("endereco: ", this.state.endereco);
-        console.log("-----------------------------------");
-        console.log("localidade: ", this.state.localidade);
-        console.log("cidade: ", this.state.cidade);
-        console.log("-----------------------------------");
-        console.log("tipo: ", this.state.tipo);
-        console.log("tipoPessoa: ", this.state.tipoPessoa);
-        console.log("-----------------------------------");
-        console.log("cnpj: ", this.state.cnpj);
-        console.log("cpf_cnpj: ", this.state.cpf_cnpj);
+        if (this.state.id === 0) {  // ------------------------------------ Ação de Cadastrar um contato novo.
 
-        if (this.state.id === 0) {
             const contato = {
                 nome: this.state.nome,
                 fantasia: this.state.fantasia,
                 tipoPessoa: this.state.tipoPessoa,
                 contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cpf_cnpj,
+                cpf_cnpj: this.state.cnpj,
                 ie_rg: this.state.ie_rg,
                 endereco: this.state.endereco,
                 numero: this.state.numero,
@@ -411,15 +571,16 @@ class Contato extends React.Component {
                 descricao: this.state.descricao,
             }
             const xmlContato = parse('contato', contato);
+            console.log(xmlContato)
             this.cadastraContato(xmlContato);
-        } else {
+        } else {                    // ------------------------------------ Ação de atualizar um contato existente.
             const contato = {
                 id: this.state.id,
                 nome: this.state.nome,
                 fantasia: this.state.fantasia,
                 tipoPessoa: this.state.tipoPessoa,
                 contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cpf_cnpj,
+                cpf_cnpj: this.state.cnpj,
                 ie_rg: this.state.ie_rg,
                 endereco: this.state.endereco,
                 numero: this.state.numero,
@@ -440,6 +601,7 @@ class Contato extends React.Component {
                 descricao: this.state.descricao,
             }
             const xmlContato = parse('contato', contato);
+            console.log(xmlContato)
             this.atualizarContato(xmlContato);
         }
 
@@ -451,14 +613,19 @@ class Contato extends React.Component {
             event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
             this.setState({ validated: true }); // atribui true na validação
         } else {
-            event.preventDefault();
-            this.setState({ validated: false }); // atribui true na validação
-            this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
-            this.buscarContato(); // atualiza a lista de produtos após a exclusão
+            // Verifica se o CPF é válido
+            if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
+                event.preventDefault();
+                this.setState({ validated: false }); // atribui true na validação
+                this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
+                this.buscarContato(); // atualiza a lista de produtos após a exclusão
+            } else {
+                this.ModalCpfValido();
+            }
         }
     }
 
-    //Ação para limpar o campos do modal para cadastrar um novo cliente.
+    //Ação para limpar os campos do modal após cadastrar um novo cliente.
     reset = (event) => {
         event.preventDefault();
         this.setState(
@@ -490,7 +657,9 @@ class Contato extends React.Component {
                 limiteCredito: '',
                 dataNascimento: '',
                 tipoContato: '',
-                descricao: ''
+                descricao: '',
+                ModalCpfValido: false,
+
             })
 
         this.abrirModal();
@@ -512,6 +681,13 @@ class Contato extends React.Component {
         });
     }
 
+    ModalCpfValido = () => {
+        this.setState((prevState) => ({
+            ModalCpfValido: !prevState.ModalCpfValido,
+        }));
+    };
+
+
     /**
      *  -------------------- TABELA DE CLIENTES. -------------------- 
      */
@@ -520,7 +696,7 @@ class Contato extends React.Component {
             return (
                 <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
-                        <div class="custom-loader"></div>
+                        <div className="custom-loader"></div>
                     </div>
                     <div >
                         <div className="text-loading text-white">Carregando contatos...</div>
@@ -538,7 +714,9 @@ class Contato extends React.Component {
                                 <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                 Incluir Cadastro
                             </button>
-                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '2.5rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>Cadastro de contato e fornecedor</span>
+                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>
+                                CONTATO E FORNECEDOR
+                            </span>
                         </div>
                     </Container>
 
@@ -629,18 +807,29 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={4} md={3}>
                                         <Form.Group controlId="cnpj" className="mb-3">
-                                            <Form.Label>CPF/CNPJ</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o CPF / CNPJ" value={this.state.cnpj || ''} onChange={this.atualizaCpfCnpj} required />
+                                            <Form.Label>
+                                                {this.state.tipo === 'J' ? 'CNPJ' : 'CPF'}
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                className={`form-control ${!this.state.cpfValido && this.state.cnpj.length === 11 && !this.state.cnpjValido ? 'is-invalid' : ''}`}
+                                                placeholder="Insira o CPF / CNPJ"
+                                                value={this.state.cnpj || ''}
+                                                onChange={this.atualizaCpfCnpj}
+                                                onBlur={this.validarCpf}
+                                                required />
                                             <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                         </Form.Group>
                                     </Col>
                                     <Col xs={4} md={3}>
                                         <Form.Group controlId="ie_rg" className="mb-3">
-                                            <Form.Label>IE/RG</Form.Label>
+                                            <Form.Label>
+                                                {this.state.tipo === 'J' ? 'Inscrição Estadual' : 'RG'}
+                                            </Form.Label>
                                             <Form.Control type="text" placeholder="Digite IE / RG" value={this.state.ie_rg || ''} onChange={this.atualizaIe_Rg} />
                                         </Form.Group>
                                     </Col>
-                                    <Col xs={4} md={3}>
+                                    {/* <Col xs={4} md={3}>
                                         <Form.Group controlId="descricao" className="mb-3">
                                             <Form.Label>Tipo Contato</Form.Label>
                                             <Form.Select as="select" placeholder="Selecione o tipo de contato" value={this.state.descricao || ''} onChange={this.atualizaDescricao} >
@@ -651,7 +840,7 @@ class Contato extends React.Component {
                                                 <option value="Transportador">Transportador</option>
                                             </Form.Select>
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                                 <Row>
                                     <Col xs={4} md={9}>
@@ -787,7 +976,7 @@ class Contato extends React.Component {
                                                 <button type="submit" className="botao-cadastro-contato">
                                                     Salvar
                                                 </button>
-                                                <button onClick={this.fecharModal} className="botao-cancelar-contato">
+                                                <button type="button" onClick={this.fecharModal} className="botao-cancelar-contato">
                                                     Cancelar
                                                 </button>
                                             </div>
@@ -796,6 +985,19 @@ class Contato extends React.Component {
                                 </Row>
                             </Form>
                         </Modal.Body>
+                    </Modal>
+
+                    <Modal show={this.state.ModalCpfValido} onHide={this.ModalCpfValido} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            CPF | CNPJ inválido. Corrija o campo antes de finalizar o cadastro.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button className="botao-finalizarvenda" variant="secondary" onClick={this.ModalCpfValido}>Fechar</Button>
+                        </Modal.Footer>
                     </Modal>
                 </div>
             )

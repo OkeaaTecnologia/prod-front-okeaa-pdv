@@ -12,10 +12,11 @@ import Tabs from 'react-bootstrap/Tabs';
 import { Container } from "react-bootstrap";
 import { Image } from 'react-bootstrap';
 
-import Spinner from 'react-bootstrap/Spinner';
 import { FaSync, FaTrash } from 'react-icons/fa';
 import { parse } from 'js2xmlparser';
 import { BsPersonAdd } from 'react-icons/bs';
+import { BsShieldFillExclamation } from 'react-icons/bs';
+
 
 
 
@@ -87,14 +88,13 @@ class Produto extends React.Component {
             altura: '',
             profundidade: '',
 
-            alias: [],
-
+            // alias: [],
             // deposito: [],
             // id: '',
             // estoque: '',
-            deposito: [],
-            idDeposito: '',
-            estoqueDeposito: '',
+            // deposito: [],
+            // idDeposito: '',
+            // estoqueDeposito: '',
 
             // variacoes: [],
             // nome: '',
@@ -102,16 +102,17 @@ class Produto extends React.Component {
             // vlr_unit: '',
             // clonarDadosPai: '',
             // estoque: '',
-            variacoes: [],
-            nomeVariacao: '',
-            codigoVariacao: '',
-            vlr_unitVariacao: '',
-            clonarDadosPaiVariacao: '',
-            estoqueVariacao: '',
+
+            // variacoes: [],
+            // nomeVariacao: '',
+            // codigoVariacao: '',
+            // vlr_unitVariacao: '',
+            // clonarDadosPaiVariacao: '',
+            // estoqueVariacao: '',
 
 
             // imagens: '',
-            // url: '',
+            url: '',
             imagens: [],
             urlImagens: '',
 
@@ -131,20 +132,20 @@ class Produto extends React.Component {
             codigoComponente: '',
             quantidadeComponente: '',
             situacao: 'Ativo', // Valor padrão
+            ModalExcluirProduto: false,
 
-            categoriaId: 0,
         };
     }
 
     componentDidMount() {
-        this.buscarDados();
+        this.buscarProdutos();
         this.buscarCategorias();
     }
 
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.categoriaId !== this.state.categoriaId) {
-            this.atualizaCategoria({ target: { value: this.state.categoriaId } });
+        if (prevState.idCategoria !== this.state.idCategoria) {
+            this.atualizaCategoria({ target: { value: this.state.idCategoria } });
         }
         if (prevState.preco !== this.state.preco) {
             this.atualizaPreco({ target: { value: this.state.preco } });
@@ -158,24 +159,14 @@ class Produto extends React.Component {
 
     }
 
-    //Ação para fechar o modal de cadastro e atualização.
-    fecharModal = () => {
-        this.setState({
-            modalAberta: false,
-            validated: false
-        });
-    }
-
-    //Ação para abrir o modal de cadastro e atualização.
-    abrirModal = () => {
-        this.setState({
-            modalAberta: true
-        });
-    }
-
     //GET - MÉTODO PARA CONSUMO DE PRODUTOS
-    buscarDados = () => {
-        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos")
+    buscarProdutos = () => {
+        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then((resposta) => resposta.json())
             .then((dados) => {
                 if (dados.retorno.produtos) {
@@ -189,22 +180,6 @@ class Produto extends React.Component {
                 this.setState({ carregando: false })
             })
     };
-
-
-    buscarCategorias = () => {
-        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/categorias")
-            .then((resposta) => resposta.json())
-            .then((dados) => {
-                console.log("Categoria: ", dados);
-                const categorias = dados.retorno.categorias || [];
-                this.setState({ categorias, carregando: false });
-            })
-            .catch((erro) => {
-                console.log(erro);
-                this.setState({ carregando: false });
-            });
-    };
-
 
     //GET - MÉTODO PARA CONSUMO DE UM PRODUTO PELO ID
     carregarProdutos = (codigo) => {
@@ -270,7 +245,7 @@ class Produto extends React.Component {
                         dataValidade: produto.dataValidade,
                         spedTipoItem: produto.spedTipoItem,
                         descricaoCategoria: categoria ? categoria.descricao : "",
-                        categoriaId: categoria ? categoria.id : ""
+                        idCategoria: categoria ? categoria.id : ""
                     });
                 } else {
                     this.setState({ produtos: [] });
@@ -280,6 +255,26 @@ class Produto extends React.Component {
             })
             .catch(error => console.error(error));
     }
+
+    //GET - MÉTODO PARA CONSUMO DE CATEGORIAS
+    buscarCategorias = () => {
+        fetch("https://prod-api-okeaa-produto.azurewebsites.net/api/v1/categorias", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((resposta) => resposta.json())
+            .then((dados) => {
+                console.log("Categoria: ", dados);
+                const categorias = dados.retorno.categorias || [];
+                this.setState({ categorias, carregando: false });
+            })
+            .catch((erro) => {
+                console.log(erro);
+                this.setState({ carregando: false });
+            });
+    };
 
     //DELETE - MÉTODO PARA DELETAR UM PRODUTO
     excluirProduto(codigo) {
@@ -292,7 +287,7 @@ class Produto extends React.Component {
             .then(resposta => resposta.json())
             .then(dados => {
                 console.log(dados);
-                this.buscarDados(); // atualiza a lista de produtos após a exclusão
+                this.buscarProdutos(); // atualiza a lista de produtos após a exclusão
             })
             .catch(erro => console.error(erro));
     }
@@ -557,12 +552,6 @@ class Produto extends React.Component {
         });
     };
 
-
-
-
-
-
-
     atualizaMarca = (event) => {
         const marca = event.target.value;
         this.setState({
@@ -791,7 +780,7 @@ class Produto extends React.Component {
                 this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
             }, 500); // 500 milissegundos equivalem a 1 segundo
             setTimeout(() => {
-                this.buscarDados(); // atualiza a lista de produtos após a exclusão
+                this.buscarProdutos(); // atualiza a lista de produtos após a exclusão
             }, 500); // 500 milissegundos equivalem a 1 segundo
         }
     }
@@ -882,6 +871,27 @@ class Produto extends React.Component {
         }));
     };
 
+    //Ação para fechar o modal de cadastro e atualização.
+    fecharModal = () => {
+        this.setState({
+            modalAberta: false,
+            validated: false
+        });
+    }
+
+    //Ação para abrir o modal de cadastro e atualização.
+    abrirModal = () => {
+        this.setState({
+            modalAberta: true
+        });
+    }
+
+    modalExcluirProduto = () => {
+        this.setState({
+            ModalExcluirProduto: !this.state.ModalExcluirProduto,
+        });
+    };
+
 
 
     render() {
@@ -910,14 +920,16 @@ class Produto extends React.Component {
                                 <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                 Incluir Cadastro
                             </button>
-                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '2.5rem', fontStyle: 'italic', fontFamily: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>Cadastro de produto</span>
+                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic', fontFamily: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>
+                                PRODUTO
+                            </span>
                         </div>
                     </Container >
                     <Container fluid className="pb-5">
                         <Table striped bordered hover responsive="xl" >
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th title="Identificador">ID</th>
                                     <th title="Descrição">Descrição</th>
                                     <th title="Código">Código</th>
                                     <th title="Unidade">Unidade</th>
@@ -946,6 +958,7 @@ class Produto extends React.Component {
                                                         <FaSync />
                                                     </Button>
                                                     <Button variant="danger" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
+                                                        {/* <Button variant="danger" onClick={() => this.modalExcluirProduto()}> */}
                                                         <FaTrash />
                                                     </Button>
                                                 </div>
@@ -1287,7 +1300,7 @@ class Produto extends React.Component {
                                                     <button type="submit" className="botao-cadastro-produto">
                                                         Salvar
                                                     </button>
-                                                    <button onClick={this.fecharModal} className="botao-cancelar-produto">
+                                                    <button type="button" onClick={this.fecharModal} className="botao-cancelar-produto">
                                                         Cancelar
                                                     </button>
                                                 </div>
@@ -1297,6 +1310,21 @@ class Produto extends React.Component {
                                 </Form>
                             </Container>
                         </Modal.Body>
+                    </Modal>
+
+
+                    <Modal show={this.state.ModalExcluirProduto} onHide={this.modalExcluirProduto} centered>
+                        <Modal.Header closeButton className="bg-warning text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            Deseja excluir o item? Essa ação não poderá ser desfeita.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>Não</Button>
+                            <Button type="button" variant="secondary" onClick={() => this.excluirProduto(this.state.codigo)}>Sim</Button>
+                        </Modal.Footer>
                     </Modal>
                 </div >
             )

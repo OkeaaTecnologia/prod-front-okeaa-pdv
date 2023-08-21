@@ -1,11 +1,12 @@
 import React from "react";
+
 import '../css/FrenteCaixa.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
-
-import 'react-datepicker/dist/react-datepicker.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Spinner } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
@@ -28,10 +29,7 @@ import { BsXCircle } from 'react-icons/bs';
 import { BsTrashFill } from 'react-icons/bs';
 import { BsPencilSquare } from 'react-icons/bs';
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-
+// import { ToastContainer, toast } from 'react-toastify';
 // import ptBR from 'date-fns/locale/pt-BR';
 // import DatePicker from 'react-datepicker';
 // import { Stack } from "react-bootstrap"
