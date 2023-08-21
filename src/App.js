@@ -36,7 +36,9 @@ function App() {
 
                   <NavDropdown title="Cadastros" id="nav-dropdown-dark-example" menuVariant="dark">
                     <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/Loja" >Loja</NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/Produto">Produtos</NavDropdown.Item>
+
                     {/* <NavDropdown.Item as={Link} to="/Categoria">Categorias</NavDropdown.Item> */}
                   </NavDropdown>
 
@@ -48,7 +50,6 @@ function App() {
 
                   <NavDropdown title="Vendas" id="nav-dropdown-dark-example" menuVariant="dark">
                     <NavDropdown.Item as={Link} to="/FrenteCaixa" >Frente de Caixa</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/CadastroLoja" >Cadastro Loja</NavDropdown.Item>
                   </NavDropdown>
                   {/* <Form className="d-flex">
                   <Form.Control
@@ -67,7 +68,7 @@ function App() {
             <Route path="/Produto" element={<Produto />}></Route>
             <Route path="/Categoria" element={<Categoria />}></Route>
             <Route path="/FrenteCaixa" element={<FrenteCaixa />}></Route>
-            <Route path="/CadastroLoja" element={<CadastroLoja />}></Route>
+            <Route path="/Loja" element={<CadastroLoja />}></Route>
           </Routes>
 
         </BrowserRouter >
