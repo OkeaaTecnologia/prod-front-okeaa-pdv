@@ -28,6 +28,33 @@ body {
   }
 }
 
+.table-container {
+  overflow-y: auto; /* Torna a tabela rolável verticalmente */
+  max-height: 105vh; /* Defina a altura máxima como 85% da altura da janela */
+}
+
+.table-container thead th {
+  position: sticky;
+  top: -1px;
+  background-color: rgb(73, 73, 73) !important;
+  z-index: 1;
+  border: none;
+}
+
+.table-container thead {
+  position: sticky;
+  top: -1px;
+  z-index: 1;
+  border: none;
+}
+
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
 .button-container-table {
   display: flex;
   justify-content: center;

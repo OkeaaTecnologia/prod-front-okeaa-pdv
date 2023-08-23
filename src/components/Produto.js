@@ -133,7 +133,7 @@ class Produto extends React.Component {
             quantidadeComponente: '',
             situacao: 'Ativo', // Valor padrão
             ModalExcluirProduto: false,
-
+            searchTerm: '', // Estado para o termo de busca
         };
     }
 
@@ -191,7 +191,7 @@ class Produto extends React.Component {
         })
             .then(resposta => resposta.json())
             .then(dados => {
-                console.log("produto: ", dados);
+                // console.log("produto: ", dados);
                 if (dados.retorno.produtos) {
 
                     const produto = dados.retorno.produtos[0].produto;
@@ -266,7 +266,7 @@ class Produto extends React.Component {
         })
             .then((resposta) => resposta.json())
             .then((dados) => {
-                console.log("Categoria: ", dados);
+                // console.log("Categoria: ", dados);
                 const categorias = dados.retorno.categorias || [];
                 this.setState({ categorias, carregando: false });
             })
@@ -791,7 +791,7 @@ class Produto extends React.Component {
 
             id: 0,
             descricao: '',
-            situacao: '',
+            situacao: 'Ativo',
             codigo: '',
             tipo: '',
             preco: '',
@@ -859,7 +859,6 @@ class Produto extends React.Component {
             origem: '',
             idGrupoProduto: '',
             grupoProduto: '',
-
         });
 
         this.abrirModal();
@@ -892,17 +891,22 @@ class Produto extends React.Component {
         });
     };
 
-
+    handleSearchChange = (event) => {
+        this.setState({ searchTerm: event.target.value });
+    };
 
     render() {
         const { tipo } = this.state;
 
+        const removeAccents = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
 
         if (this.state.carregando) {
             return (
                 <div className="spinner-container" >
                     <div className="d-flex align-items-center justify-content-center">
-                        <div class="custom-loader"></div>
+                        <div className="custom-loader"></div>
                     </div>
                     <div>
                         <div className="text-loading text-white">Carregando produtos...</div>
@@ -913,63 +917,83 @@ class Produto extends React.Component {
             return (
                 <div className="grid-produto">
                     <Container fluid>
-                        <div className="d-flex align-items-center mt-3 mb-3">
-                            <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo produto:</span>
-                            <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-                            <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-produto">
-                                <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
-                                Incluir Cadastro
-                            </button>
-                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic', fontFamily: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>
-                                PRODUTO
-                            </span>
-                        </div>
-                    </Container >
-                    <Container fluid className="pb-5">
-                        <Table striped bordered hover responsive="xl" >
-                            <thead>
-                                <tr>
-                                    <th title="Identificador">ID</th>
-                                    <th title="Descrição">Descrição</th>
-                                    <th title="Código">Código</th>
-                                    <th title="Unidade">Unidade</th>
-                                    <th title="Preço">Preço</th>
-                                    <th title="Estoque">Estoque</th>
-                                    <th title="Opções">Opções</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    this.state.produtos.map((produtos) =>
-                                        <tr key={produtos.produto.id}>
-                                            <td>{produtos.produto.id}</td>
-                                            <td>{produtos.produto.descricao}</td>
-                                            <td>{produtos.produto.codigo}</td>
-                                            <td>{produtos.produto.unidade}</td>
-                                            <td>{parseFloat(produtos.produto.preco).toFixed(2)}</td>
-                                            <td>{produtos.produto.estoqueMaximo}</td>
-                                            <td>
-                                                <div className="button-container-table">
+                        <Col className="col">
+                            <div className="d-flex align-items-center mt-3 mb-3">
+                                <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo produto:</span>
+                                <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
+                                <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-produto">
+                                    <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
+                                    Incluir Cadastro
+                                </button>
+                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>PRODUTO</span>
+                            </div>
+                        </Col>
 
-                                                    <Button variant="warning" onClick={() => {
-                                                        console.log(produtos.produto.codigo);
-                                                        this.carregarProdutos(produtos.produto.codigo);
-                                                    }}>
-                                                        <FaSync />
-                                                    </Button>
-                                                    <Button variant="danger" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
-                                                        {/* <Button variant="danger" onClick={() => this.modalExcluirProduto()}> */}
-                                                        <FaTrash />
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                }
-                                {this.state.produtos.length === 0 && <tr><td colSpan="6">Nenhum produto cadastrado.</td></tr>}
-                            </tbody>
-                        </Table>
-                    </Container>
+                        <Col className="col">
+                            <div className="d-flex align-items-center justify-content-start mt-3 mb-3 flex-row">
+                                <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar produto:</span>
+                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+                            </div>
+                        </Col>
+                    </Container >
+                    <div className="table-container">
+                        <Container fluid className="pb-5">
+                            <Table striped bordered hover responsive="xl">
+                                <thead>
+                                    <tr>
+                                        <th title="Identificador">ID</th>
+                                        <th title="Descrição">Descrição</th>
+                                        <th title="Código">Código</th>
+                                        <th title="Unidade">Unidade</th>
+                                        <th title="Preço">Preço</th>
+                                        <th title="Estoque">Estoque</th>
+                                        <th title="Opções">Opções</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.state.produtos.map((produtos) => {
+                                        const normalizedSearchTerm = removeAccents(this.state.searchTerm.toLowerCase());
+                                        const normalizedDescription = removeAccents(produtos.produto.descricao.toLowerCase());
+                                        const normalizedCodigo = produtos.produto.codigo.toLowerCase();
+
+                                        if (
+                                            normalizedDescription.includes(normalizedSearchTerm) ||
+                                            normalizedCodigo.includes(normalizedSearchTerm)
+                                        ) {
+                                            return (
+                                                <tr
+                                                    key={produtos.produto.id}
+                                                    onClick={() => this.carregarProdutos(produtos.produto.codigo)}
+                                                    onMouseEnter={(e) => (e.currentTarget.style.cursor = 'pointer')}
+                                                    onMouseLeave={(e) => (e.currentTarget.style.cursor = 'default')}
+                                                >
+                                                    <td>{produtos.produto.id}</td>
+                                                    <td>{produtos.produto.descricao}</td>
+                                                    <td>{produtos.produto.codigo}</td>
+                                                    <td>{produtos.produto.unidade}</td>
+                                                    <td>{parseFloat(produtos.produto.preco).toFixed(2)}</td>
+                                                    <td>{produtos.produto.estoqueMaximo}</td>
+                                                    <td>
+                                                        <div className="button-container-table">
+                                                            <Button variant="warning" onClick={() => this.carregarProdutos(produtos.produto.codigo)}>
+                                                                <FaSync />
+                                                            </Button>
+                                                            <Button variant="danger" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
+                                                                <FaTrash />
+                                                            </Button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        } else {
+                                            return null;
+                                        }
+                                    })}
+                                    {this.state.produtos.length === 0 && <tr><td colSpan="6">Nenhum produto cadastrado.</td></tr>}
+                                </tbody>
+                            </Table>
+                        </Container>
+                    </div>
 
                     {/* Modal */}
                     <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" fullscreen="xxl-down" backdrop="static" >
@@ -1038,18 +1062,18 @@ class Produto extends React.Component {
                                         <Col xs={12} md={2}>
                                             <Form.Group controlId="Situacao" className="mb-3">
                                                 <Form.Label>Situação</Form.Label>
-                                                <div class="flipswitch">
+                                                <div className="flipswitch">
                                                     <input
                                                         type="checkbox"
                                                         name="flipswitch"
-                                                        class="flipswitch-cb"
+                                                        className="flipswitch-cb"
                                                         id="fs"
                                                         checked={this.state.situacao === 'Ativo'}
                                                         onChange={this.handleSituacaoChange}
                                                     />
-                                                    <label class="flipswitch-label" for="fs">
-                                                        <div class="flipswitch-inner"></div>
-                                                        <div class="flipswitch-switch"></div>
+                                                    <label className="flipswitch-label" htmlFor="fs">
+                                                        <div className="flipswitch-inner"></div>
+                                                        <div className="flipswitch-switch"></div>
                                                     </label>
                                                 </div>
                                             </Form.Group>
@@ -1169,7 +1193,7 @@ class Produto extends React.Component {
                                                                 <Form.Label>Unidade de medida</Form.Label>
                                                                 <Form.Select as="select" placeholder="Selecione o frete" value={this.state.unidadeMedida || ''} onChange={this.atualizaUnidadeMedida} >
                                                                     <option value="Metros">Metros</option>
-                                                                    <option value="Centímetros">Centimetros</option>
+                                                                    <option value="Centímetro">Centimetro</option>
                                                                     <option value="Milímetro">Milímetro</option>
                                                                 </Form.Select>
                                                             </Form.Group>

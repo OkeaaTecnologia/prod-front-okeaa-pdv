@@ -57,6 +57,8 @@ class Contato extends React.Component {
             modalAberta: false,
             validated: false,
             cpfValido: '',
+            searchTerm: '', // Estado para o termo de busca
+
         }
 
         this.numeroRef = React.createRef();
@@ -120,7 +122,7 @@ class Contato extends React.Component {
         })
             .then(resposta => resposta.json())
             .then(dados => {
-                console.log("Linha 80", dados)
+                // console.log("Linha 80", dados)
                 if (dados.retorno.contatos) {
 
                     const contato = dados.retorno.contatos[0].contato;
@@ -129,7 +131,7 @@ class Contato extends React.Component {
                         descricao: item.tipoContato.descricao
                     }));
 
-                    console.log(tiposContato); // Adicione o console.log aqui
+                    // console.log(tiposContato); // Adicione o console.log aqui
 
                     this.setState({
                         id: contato.id,
@@ -687,11 +689,20 @@ class Contato extends React.Component {
         }));
     };
 
+    handleSearchChange = (event) => {
+        this.setState({ searchTerm: event.target.value });
+    };
+
 
     /**
      *  -------------------- TABELA DE CLIENTES. -------------------- 
      */
     render() {
+
+        const removeAccents = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
+
         if (this.state.carregando) {
             return (
                 <div className="spinner-container">
@@ -707,21 +718,78 @@ class Contato extends React.Component {
             return (
                 <div className="grid-contato">
                     <Container fluid>
-                        <div className="d-flex align-items-center mt-3 mb-3">
-                            <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo contato:</span>
-                            <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-                            <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-contato">
-                                <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
-                                Incluir Cadastro
-                            </button>
-                            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>
-                                CONTATO E FORNECEDOR
-                            </span>
-                        </div>
+                        <Col className="col">
+                            <div className="d-flex align-items-center mt-3 mb-3">
+                                <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo contato:</span>
+                                <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
+                                <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-contato">
+                                    <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
+                                    Incluir Cadastro
+                                </button>
+                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>CONTATO E FORNECEDOR</span>
+                            </div>
+                        </Col>
+
+                        <Col className="col">
+                            <div className="d-flex align-items-center mt-3 mb-3">
+                                <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar contato:</span>
+                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+                            </div>
+                        </Col>
                     </Container>
+                    <div className="table-container">
+                        <Container fluid className="pb-5">
+                            <Table striped bordered hover responsive="xl">
+                                <thead>
+                                    <tr>
+                                        <th title="Identificador">ID</th>
+                                        <th title="Código">Código</th>
+                                        <th title="Nome">Nome</th>
+                                        <th title="CPF / CNPJ">CPF/CNPJ</th>
+                                        <th title="Cidade">Cidade</th>
+                                        <th title="Telefone">Telefone</th>
+                                        <th title="Opções">Opções</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.state.contatos.map((contatos) => {
+                                        const normalizedSearchTerm = removeAccents(this.state.searchTerm.toLowerCase());
+                                        const normalizedDescription = removeAccents(contatos.contato.nome.toLowerCase());
+                                        const normalizedCodigo = contatos.contato.codigo.toLowerCase();
 
+                                        if (
+                                            normalizedDescription.includes(normalizedSearchTerm) ||
+                                            normalizedCodigo.includes(normalizedSearchTerm)
+                                        ) {
+                                            return (
+                                                <tr key={contatos.contato.id}
+                                                    onClick={() => this.atualizaContato(contatos.contato.id)}
+                                                    onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}>
+                                                    <td>{contatos.contato.id}</td>
+                                                    <td>{contatos.contato.codigo}</td>
+                                                    <td>{contatos.contato.nome}</td>
+                                                    <td>{contatos.contato.cnpj}</td>
+                                                    <td>{contatos.contato.cidade}</td>
+                                                    <td>{contatos.contato.fone}</td>
+                                                    <td>
+                                                        <Button variant="warning" onClick={() => this.atualizaContato(contatos.contato.id)}>
+                                                            <FaSync />
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        } else {
+                                            return null;
+                                        }
+                                    })}
+                                    {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
+                                </tbody>
+                            </Table>
+                        </Container>
+                    </div>
 
-                    <Container fluid className="pb-5">
+                    {/* <Container fluid className="pb-5">
                         <Table striped bordered hover responsive="xl" >
                             <thead>
                                 <tr>
@@ -755,7 +823,7 @@ class Contato extends React.Component {
                                 {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
                             </tbody>
                         </Table>
-                    </Container>
+                    </Container> */}
 
                     <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
                         <Modal.Header closeButton className="modal-contato-header">
