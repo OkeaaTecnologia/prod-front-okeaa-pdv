@@ -11,7 +11,7 @@ import { Container } from "react-bootstrap";
 
 import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
-import { FaSync } from 'react-icons/fa';
+import { BsPencilSquare } from 'react-icons/bs';
 import { parse } from 'js2xmlparser';
 
 
@@ -737,7 +737,7 @@ class Contato extends React.Component {
                             </div>
                         </Col>
                     </Container>
-                    <div className="table-container">
+                    <div className="table-container-contato">
                         <Container fluid className="pb-5">
                             <Table striped bordered hover responsive="xl">
                                 <thead>
@@ -773,8 +773,8 @@ class Contato extends React.Component {
                                                     <td>{contatos.contato.cidade}</td>
                                                     <td>{contatos.contato.fone}</td>
                                                     <td>
-                                                        <Button variant="warning" onClick={() => this.atualizaContato(contatos.contato.id)}>
-                                                            <FaSync />
+                                                        <Button variant="warning" title="Editar contato" onClick={() => this.atualizaContato(contatos.contato.id)}>
+                                                            <BsPencilSquare />
                                                         </Button>
                                                     </td>
                                                 </tr>

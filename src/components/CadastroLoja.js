@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from 'react-bootstrap';
+
 import { Button } from 'react-bootstrap';
 import { Modal } from 'react-bootstrap';
 import { Container } from 'react-bootstrap'
@@ -9,14 +9,11 @@ import { Form } from 'react-bootstrap'
 import { Table } from "react-bootstrap";
 
 import { BsPersonAdd } from 'react-icons/bs';
-
+import { FaTrash } from 'react-icons/fa';
+import { BsPencilSquare } from 'react-icons/bs';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/CadastroLoja.css';
-
-
-import { BsTrashFill } from 'react-icons/bs';
-import { BsPencilSquare } from 'react-icons/bs';
 
 class CadastroLoja extends React.Component {
 
@@ -52,6 +49,27 @@ class CadastroLoja extends React.Component {
       })
       .catch(error => {
         console.error('Erro ao buscar as lojas:', error);
+
+        const loja1 = {
+          idLoja: '204607447',
+          nomeLoja: 'Loja - Araucaria',
+          unidadeLoja: 'Matriz',
+        };
+
+        const loja3 = {
+          idLoja: '204607448',
+          nomeLoja: 'Loja - Londrina',
+          unidadeLoja: 'Filial',
+        };
+
+        const loja2 = {
+          idLoja: '204607449',
+          nomeLoja: 'Loja - Curitiba',
+          unidadeLoja: 'Filial',
+        };
+
+        const lojasComAdicionais = [loja1, loja2, loja3];
+        this.setState({ lojas: lojasComAdicionais });
       });
   };
 
@@ -194,52 +212,65 @@ class CadastroLoja extends React.Component {
     const { lojas, modalEditarLoja, selecionaLoja } = this.state;
 
     return (
-      <div className="grid-cadastro-loja">
+      <div className="grid-loja">
         <Container fluid>
-          <div className="d-flex align-items-center mt-3 mb-3">
-            <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar uma nova loja:</span>
-            <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-            <button onClick={this.handleCadastrarClick} className="d-flex align-items-center botao-cadastro-loja">
-              <BsPersonAdd style={{ marginRight: '0.8rem' }} />
-              Incluir Cadastro
-            </button>
-            <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '2.5rem', fontStyle: 'italic', fontFamily: 'apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif' }}>Cadastro de loja</span>
-          </div>
+          <Col className="col">
+            <div className="d-flex align-items-center mt-3 mb-3">
+              <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar uma nova loja:</span>
+              <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
+              <button onClick={this.handleCadastrarClick} className="d-flex align-items-center botao-cadastro-loja">
+                <BsPersonAdd style={{ marginRight: '0.8rem' }} />
+                Incluir Cadastro
+              </button>
+              <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>UNIDADE LOJA</span>
+            </div>
+
+            <Col className="col">
+              <div className="d-flex align-items-center mt-3 mb-3">
+                <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar contato:</span>
+                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+              </div>
+            </Col>
+          </Col>
         </Container>
 
-        <Container fluid className="pb-5">
-          <Table striped bordered hover responsive="xl" >
-            <thead>
-              <tr>
-                <th>ID Loja</th>
-                <th>Nome Loja</th>
-                <th>Unidade Loja</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lojas.map(loja => (
-                <tr key={loja.id}>
-                  <td>{loja.idLoja}</td>
-                  <td>{loja.nomeLoja}</td>
-                  <td>{loja.unidadeLoja}</td>
-                  <td>
-                    <Button variant="light" title="Editar loja" className="transparent-button" onClick={() => {
-                      this.handleModalEditarLoja(loja);
-                    }}>
-                      <BsPencilSquare className="blue-icon" />
-                    </Button>
-                    <Button variant="light" title="Excluir loja" className="transparent-button" onClick={() => {
-                      this.deletarLoja(loja.idLoja);
-                    }}>
-                      <BsTrashFill className="red-icon" />
-                    </Button>
-                  </td>
+        <div className="table-container-loja">
+          <Container fluid className="pb-5">
+            <Table striped bordered hover responsive="xl">
+              <thead>
+                <tr>
+                  <th title="ID loja">ID Loja</th>
+                  <th title="Nome loja">Nome Loja</th>
+                  <th title="Unidade loja">Unidade Loja</th>
+                  <th title="Ações">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Container>
+              </thead>
+              <tbody>
+                {lojas.map(loja => (
+                  <tr key={loja.id}
+                    onClick={() => this.handleModalEditarLoja(loja)}
+                    onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
+                    onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}
+                  >
+                    <td>{loja.idLoja}</td>
+                    <td>{loja.nomeLoja}</td>
+                    <td>{loja.unidadeLoja}</td>
+                    <td>
+                      <div className="button-container-table">
+                        <Button variant="warning" title="Editar loja" onClick={() => { this.handleModalEditarLoja(loja) }}>
+                          <BsPencilSquare />
+                        </Button>
+                        <Button variant="danger" title="Excluir loja" onClick={() => { this.deletarLoja(loja.idLoja) }}>
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Container>
+        </div>
 
         {/* Modal */}
         <Modal show={modalEditarLoja} onHide={this.fecharModalEditarLoja} size="lg" centered>
@@ -298,7 +329,7 @@ class CadastroLoja extends React.Component {
             <button className="botao-cadastro-loja" onClick={() => this.salvarLoja()}>Salvar</button>
           </Modal.Footer>
         </Modal>
-      </div>
+      </div >
     );
   }
 }

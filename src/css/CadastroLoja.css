@@ -2,7 +2,7 @@
   padding-top: 40px; /* ajuste o valor de acordo com a altura da sua barra */
 }
 
-.grid-cadastro-loja {
+.grid-loja {
   position: sticky;
   top: 60px;
   background-color: #dddddd18;
@@ -17,6 +17,122 @@
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
 }
 
+@keyframes bolha {
+  0% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+.table-container-loja {
+  overflow-y: auto; /* Torna a tabela rolável verticalmente */
+  max-height: 98vh; /* Defina a altura máxima da altura da janela */
+}
+
+.table-container-loja thead th {
+  position: sticky;
+  top: -1px;
+  background-color: rgb(73, 73, 73) !important;
+  z-index: 1;
+  border: none;
+}
+
+.table-container-loja thead {
+  position: sticky;
+  top: -1px;
+  z-index: 1;
+  border: none;
+}
+
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.spinner-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spinner 1s ease-in-out infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-salvar-button {
+  padding: 15px;
+  height: 32px;
+  width: 285px;
+  font-size: 16px;
+  line-height: normal;
+  text-align: center;
+  background-color: #fda21e !important;
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-salvar-button:hover {
+  color: #ffffff !important;
+  background: #c98300;
+}
+
+.btn-cancelar-button {
+  padding: 15px;
+  height: 32px;
+  width: 285px;
+  font-size: 16px;
+  line-height: normal;
+  text-align: center;
+  background-color: #838282 !important;
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-loader {
+  width: 120px;
+  height: 20px;
+  border-radius: 20px;
+  background: repeating-linear-gradient(135deg, #fda21e 0 10px, #fda21e 0 20px)
+      left/0% 100% no-repeat,
+    repeating-linear-gradient(135deg, #f47b0233 0 10px, #f47b021a 0 20px)
+      left/100% 100%;
+  animation: p3 2s infinite;
+}
+@keyframes p3 {
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
+.text-loading {
+  text-shadow: 3px 4px 5px rgb(51, 51, 51);
+}
+
 .botao-cadastro-loja {
   color: #ffffff !important;
   font-size: 16px;
@@ -27,6 +143,7 @@
   border: 0px solid #fda21e;
   background: #fda21e;
 }
+
 .botao-cadastro-loja:hover {
   color: #ffffff !important;
   background: #c98300;
@@ -49,7 +166,6 @@
 }
 
 .modal-loja-header,
-.modal-loja-body,
-.modal-loja-footer {
+.modal-loja-body {
   background-color: rgba(114, 114, 114, 0.048);
 }

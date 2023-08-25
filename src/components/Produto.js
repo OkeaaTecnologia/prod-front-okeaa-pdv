@@ -12,12 +12,11 @@ import Tabs from 'react-bootstrap/Tabs';
 import { Container } from "react-bootstrap";
 import { Image } from 'react-bootstrap';
 
-import { FaSync, FaTrash } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import { parse } from 'js2xmlparser';
 import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
-
-
+import { BsPencilSquare } from 'react-icons/bs';
 
 
 class Produto extends React.Component {
@@ -936,7 +935,7 @@ class Produto extends React.Component {
                             </div>
                         </Col>
                     </Container >
-                    <div className="table-container">
+                    <div className="table-container-produto">
                         <Container fluid className="pb-5">
                             <Table striped bordered hover responsive="xl">
                                 <thead>
@@ -975,10 +974,10 @@ class Produto extends React.Component {
                                                     <td>{produtos.produto.estoqueMaximo}</td>
                                                     <td>
                                                         <div className="button-container-table">
-                                                            <Button variant="warning" onClick={() => this.carregarProdutos(produtos.produto.codigo)}>
-                                                                <FaSync />
+                                                            <Button variant="warning" title="Editar produto" onClick={() => this.carregarProdutos(produtos.produto.codigo)}>
+                                                                <BsPencilSquare />
                                                             </Button>
-                                                            <Button variant="danger" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
+                                                            <Button variant="danger" title="Excluir produto" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
                                                                 <FaTrash />
                                                             </Button>
                                                         </div>

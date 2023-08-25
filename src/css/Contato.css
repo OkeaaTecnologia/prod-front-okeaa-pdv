@@ -28,12 +28,12 @@
   }
 }
 
-.table-container {
+.table-container-contato {
   overflow-y: auto; /* Torna a tabela rolável verticalmente */
-  max-height: 105vh; /* Defina a altura máxima como 85% da altura da janela */
+  max-height: 98vh; /* Defina a altura máxima da altura da janela */
 }
 
-.table-container thead th {
+.table-container-contato thead th {
   position: sticky;
   top: -1px;
   background-color: rgb(73, 73, 73) !important;
@@ -41,7 +41,7 @@
   border: none;
 }
 
-.table-container thead {
+.table-container-contato thead {
   position: sticky;
   top: -1px;
   z-index: 1;
