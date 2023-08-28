@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 import Home from './components/Home'
 import Contato from './components/Contato';
 import Produto from "./components/Produto";
@@ -10,72 +12,95 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 
 import { BrowserRouter, Routes, Link, Route } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../src/css/App.css'
+import Login from './components/Login';
 
-function App() {
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
+    };
+  }
 
-  return (
+  handleLogin = () => {
+    this.setState({ isLoggedIn: true });
+  };
 
-    <div className="App">
-      <Container fluid>
-        <BrowserRouter>
-          <Navbar bg="dark" expand="lg" variant="dark" fixed="top" label="Toggle navigation" >
-            <Container fluid>
-              <Link to="/">
-                <img alt="" src="/assets/logo.png" width="130" height="20" className="d-inline-block align-top" style={{ marginRight: '10px' }} />
-              </Link>{' '}
-              <Navbar.Brand href="/">ERP</Navbar.Brand>
-              <Navbar.Toggle aria-controls="navbar-dark-example" />
-              <Navbar.Collapse id="navbar-dark-example">
-                <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll >
-                  <Nav.Link href="/" className="text-light">Página inicial</Nav.Link>
+  handleLogout = () => {
+    // Remover a informação de autenticação do Local Storage
+    localStorage.removeItem('isLoggedIn');
+    this.setState({ isLoggedIn: false });
+  };
 
-                  <NavDropdown title="Cadastros" id="nav-dropdown-dark-example" menuVariant="dark">
-                    <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/Loja" >Loja</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/Produto">Produtos</NavDropdown.Item>
 
-                    {/* <NavDropdown.Item as={Link} to="/Categoria">Categorias</NavDropdown.Item> */}
-                  </NavDropdown>
+  render() {
+    // Se o usuário estiver logado, renderize o conteúdo normal da aplicação
+    if (this.state.isLoggedIn) {
+      return (
+        <div className="App">
+          <Container fluid>
+            <BrowserRouter>
+              <Navbar bg="dark" expand="lg" variant="dark" fixed="top" label="Toggle navigation" >
+                <Container fluid>
+                  <Link to="/">
+                    <img alt="" src="/assets/logo.png" width="130" height="20" className="d-inline-block align-top" style={{ marginRight: '10px' }} />
+                  </Link>{' '}
+                  <Navbar.Brand href="/">ERP</Navbar.Brand>
+                  <Navbar.Toggle aria-controls="navbar-dark-example" />
+                  <Navbar.Collapse id="navbar-dark-example">
+                    <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll >
+                      <Nav.Link href="/" className="text-light">Página inicial</Nav.Link>
 
-                  {/* <NavDropdown title="Suprimentos" id="nav-dropdown-dark-example" menuVariant="dark">
-                    <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/Produto" >Produtos</NavDropdown.Item>
-                    <NavDropdown.Item href="#action/3.3" >Something</NavDropdown.Item>
-                  </NavDropdown> */}
+                      <NavDropdown title="Cadastros" id="nav-dropdown-dark-example" menuVariant="dark">
+                        <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/Produto">Produtos</NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/Loja" >Unidade Loja</NavDropdown.Item>
+                      </NavDropdown>
 
-                  <NavDropdown title="Vendas" id="nav-dropdown-dark-example" menuVariant="dark">
-                    <NavDropdown.Item as={Link} to="/FrenteCaixa" >Frente de Caixa</NavDropdown.Item>
-                  </NavDropdown>
-                  {/* <Form className="d-flex">
-                  <Form.Control
-                    type="search" placeholder="Search" className="me-2" aria-label="Search" />
-                  <Button variant="light">Busca</Button>
-                </Form> */}
-                </Nav>
+                      <NavDropdown title="Vendas" id="nav-dropdown-dark-example" menuVariant="dark">
+                        <NavDropdown.Item as={Link} to="/FrenteCaixa" >Frente de Caixa</NavDropdown.Item>
+                      </NavDropdown>
+                    </Nav>
 
-              </Navbar.Collapse>
-            </Container>
-          </Navbar>
+                    {this.state.isLoggedIn && (  // Renderizar botão de deslogar apenas quando logado
+                      <Button variant="danger" onClick={this.handleLogout} className="btn btn-link text-light ms-auto">
+                        <img alt="" src="/assets/sair.png" width="30" height="30" className="d-inline-block align-top" />
+                      </Button>
+                    )}
 
-          <Routes>
-            <Route path="/" element={<Home />}></Route>
-            <Route path="/Contato" element={<Contato />}></Route>
-            <Route path="/Produto" element={<Produto />}></Route>
-            <Route path="/Categoria" element={<Categoria />}></Route>
-            <Route path="/FrenteCaixa" element={<FrenteCaixa />}></Route>
-            <Route path="/Loja" element={<CadastroLoja />}></Route>
-          </Routes>
+                  </Navbar.Collapse>
+                </Container>
+              </Navbar>
 
-        </BrowserRouter >
-      </Container>
-    </div >
+              <Routes>
+                <Route path="/" element={<Home />}></Route>
+                <Route path="/Contato" element={<Contato />}></Route>
+                <Route path="/Produto" element={<Produto />}></Route>
+                <Route path="/Categoria" element={<Categoria />}></Route>
+                <Route path="/FrenteCaixa" element={<FrenteCaixa />}></Route>
+                <Route path="/Loja" element={<CadastroLoja />}></Route>
+              </Routes>
 
-  );
+            </BrowserRouter >
+          </Container>
+        </div >
+      );
+    }
+
+    // Caso contrário, renderize o componente de login
+    return (
+      <div className="App">
+        <Container fluid>
+          <Login onLogin={this.handleLogin} />
+        </Container>
+      </div>
+
+    );
+  }
 }
 
 export default App;
