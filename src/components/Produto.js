@@ -27,9 +27,12 @@ class Produto extends React.Component {
         this.state = {
             produtos: [],
             categorias: [],
+            imagens: [],
+            componente: [],
+            estrutura: [],
+            id: 0,
             descricaoCategoria: '',
             idCategoria: '',
-            id: 0,
             codigo: '',
             descricao: '',
             tipo: '',
@@ -74,89 +77,56 @@ class Produto extends React.Component {
             producao: '',
             dataValidade: '',
             spedTipoItem: '',
-            carregando: true,
-            modalAberta: false,
-
             codigoItem: '',
             un: '',
             vlr_unit: '',
-            preco_custo: '',
             peso_bruto: '',
             peso_liq: '',
             largura: '',
             altura: '',
             profundidade: '',
-
-            // alias: [],
-            // deposito: [],
-            // id: '',
-            // estoque: '',
-            // deposito: [],
-            // idDeposito: '',
-            // estoqueDeposito: '',
-
-            // variacoes: [],
-            // nome: '',
-            // codigo: '',
-            // vlr_unit: '',
-            // clonarDadosPai: '',
-            // estoque: '',
-
-            // variacoes: [],
-            // nomeVariacao: '',
-            // codigoVariacao: '',
-            // vlr_unitVariacao: '',
-            // clonarDadosPaiVariacao: '',
-            // estoqueVariacao: '',
-
-
-            // imagens: '',
             url: '',
-            imagens: [],
             urlImagens: '',
-
-            // estrutura: [],
-            // tipoEstoque: '',
-            // lancarEstoque: '',
-            estrutura: [],
             tipoEstoqueEstrutura: '',
             lancarEstoque: '',
-
-            // componente: [],
-            // nome: '',
-            // codigo: '',
-            // quantidade: '',
-            componente: [],
             nomeComponente: '',
             codigoComponente: '',
             quantidadeComponente: '',
-            situacao: 'Ativo', // Valor padrão
-            ModalExcluirProduto: false,
-            searchTerm: '', // Estado para o termo de busca
+            searchTerm: '',
+            situacao: 'Ativo',
+            carregando: true,
+            modalAberta: false,
+            modalExcluirProduto: false,
+            modalExcluindoProduto: false,
+            modalSalvarProduto: false,
+            codigoProdutoParaExcluir: null,
         };
-    }
+    };
 
     componentDidMount() {
         this.buscarProdutos();
         this.buscarCategorias();
-    }
+    };
 
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.idCategoria !== this.state.idCategoria) {
             this.atualizaCategoria({ target: { value: this.state.idCategoria } });
-        }
+        };
         if (prevState.preco !== this.state.preco) {
             this.atualizaPreco({ target: { value: this.state.preco } });
-        }
+        };
         if (prevState.pesoLiq !== this.state.pesoLiq) {
             this.atualizaPesoLiq({ target: { value: this.state.pesoLiq } });
-        }
-    }
+        };
+        if (prevState.tipo !== this.state.tipo) {
+            this.atualizaTipo({ target: { value: this.state.tipo } });
+        };
+    };
 
-    componentWillUnmount() {
-
-    }
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //--------------------------------------- CHAMADAS E CONSUMO DA API DE CONTATOS. ----------------------------------------|  
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //GET - MÉTODO PARA CONSUMO DE PRODUTOS
     buscarProdutos = () => {
@@ -177,7 +147,7 @@ class Produto extends React.Component {
                 }
 
                 this.setState({ carregando: false })
-            })
+            });
     };
 
     //GET - MÉTODO PARA CONSUMO DE UM PRODUTO PELO ID
@@ -197,55 +167,63 @@ class Produto extends React.Component {
                     const categoria = produto.categoria;
 
                     this.setState({
-                        id: produto.id,
-                        codigo: produto.codigo,
-                        descricao: produto.descricao,
-                        tipo: produto.tipo,
-                        situacao: produto.situacao,
-                        unidade: produto.unidade,
-                        preco: produto.preco,
-                        precoCusto: produto.precoCusto,
-                        descricaoCurta: produto.descricaoCurta,
-                        descricaoComplementar: produto.descricaoComplementar,
-                        dataInclusao: produto.dataInclusao,
-                        dataAlteracao: produto.dataAlteracao,
-                        imageThumbnail: produto.imageThumbnail,
-                        urlVideo: produto.urlVideo,
-                        nomeFornecedor: produto.nomeFornecedor,
-                        codigoFabricante: produto.codigoFabricante,
-                        marca: produto.marca,
-                        class_fiscal: produto.class_fiscal,
-                        cest: produto.cest,
-                        origem: produto.origem,
-                        idGrupoProduto: produto.idGrupoProduto,
-                        linkExterno: produto.linkExterno,
-                        observacoes: produto.observacoes,
-                        grupoProduto: produto.grupoProduto,
-                        garantia: produto.garantia,
-                        descricaoFornecedor: produto.descricaoFornecedor,
-                        idFabricante: produto.idFabricante,
-                        pesoLiq: produto.pesoLiq,
-                        pesoBruto: produto.pesoBruto,
-                        estoqueMinimo: produto.estoqueMinimo,
-                        estoqueMaximo: produto.estoqueMaximo,
-                        gtin: produto.gtin,
-                        gtinEmbalagem: produto.gtinEmbalagem,
-                        larguraProduto: produto.larguraProduto,
-                        alturaProduto: produto.alturaProduto,
-                        profundidadeProduto: produto.profundidadeProduto,
-                        unidadeMedida: produto.unidadeMedida,
-                        itensPorCaixa: produto.itensPorCaixa,
-                        volumes: produto.volumes,
-                        localizacao: produto.localizacao,
-                        crossdocking: produto.crossdocking,
-                        condicao: produto.condicao,
-                        freteGratis: produto.freteGratis,
-                        producao: produto.producao,
-                        dataValidade: produto.dataValidade,
-                        spedTipoItem: produto.spedTipoItem,
-                        descricaoCategoria: categoria ? categoria.descricao : "",
-                        idCategoria: categoria ? categoria.id : ""
+                        id: produto.id || '',
+                        codigo: produto.codigo || '',
+                        descricao: produto.descricao || '',
+                        tipo: produto.tipo || '',
+                        situacao: produto.situacao || '',
+                        unidade: produto.unidade || '',
+                        un: produto.unidade || '',
+                        preco: parseFloat(produto.preco).toFixed(2) || '',
+                        precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
+                        preco_custo: produto.precoCusto || '',
+                        descricaoCurta: produto.descricaoCurta || '',
+                        descricaoComplementar: produto.descricaoComplementar || '',
+                        dataInclusao: produto.dataInclusao || '',
+                        dataAlteracao: produto.dataAlteracao || '',
+                        imageThumbnail: produto.imageThumbnail || '',
+                        urlVideo: produto.urlVideo || '',
+                        nomeFornecedor: produto.nomeFornecedor || '',
+                        codigoFabricante: produto.codigoFabricante || '',
+                        marca: produto.marca || '',
+                        class_fiscal: produto.class_fiscal || '',
+                        cest: produto.cest || '',
+                        origem: produto.origem || '',
+                        idGrupoProduto: produto.idGrupoProduto || '',
+                        linkExterno: produto.linkExterno || '',
+                        observacoes: produto.observacoes || '',
+                        grupoProduto: produto.grupoProduto || '',
+                        garantia: produto.garantia || '',
+                        descricaoFornecedor: produto.descricaoFornecedor || '',
+                        idFabricante: produto.idFabricante || '',
+                        pesoLiq: parseFloat(produto.pesoLiq).toFixed(2) || '',
+                        peso_liq: produto.pesoLiq || '',
+                        pesoBruto: parseFloat(produto.pesoBruto).toFixed(2) || '',
+                        peso_bruto: produto.pesoBruto || '',
+                        estoqueMinimo: parseFloat(produto.estoqueMinimo).toFixed(2) || '',
+                        estoqueMaximo: parseFloat(produto.estoqueMaximo).toFixed(2) || '',
+                        gtin: produto.gtin || '',
+                        gtinEmbalagem: produto.gtinEmbalagem || '',
+                        larguraProduto: produto.larguraProduto || '',
+                        largura: produto.larguraProduto || '',
+                        alturaProduto: produto.alturaProduto || '',
+                        altura: produto.alturaProduto || '',
+                        profundidadeProduto: produto.profundidadeProduto || '',
+                        profundidade: produto.profundidadeProduto || '',
+                        unidadeMedida: produto.unidadeMedida || '',
+                        itensPorCaixa: produto.itensPorCaixa || '',
+                        volumes: produto.volumes || '',
+                        localizacao: produto.localizacao || '',
+                        crossdocking: produto.crossdocking || '',
+                        condicao: produto.condicao || '',
+                        freteGratis: produto.freteGratis || '',
+                        producao: produto.producao || '',
+                        dataValidade: produto.dataValidade || '',
+                        spedTipoItem: produto.spedTipoItem || '',
+                        descricaoCategoria: categoria ? categoria.descricao : '' || '',
+                        idCategoria: categoria ? categoria.id : '' || ''
                     });
+
                 } else {
                     this.setState({ produtos: [] });
                 }
@@ -253,7 +231,7 @@ class Produto extends React.Component {
                 this.abrirModal();
             })
             .catch(error => console.error(error));
-    }
+    };
 
     //GET - MÉTODO PARA CONSUMO DE CATEGORIAS
     buscarCategorias = () => {
@@ -270,7 +248,7 @@ class Produto extends React.Component {
                 this.setState({ categorias, carregando: false });
             })
             .catch((erro) => {
-                console.log(erro);
+                console.error(erro);
                 this.setState({ carregando: false });
             });
     };
@@ -285,11 +263,11 @@ class Produto extends React.Component {
         })
             .then(resposta => resposta.json())
             .then(dados => {
-                console.log(dados);
+                // console.log(dados);
                 this.buscarProdutos(); // atualiza a lista de produtos após a exclusão
             })
             .catch(erro => console.error(erro));
-    }
+    };
 
     //POST - MÉTODO PARA INSERIR UM NOVO PRODUTO
     cadastraProduto = (xmlProduto) => {
@@ -303,12 +281,12 @@ class Produto extends React.Component {
             headers: {
                 'Content-Type': 'application/xml'
             }
-        })
-    }
+        });
+    };
 
     //PUT - MÉTODO PARA ATUALIZAR UM PRODUTO EXISTENTE
     atualizarProduto = (xmlProduto) => {
-        console.log(xmlProduto)
+        // console.log(xmlProduto)
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlProduto, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
@@ -320,75 +298,80 @@ class Produto extends React.Component {
             headers: {
                 'Content-Type': 'application/xml'
             }
-        })
-    }
+        });
+    };
 
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //---------------------- SCRIPT´S DE AÇÕES PARA CADA UM DOS CAMPOS DE CADASTRO E ATUALIZAÇÃO. ---------------------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     atualizaCodigo = (event) => {
         const codigo = event.target.value
         this.setState({
             codigo: codigo
-        })
-    }
+        });
+    };
 
     atualizaDescricao = (event) => {
         const descricao = event.target.value;
         this.setState({
             descricao: descricao
         });
-    }
+    };
 
     atualizaTipo = (event) => {
         const tipo = event.target.value;
         this.setState({
             tipo: tipo
         });
-    }
+    };
 
     atualizaSituacao = (event) => {
         const situacao = event.target.value;
         this.setState({
             situacao: situacao
         });
-    }
+    };
 
     atualizaUnidade = (event) => {
         const unidade = event.target.value
         this.setState({
             unidade: unidade,
             un: unidade
-        })
-    }
+        });
+    };
 
     atualizaAlturaProduto = (event) => {
         const alturaProduto = event.target.value;
         this.setState({
-            altura: alturaProduto,
-            alturaProduto: alturaProduto
-        })
-    }
+            alturaProduto: alturaProduto,
+            altura: alturaProduto
+        });
+    };
 
     atualizaPreco = (event) => {
         const preco = event.target.value;
+        const precoFormatado = preco.replace(',', '.');
+
         this.setState({
-            preco: preco,
-            vlr_unit: preco
-        })
-    }
+            preco: preco,        // Mantém a formatação com vírgula para exibição
+            vlr_unit: precoFormatado  // Usa a formatação com ponto para o envio
+        });
+    };
 
     atualizaDescricaoCurta = (event) => {
         const descricaoCurta = event.target.value;
         this.setState({
             descricaoCurta: descricaoCurta
         });
-    }
+    };
 
     atualizaDescricaoComplementar = (event) => {
         const descricaoComplementar = event.target.value;
         this.setState({
             descricaoComplementar: descricaoComplementar
         });
-    }
+    };
 
     atualizaImagem = (event) => {
         const imageThumbnail = event.target.value
@@ -403,81 +386,85 @@ class Produto extends React.Component {
         this.setState({
             urlVideo: urlVideo
         });
-    }
+    };
 
     atualizaPesoLiq = (event) => {
         const pesoLiq = event.target.value
+        const pesoLiqFormatado = pesoLiq.replace(',', '.');
         this.setState({
-            pesoLiq: pesoLiq,
-            peso_liq: pesoLiq
-        })
-    }
+            pesoLiq: pesoLiqFormatado,
+            peso_liq: pesoLiqFormatado
+        });
+    };
 
     atualizaPesoBruto = (event) => {
         const pesoBruto = event.target.value
+        const pesoBrutoFormatado = pesoBruto.replace(',', '.');
         this.setState({
             pesoBruto: pesoBruto,
-            peso_bruto: pesoBruto
-        })
-    }
+            peso_bruto: pesoBrutoFormatado
+        });
+    };
 
     atualizaLarguraProduto = (event) => {
         const larguraProduto = event.target.value
+        const larguraProdutoFormatado = larguraProduto.replace(',', '.');
         this.setState({
             larguraProduto: larguraProduto,
-            largura: larguraProduto
-        })
-    }
+            largura: larguraProdutoFormatado
+        });
+    };
 
     atualizaProfundidadeProduto = (event) => {
         const profundidadeProduto = event.target.value
+        const profundidadeProdutoFormatado = profundidadeProduto.replace(',', '.');
         this.setState({
             profundidadeProduto: profundidadeProduto,
-            profundidade: profundidadeProduto
-        })
-    }
+            profundidade: profundidadeProdutoFormatado
+        });
+    };
 
     atualizaLinkExterno = (event) => {
         const linkExterno = event.target.value;
         this.setState({
             linkExterno: linkExterno
         });
-    }
+    };
 
     atualizaObservacoes = (event) => {
         const observacoes = event.target.value;
         this.setState({
             observacoes: observacoes
         });
-    }
+    };
 
     atualizaEstoqueMinimo = (event) => {
         const estoqueMinimo = event.target.value;
         this.setState({
             estoqueMinimo: estoqueMinimo
         });
-    }
+    };
 
     atualizaEstoqueMaximo = (event) => {
         const estoqueMaximo = event.target.value;
         this.setState({
             estoqueMaximo: estoqueMaximo
         });
-    }
+    };
 
     atualizaCondicao = (event) => {
         const condicao = event.target.value;
         this.setState({
             condicao: condicao
         });
-    }
+    };
 
     atualizaProducao = (event) => {
         const producao = event.target.value;
         this.setState({
             producao: producao
         });
-    }
+    };
 
     atualizaDataValidade = (event) => {
         const dataValidade = event.target.value;
@@ -491,7 +478,7 @@ class Produto extends React.Component {
         this.setState({
             freteGratis: freteGratis
         });
-    }
+    };
 
     atualizaVolumes = (event) => {
         const value = event.target.value;
@@ -499,53 +486,54 @@ class Produto extends React.Component {
             this.setState({
                 volumes: value
             });
-        }
-    }
+        };
+    };
 
     atualizaItensPorCaixa = (event) => {
         const itensPorCaixa = event.target.value;
         this.setState({
             itensPorCaixa: itensPorCaixa
         });
-    }
+    };
 
     atualizaUnidadeMedida = (event) => {
         const unidadeMedida = event.target.value;
         this.setState({
             unidadeMedida: unidadeMedida
         });
-    }
+    };
 
     atualizaGtin = (event) => {
         const gtin = event.target.value;
         this.setState({
             gtin: gtin
         });
-    }
+    };
 
     atualizaGtinEmbalagem = (event) => {
         const gtinEmbalagem = event.target.value;
         this.setState({
             gtinEmbalagem: gtinEmbalagem
         });
-    }
+    };
 
     atualizaCrossdocking = (event) => {
         const crossdocking = event.target.value
         this.setState({
             crossdocking: crossdocking
-        })
-    }
+        });
+    };
 
     atualizaLocalizacao = (event) => {
         const localizacao = event.target.value
         this.setState({
             localizacao: localizacao
-        })
-    }
+        });
+    };
 
     atualizaCategoria = (event) => {
         const idCategoria = event.target.value
+        // console.log(idCategoria)
         this.setState({
             idCategoria: idCategoria
         });
@@ -556,243 +544,27 @@ class Produto extends React.Component {
         this.setState({
             marca: marca
         });
-    }
+    };
 
     atualizaCodigoItem = (event) => {
         const codigoItem = event.target.value;
         this.setState({
             codigoItem: codigoItem
         });
-    }
+    };
 
-
-
-
-    //Ações do botão SUBMIT (Cadastrar).
-    submit = (event) => {
-
-        event.preventDefault(); // Prevenir o comportamento padrão do formulário
-
-        let categoria = {};
-
-        if (this.state.idCategoria !== '') {
-            categoria = {
-                idCategoria: this.state.idCategoria,
-                descricaoCategoria: this.state.descricaoCategoria
-            };
-        }
-
-        if (this.state.id === 0) {
-            const produto = {
-                descricao: this.state.descricao,
-                situacao: this.state.situacao,
-                codigo: this.state.codigo,
-                tipo: this.state.tipo,
-                vlr_unit: this.state.vlr_unit,
-                un: this.state.un,
-                condicao: this.state.condicao,
-
-                // Caracteristica
-                marca: this.state.marca,
-                producao: this.state.producao,
-                dataValidade: this.state.dataValidade,
-                freteGratis: this.state.freteGratis,
-                peso_liq: this.state.peso_liq,
-                peso_bruto: this.state.peso_bruto,
-                largura: this.state.largura,
-                altura: this.state.altura,
-                profundidade: this.state.profundidade,
-                volumes: this.state.volumes,
-                itensPorCaixa: this.state.itensPorCaixa,
-                unidadeMedida: this.state.unidadeMedida,
-                gtin: this.state.gtin,
-                gtinEmbalagem: this.state.gtinEmbalagem,
-                descricaoCurta: this.state.descricaoCurta,
-                descricaoComplementar: this.state.descricaoComplementar,
-                linkExterno: this.state.linkExterno,
-                urlVideo: this.state.urlVideo,
-                observacoes: this.state.observacoes,
-                ...categoria,
-
-                // Imagem
-                imagens: [{
-                    url: this.state.url
-                }],
-
-                // Estoque
-                estoqueMinimo: this.state.estoqueMinimo,
-                estoqueMaximo: this.state.estoqueMaximo,
-                crossdocking: this.state.crossdocking,
-                localizacao: this.state.localizacao,
-
-                // Fornecedores
-                codigoFabricante: this.state.codigoFabricante,
-                idFabricante: this.state.idFabricante,
-                nomeFornecedor: '',
-                descricaoFornecedor: this.state.descricaoFornecedor,
-                codigoItem: this.state.codigoItem,
-                preco_custo: this.state.preco_custo,
-                garantia: this.state.garantia,
-
-                // INFORMACOES NAO TELA
-                spedTipoItem: this.state.spedTipoItem,
-
-                // FISCAL
-                class_fiscal: this.state.class_fiscal,
-                cest: this.state.cest,
-                origem: this.state.origem,
-                idGrupoProduto: this.state.idGrupoProduto,
-                grupoProduto: '',
-
-                // ---------------------------------------------------
-
-                // deposito: [],
-                // idDeposito: this.state.idDeposito,
-                // estoqueDeposito: this.state.estoqueDeposito,
-
-                // variacoes: [],
-                // nomeVariacao: this.state.nomeVariacao,
-                // codigoVariacao: this.state.codigoVariacao,
-                // vlr_unitVariacao: this.state.vlr_unitVariacao,
-                // clonarDadosPaiVariacao: this.state.clonarDadosPaiVariacao,
-                // estoqueVariacao: this.state.estoqueVariacao,
-
-                // alias: [],
-
-                // estrutura: [],
-                // tipoEstoqueEstrutura: this.state.tipoEstoqueEstrutura,
-                // lancarEstoque: this.state.lancarEstoque,
-
-                // componente: [],
-                // nomeComponente: this.state.nomeComponente,
-                // codigoComponente: this.state.codigoComponente,
-                // quantidadeComponente: this.state.quantidadeComponente,
-            };
-
-            const xmlProduto = parse('produto', produto);
-            this.cadastraProduto(xmlProduto);
-        } else {
-            const produto = {
-                id: this.state.id,
-                descricao: this.state.descricao,
-                situacao: this.state.situacao,
-                codigo: this.state.codigo,
-                tipo: this.state.tipo,
-                vlr_unit: this.state.vlr_unit,
-                un: this.state.un,
-                condicao: this.state.condicao,
-
-                // Caracteristica
-                marca: this.state.marca,
-                producao: this.state.producao,
-                dataValidade: this.state.dataValidade,
-                freteGratis: this.state.freteGratis,
-                peso_liq: this.state.peso_liq,
-                peso_bruto: this.state.peso_bruto,
-                largura: this.state.largura,
-                altura: this.state.altura,
-                profundidade: this.state.profundidade,
-                volumes: this.state.volumes,
-                itensPorCaixa: this.state.itensPorCaixa,
-                unidadeMedida: this.state.unidadeMedida,
-                gtin: this.state.gtin,
-                gtinEmbalagem: this.state.gtinEmbalagem,
-                descricaoCurta: this.state.descricaoCurta,
-                descricaoComplementar: this.state.descricaoComplementar,
-                linkExterno: this.state.linkExterno,
-                urlVideo: this.state.urlVideo,
-                observacoes: this.state.observacoes,
-                ...categoria,
-
-                // Imagem
-                imagens: [{
-                    url: this.state.url
-                }],
-
-                // Estoque
-                estoqueMinimo: this.state.estoqueMinimo,
-                estoqueMaximo: this.state.estoqueMaximo,
-                crossdocking: this.state.crossdocking,
-                localizacao: this.state.localizacao,
-
-                // Fornecedores
-                codigoFabricante: this.state.codigoFabricante,
-                idFabricante: this.state.idFabricante,
-                nomeFornecedor: '',
-                descricaoFornecedor: this.state.descricaoFornecedor,
-                codigoItem: this.state.codigoItem,
-                preco_custo: this.state.preco_custo,
-                garantia: this.state.garantia,
-
-                // INFORMACOES NAO TELA
-                spedTipoItem: this.state.spedTipoItem,
-
-                // FISCAL
-                class_fiscal: this.state.class_fiscal,
-                cest: this.state.cest,
-                origem: this.state.origem,
-                idGrupoProduto: this.state.idGrupoProduto,
-                grupoProduto: '',
-
-                // ---------------------------------------------------
-
-                // deposito: [],
-                // idDeposito: this.state.idDeposito,
-                // estoqueDeposito: this.state.estoqueDeposito,
-
-                // variacoes: [],
-                // nomeVariacao: this.state.nomeVariacao,
-                // codigoVariacao: this.state.codigoVariacao,
-                // vlr_unitVariacao: this.state.vlr_unitVariacao,
-                // clonarDadosPaiVariacao: this.state.clonarDadosPaiVariacao,
-                // estoqueVariacao: this.state.estoqueVariacao,
-
-
-                // alias: [],
-
-                // estrutura: [],
-                // tipoEstoqueEstrutura: this.state.tipoEstoqueEstrutura,
-                // lancarEstoque: this.state.lancarEstoque,
-
-                // componente: [],
-                // nomeComponente: this.state.nomeComponente,
-                // codigoComponente: this.state.codigoComponente,
-                // quantidadeComponente: this.state.quantidadeComponente,
-            }
-            const xmlProduto = parse('produto', produto);
-            this.atualizarProduto(xmlProduto);
-        }
-
-        const form = event.currentTarget;
-
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
-            this.setState({ validated: true }); // atribui true na validação
-        } else {
-            event.preventDefault();
-            this.setState({ validated: false }); // atribui true na validação
-            setTimeout(() => {
-                this.reset();// atualiza a lista de produtos após a exclusão
-            }, 500); // 500 milissegundos equivalem a 1 segundo
-            setTimeout(() => {
-                this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
-            }, 500); // 500 milissegundos equivalem a 1 segundo
-            setTimeout(() => {
-                this.buscarProdutos(); // atualiza a lista de produtos após a exclusão
-            }, 500); // 500 milissegundos equivalem a 1 segundo
-        }
-    }
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //---------------- SCRIPT´S DE AÇÃO PARA OS BOTÕES DA TELA PRODUTO E GERAÇÃO DO XML DE ENVIO PARA O BLING. --------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //Ação para limpar o campos do modal para cadastrar um novo cliente.
     reset = () => {
         this.setState({
-
             id: 0,
             descricao: '',
             situacao: 'Ativo',
             codigo: '',
-            tipo: '',
+            tipo: 'P',
             preco: '',
             vlr_unit: '',
             unidade: '',
@@ -843,9 +615,7 @@ class Produto extends React.Component {
             descricaoFornecedor: '',
             codigoItem: '',
             precoCusto: '',
-            preco_custo: '',
             garantia: '',
-
 
             // INFORMACOES NAO TELA
             dataInclusao: '',
@@ -861,13 +631,106 @@ class Produto extends React.Component {
         });
 
         this.abrirModal();
-    }
-
-    handleSituacaoChange = () => {
-        this.setState((prevState) => ({
-            situacao: prevState.situacao === 'Ativo' ? 'Inativo' : 'Ativo'
-        }));
     };
+
+    submit = (event) => {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const isValid = form.checkValidity();
+
+        if (!isValid) {
+            event.stopPropagation();
+            this.setState({ validated: true });
+            return;
+        };
+
+        const produto = {};
+        const campos = [
+            'id',
+            'descricao',
+            'situacao',
+            'codigo',
+            'tipo',
+            'vlr_unit',
+            'un',
+            'condicao',
+            'marca',
+            'producao',
+            'dataValidade',
+            'freteGratis',
+            'peso_liq',
+            'peso_bruto',
+            'largura',
+            'altura',
+            'profundidade',
+            'volumes',
+            'itensPorCaixa',
+            'unidadeMedida',
+            'gtin',
+            'gtinEmbalagem',
+            'descricaoCurta',
+            'descricaoComplementar',
+            'linkExterno',
+            'urlVideo',
+            'url',
+            'observacoes',
+            'estoqueMinimo',
+            'estoqueMaximo',
+            'crossdocking',
+            'localizacao',
+            'codigoFabricante',
+            'idFabricante',
+            'descricaoFornecedor',
+            'codigoItem',
+            'precoCusto',
+            'garantia',
+            'spedTipoItem',
+            'class_fiscal',
+            'cest',
+            'origem',
+            'idGrupoProduto',
+            'grupoProduto',
+            'idCategoria'
+        ];
+
+        campos.forEach(campo => {
+            if (this.state[campo] !== null && this.state[campo] !== '') {
+                produto[campo] = this.state[campo];
+            };
+        });
+
+        if (this.state.url !== '') {
+            produto.imagens = {
+                url: this.state.url
+            };
+        };
+
+        const xmlProduto = parse('produto', produto);
+        // console.log(xmlProduto);
+
+        if (this.state.id === 0) {
+            this.modalSalvarProduto();
+            this.cadastraProduto(xmlProduto);
+            this.reset();
+            this.fecharModal();
+        } else {
+            this.modalSalvarProduto();
+            this.atualizarProduto(xmlProduto);
+            this.reset();
+            this.fecharModal();
+        };
+
+        this.setState({ validated: false });
+
+        setTimeout(() => {
+            this.buscarProdutos();
+        }, 1000);
+    };
+
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //--------------------------------------------- SCRIPT´S DE AÇÃO DOS MODALS. --------------------------------------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //Ação para fechar o modal de cadastro e atualização.
     fecharModal = () => {
@@ -875,24 +738,55 @@ class Produto extends React.Component {
             modalAberta: false,
             validated: false
         });
-    }
+    };
 
     //Ação para abrir o modal de cadastro e atualização.
     abrirModal = () => {
         this.setState({
             modalAberta: true
         });
-    }
+    };
 
     modalExcluirProduto = () => {
         this.setState({
-            ModalExcluirProduto: !this.state.ModalExcluirProduto,
+            modalExcluirProduto: !this.state.modalExcluirProduto,
         });
     };
 
-    handleSearchChange = (event) => {
+    modalSalvarProduto = () => {
+        this.setState({
+            modalSalvarProduto: !this.state.modalSalvarProduto
+        }, () => {
+            setTimeout(() => {
+                this.setState({
+                    modalSalvarProduto: false
+                })
+            }, 1000);
+        });
+    };
+
+    modalExcluindoProduto = () => {
+        this.setState({
+            modalExcluindoProduto: !this.state.modalExcluindoProduto
+        }, () => {
+            setTimeout(() => {
+                this.setState({
+                    modalExcluindoProduto: false
+                })
+            }, 1000);
+        });
+    };
+
+    handleSituacaoChange = () => {
+        this.setState((prevState) => ({
+            situacao: prevState.situacao === 'Ativo' ? 'Inativo' : 'Ativo'
+        }));
+    };
+
+    campoBusca = (event) => {
         this.setState({ searchTerm: event.target.value });
     };
+
 
     render() {
         const { tipo } = this.state;
@@ -924,14 +818,14 @@ class Produto extends React.Component {
                                     <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                     Incluir Cadastro
                                 </button>
-                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>PRODUTO</span>
+                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>PRODUTOS</span>
                             </div>
                         </Col>
 
                         <Col className="col">
                             <div className="d-flex align-items-center justify-content-start mt-3 mb-3 flex-row">
                                 <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar produto:</span>
-                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.campoBusca} className="form-control ml-2" />
                             </div>
                         </Col>
                     </Container >
@@ -945,7 +839,7 @@ class Produto extends React.Component {
                                         <th title="Código">Código</th>
                                         <th title="Unidade">Unidade</th>
                                         <th title="Preço">Preço</th>
-                                        <th title="Estoque">Estoque</th>
+                                        {/* <th title="Estoque">Estoque</th> */}
                                         <th title="Opções">Opções</th>
                                     </tr>
                                 </thead>
@@ -970,14 +864,24 @@ class Produto extends React.Component {
                                                     <td>{produtos.produto.descricao}</td>
                                                     <td>{produtos.produto.codigo}</td>
                                                     <td>{produtos.produto.unidade}</td>
-                                                    <td>{parseFloat(produtos.produto.preco).toFixed(2)}</td>
-                                                    <td>{produtos.produto.estoqueMaximo}</td>
+                                                    <td>{parseFloat(produtos.produto.preco).toFixed(2).replace('.', ',')}</td>
+                                                    {/* <td>{produtos.produto.estoqueMaximo}</td> */}
                                                     <td>
                                                         <div className="button-container-table">
                                                             <Button variant="warning" title="Editar produto" onClick={() => this.carregarProdutos(produtos.produto.codigo)}>
                                                                 <BsPencilSquare />
                                                             </Button>
-                                                            <Button variant="danger" title="Excluir produto" onClick={() => this.excluirProduto(produtos.produto.codigo)}>
+                                                            <Button
+                                                                variant="danger"
+                                                                title="Excluir produto"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    this.setState({
+                                                                        codigoProdutoParaExcluir: produtos.produto.codigo,
+                                                                        modalExcluirProduto: true,
+                                                                    });
+                                                                }}
+                                                            >
                                                                 <FaTrash />
                                                             </Button>
                                                         </div>
@@ -988,16 +892,27 @@ class Produto extends React.Component {
                                             return null;
                                         }
                                     })}
-                                    {this.state.produtos.length === 0 && <tr><td colSpan="6">Nenhum produto cadastrado.</td></tr>}
+                                    {this.state.produtos.length === 0 && <tr><td colSpan="6">Nenhum produto cadastrado.</td>
+                                        <td>
+                                            <div className="button-container-table">
+                                                <Button variant="warning" title="Editar produto" onClick={() => this.carregarProdutos(this.state.produtos.produto.codigo)} disabled>
+                                                    <BsPencilSquare />
+                                                </Button>
+                                                <Button variant="danger" title="Excluir produto" onClick={() => this.modalExcluirProduto} disabled>
+                                                    <FaTrash />
+                                                </Button>
+                                            </div>
+                                        </td></tr>}
                                 </tbody>
                             </Table>
                         </Container>
                     </div>
 
-                    {/* Modal */}
+                    {/* ---------------------------------------------------------- MODALS ---------------------------------------------------------- */}
+
                     <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" fullscreen="xxl-down" backdrop="static" >
                         <Modal.Header closeButton className="modal-produto-header">
-                            <Modal.Title>Cadastro/Atualização de Produto</Modal.Title>
+                            <Modal.Title>Produtos</Modal.Title>
                         </Modal.Header>
                         <Modal.Body className="modal-produto-body">
                             <Container>
@@ -1093,7 +1008,7 @@ class Produto extends React.Component {
                                             <Form.Group controlId="Formato" className="mb-3">
                                                 <Form.Label>Condição</Form.Label>
                                                 <Form.Select as="select" value={this.state.condicao || ''} onChange={this.atualizaCondicao} >
-                                                    <option value="">Não Evspecificado</option>
+                                                    <option value="">Não Especificado</option>
                                                     <option value="NOVO">Novo</option>
                                                     <option value="USADO">Usado</option>
                                                     <option value="RECONDICIONADO">Recondicionado</option>
@@ -1124,12 +1039,11 @@ class Produto extends React.Component {
                                                             </Form.Group>
                                                         </Col>
                                                         {/* <Col xs={2} md={3}>
-                                            <Form.Group controlId="datavalidade" className="mb-3">
-                                                <Form.Label>Data de validade</Form.Label>
-                                                <Form.Control type="date" placeholder="Digite o nome" value={this.state.dataValidade || ''} onChange={this.atualizaDataValidade} />
-                                                <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col> */}
+                                                            <Form.Group controlId="datavalidade" className="mb-3">
+                                                                <Form.Label>Data de validade</Form.Label>
+                                                                <Form.Control type="text" placeholder="Digite a data de validade" value={this.state.dataValidade || ''} onChange={this.atualizaDataValidade} />
+                                                            </Form.Group>
+                                                        </Col> */}
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="frete" className="mb-3">
                                                                 <Form.Label>Frete Grátis</Form.Label>
@@ -1257,7 +1171,7 @@ class Produto extends React.Component {
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="categoria" className="mb-3">
                                                         <Form.Label>Categoria</Form.Label>
-                                                        <Form.Control as="select" placeholder="insira as observações" value={this.state.idCategoria || ''} onChange={(event) => this.atualizaCategoria(event)} >
+                                                        <Form.Control as="select" placeholder="insira as observações" value={this.state.idCategoria || ''} onChange={this.atualizaCategoria} >
                                                             <option value="">Sem categoria</option>
                                                             {this.state.categorias.map((categoria) => (
                                                                 <option key={categoria.categoria.id} value={categoria.categoria.id}>
@@ -1311,10 +1225,9 @@ class Produto extends React.Component {
                                                 </div>
                                             )}
                                         </Tab>
-                                        <Tab eventKey="fornecedores" title="Fornecedores">
+                                        {/* <Tab eventKey="fornecedores" title="Fornecedores">
 
-
-                                        </Tab>
+                                        </Tab> */}
                                     </Tabs>
                                     <Row className="text-center">
                                         <Col>
@@ -1335,19 +1248,38 @@ class Produto extends React.Component {
                         </Modal.Body>
                     </Modal>
 
+                    <Modal show={this.state.modalSalvarProduto} onHide={this.modalSalvarProduto} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Salvando produto...</strong></span>
+                        </Modal.Body>
+                    </Modal>
 
-                    <Modal show={this.state.ModalExcluirProduto} onHide={this.modalExcluirProduto} centered>
-                        <Modal.Header closeButton className="bg-warning text-white">
+                    <Modal show={this.state.modalExcluirProduto} onHide={this.modalExcluirProduto} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
                             <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                             <Modal.Title>Atenção </Modal.Title>
                         </Modal.Header>
                         <Modal.Body style={{ padding: '20px' }}>
-                            Deseja excluir o item? Essa ação não poderá ser desfeita.
+                            Deseja excluir o produto? Essa ação não poderá ser desfeita.
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>Não</Button>
-                            <Button type="button" variant="secondary" onClick={() => this.excluirProduto(this.state.codigo)}>Sim</Button>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>
+                                Não
+                            </Button>
+                            <Button type="button" variant="secondary" onClick={() => {
+                                this.excluirProduto(this.state.codigoProdutoParaExcluir);
+                                this.modalExcluirProduto();
+                                this.modalExcluindoProduto();
+                            }}>
+                                Sim
+                            </Button>
                         </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={this.state.modalExcluindoProduto} onHide={this.modalExcluindoProduto} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Excluindo produto...</strong></span>
+                        </Modal.Body>
                     </Modal>
                 </div >
             )

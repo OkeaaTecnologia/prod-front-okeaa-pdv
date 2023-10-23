@@ -22,6 +22,8 @@ class Contato extends React.Component {
 
         this.state = {
             contatos: [],
+            tiposContato: [],
+            itensSelecionados: [],
             id: 0,
             codigo: '',
             nome: '',
@@ -48,48 +50,44 @@ class Contato extends React.Component {
             clienteDesde: '',
             limiteCredito: '',
             dataNascimento: '',
-            tiposContato: [],
             tipoContato: '',
             descricao: '',
             logradouro: '',
             localidade: '',
-            carregando: true,
-            modalAberta: false,
-            validated: false,
             cpfValido: '',
             searchTerm: '', // Estado para o termo de busca
-
-        }
+            carregando: true,
+            modalAberta: false,
+            modalSalvarContato: false,
+            validated: false,
+        };
 
         this.numeroRef = React.createRef();
-    }
+    };
 
     componentDidMount() {
         this.buscarContato();
-    }
+        this.buscarTipoContato();
+    };
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.logradouro !== this.state.logradouro) {
             this.atualizaEndereco({ target: { value: this.state.logradouro } });
-        }
+        };
         if (prevState.localidade !== this.state.localidade) {
             this.atualizaCidade({ target: { value: this.state.localidade } });
-        }
+        };
         if (prevState.cnpj !== this.state.cnpj) {
             this.atualizaCpfCnpj({ target: { value: this.state.cnpj } });
-        }
+        };
         if (prevState.tipo !== this.state.tipo) {
             this.atualizaTipoPessoa({ target: { value: this.state.tipo } });
-        }
-    }
+        };
+    };
 
-    componentWillUnmount() {
-
-    }
-
-    /**
-     *  -------------------- CHAMADAS E CONSUMO DA API DE CONTATOS. -------------------- 
-     */
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //--------------------------------------- CHAMADAS E CONSUMO DA API DE CONTATOS. ----------------------------------------|  
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //GET - MÉTODO PARA CONSUMO DA API CONTATOS
     buscarContato = () => {
@@ -104,15 +102,15 @@ class Contato extends React.Component {
                 if (dados.retorno.contatos) {
                     this.setState({
                         contatos: dados.retorno.contatos,
-                    })
+                    });
                 } else {
                     this.setState({ contatos: [] })
-                }
+                };
                 this.setState({ carregando: false })
-            })
-    }
+            });
+    };
 
-    //GET - MÉTODO PARA CONSUMO DA API CONTATOS
+    //GET - MÉTODO PARA CONSUMO DE UM CONTATO PELO ID
     atualizaContato = (id) => {
         fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/${id}`, {
             method: 'GET',
@@ -132,7 +130,6 @@ class Contato extends React.Component {
                     }));
 
                     // console.log(tiposContato); // Adicione o console.log aqui
-
                     this.setState({
                         id: contato.id,
                         codigo: contato.codigo,
@@ -170,7 +167,27 @@ class Contato extends React.Component {
                 this.abrirModal();
             })
             .catch(error => console.error(error));
-    }
+    };
+
+    //GET - MÉTODO PARA CONSUMO DE TIPOS DE CONTATO DO BANCO DE DADOS.
+    buscarTipoContato = () => {
+        // fetch(`https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`, {
+        fetch("http://localhost:8080/api/v1/selecionartipocontato", {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ tiposDeContato: data });
+                console.log(data); // Adicione o console.log aqui
+            })
+            .catch(error => {
+                console.error('Erro ao buscar as lojas:', error);
+            });
+    };
 
     //POST - MÉTODO PARA INSERIR UM NOVO CONTATO NA API CONTATOS
     cadastraContato = (xmlContato) => {
@@ -184,8 +201,8 @@ class Contato extends React.Component {
             headers: {
                 'Content-Type': 'application/xml'
             }
-        })
-    }
+        });
+    };
 
     //PUT - MÉTODO PARA ATUALIZAR UM CONTATO EXISTENTE NA API CONTATOS
     atualizarContato = (xmlContato) => {
@@ -200,9 +217,10 @@ class Contato extends React.Component {
             headers: {
                 'Content-Type': 'application/xml'
             }
-        })
-    }
+        });
+    };
 
+    //GET - MÉTODO DO VIACEP PARA PREENCHER OS CAMPOS DE ENDEREÇO, BAIRRO, CIDADE.
     checkCEP = (event) => {
         const cep = event.target.value.replace(/\D/g, '');
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
@@ -213,51 +231,51 @@ class Contato extends React.Component {
                     bairro: data.bairro,
                     cidade: data.localidade,
                     uf: data.uf,
-                })
+                });
                 console.log(data);
                 this.numeroRef.current.focus();
-            })
-    }
+            });
+    };
 
-    /**
-     *  -------------------- SCRIPT´S DE AÇÕES PARA CADA UM DOS CAMPOS DE CADASTRO E ATUALIZAÇÃO. -------------------- 
-     */
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //---------------------- SCRIPT´S DE AÇÕES PARA CADA UM DOS CAMPOS DE CADASTRO E ATUALIZAÇÃO. ---------------------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     atualizaCodigo = (event) => {
         const codigo = event.target.value;
         this.setState({
             codigo: codigo
-        })
-    }
+        });
+    };
 
     atualizaNome = (event) => {
         const nome = event.target.value
         this.setState({
             nome: nome
-        })
-    }
+        });
+    };
 
     atualizaFantasia = (event) => {
         const fantasia = event.target.value
         this.setState({
             fantasia: fantasia
-        })
-    }
+        });
+    };
 
     atualizaTipoPessoa = (event) => {
         const tipo = event.target.value
         this.setState({
             tipo: tipo,
             tipoPessoa: tipo
-        })
-    }
+        });
+    };
 
     atualizaContribuinte = (event) => {
         const contribuinte = event.target.value
         this.setState({
             contribuinte: contribuinte
-        })
-    }
+        });
+    };
 
     atualizaCpfCnpj = (event) => {
         const cnpj = event.target.value;
@@ -272,7 +290,7 @@ class Contato extends React.Component {
                     cnpjValido: false // Define a flag de CNPJ válido como false
                 });
                 return; // Retorna antecipadamente para evitar ações adicionais
-            }
+            };
 
             const cpfFormatado = cpfCnpjSemPontuacao.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             this.setState({
@@ -290,7 +308,7 @@ class Contato extends React.Component {
                     cnpjValido: false // Define a flag de CNPJ válido como false
                 });
                 return; // Retorna antecipadamente para evitar ações adicionais
-            }
+            };
 
             const cnpjFormatado = cpfCnpjSemPontuacao.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
             this.setState({
@@ -306,7 +324,7 @@ class Contato extends React.Component {
                 cpfValido: false,
                 cnpjValido: false
             });
-        }
+        };
     };
 
     validarCPF(cpf) {
@@ -350,7 +368,7 @@ class Contato extends React.Component {
         }
 
         return true; // CPF válido
-    }
+    };
 
     validarCNPJ(cnpj) {
 
@@ -402,7 +420,7 @@ class Contato extends React.Component {
         }
 
         return true; // CNPJ válido
-    }
+    };
 
     atualizaIe_Rg = (event) => {
         const ie_rg = event.target.value;
@@ -410,7 +428,7 @@ class Contato extends React.Component {
         this.setState({
             ie_rg: formattedValue
         });
-    }
+    };
 
     formatIeRg = (value, tipo) => {
         // console.log("tipo: ", tipo)
@@ -426,10 +444,17 @@ class Contato extends React.Component {
             if (match) {
                 return `${match[1]}.${match[2]}.${match[3]}-${match[4]}`;
             }
-        }
+        };
 
         return value;
-    }
+    };
+
+    atualizaSexo = (event) => {
+        const sexo = event.target.value
+        this.setState({
+            sexo: sexo
+        });
+    };
 
     atualizaEndereco = (event) => {
         const endereco = event.target.value
@@ -443,22 +468,22 @@ class Contato extends React.Component {
         const numero = event.target.value
         this.setState({
             numero: numero
-        })
-    }
+        });
+    };
 
     atualizaComplemento = (event) => {
         const complemento = event.target.value
         this.setState({
             complemento: complemento
-        })
-    }
+        });
+    };
 
     atualizaBairro = (event) => {
         const bairro = event.target.value
         this.setState({
             bairro: bairro
-        })
-    }
+        });
+    };
 
     atualizaCep = (event) => {
         const cep = event.target.value;
@@ -467,22 +492,22 @@ class Contato extends React.Component {
         this.setState({
             cep: cepFormatado
         });
-    }
+    };
 
     atualizaCidade = (event) => {
         const cidade = event.target.value
         this.setState({
             localidade: cidade,
             cidade: cidade
-        })
-    }
+        });
+    };
 
     atualizaUf = (event) => {
         const uf = event.target.value
         this.setState({
             uf: uf
-        })
-    }
+        });
+    };
 
     atualizaFone = (event) => {
         const fone = event.target.value;
@@ -491,7 +516,7 @@ class Contato extends React.Component {
         this.setState({
             fone: foneFormatado
         });
-    }
+    };
 
     atualizaCelular = (event) => {
         const celular = event.target.value;
@@ -500,14 +525,43 @@ class Contato extends React.Component {
         this.setState({
             celular: celularFormatado
         });
-    }
+    };
 
     atualizaEmail = (event) => {
         const email = event.target.value
         this.setState({
             email: email
-        })
-    }
+        });
+    };
+
+    atualizaSite = (event) => {
+        const site = event.target.value
+        this.setState({
+            site: site
+        });
+    };
+
+    atualizaSituacao = (event) => {
+        const situacao = event.target.value
+        this.setState({
+            situacao: situacao
+        });
+    };
+
+    atualizaLimiteCredito = (event) => {
+        const limiteCredito = event.target.value
+        const limiteCreditoFormatado = limiteCredito.replace(',', '.');
+        this.setState({
+            limiteCredito: limiteCreditoFormatado
+        });
+    };
+
+    atualizaDescricao = (event) => {
+        const descricao = event.target.value
+        this.setState({
+            descricao: descricao
+        });
+    };
 
     // atualizaEmailNfe = (event) => {
     //     console.log(event.target.value); // Verifica se o valor do campo está sendo capturado corretamente
@@ -517,115 +571,46 @@ class Contato extends React.Component {
     //     })
     // }
 
-    atualizaInformacaoContato = (event) => {
-        const informacaoContato = event.target.value
-        this.setState({
-            informacaoContato: informacaoContato
-        })
-    }
+    // atualizaInformacaoContato = (event) => {
+    //     const informacaoContato = event.target.value
+    //     this.setState({
+    //         informacaoContato: informacaoContato
+    //     })
+    // }
 
-    atualizaLimiteCredito = (event) => {
-        const limiteCredito = event.target.value
-        this.setState({
-            limiteCredito: limiteCredito
-        })
-    }
+    // handleSelectChange = (event) => {
+    //     const selectedItem = event.target.value;
 
-    atualizaDescricao = (event) => {
-        const descricao = event.target.value
-        this.setState({
-            descricao: descricao
-        })
-    }
+    //     if (selectedItem) {
+    //         // Verifique se o item já está na lista de itens selecionados
+    //         if (!this.state.itensSelecionados.includes(selectedItem)) {
+    //             // Adicione o item selecionado ao estado itensSelecionados
+    //             this.setState((prevState) => ({
+    //                 itensSelecionados: [...prevState.itensSelecionados, selectedItem],
+    //             }));
+    //         } else {
+    //             // Remova o item se já estiver selecionado
+    //             this.setState((prevState) => ({
+    //                 itensSelecionados: prevState.itensSelecionados.filter(
+    //                     (item) => item !== selectedItem
+    //                 ),
+    //             }));
+    //         };
 
-    /**
-     * -------------------- SCRIPT´S De AÇÃO PARA OS BOTÕES DA TELA CONTATO. -------------------- 
-     */
+    //         // Limpe a seleção no <select>
+    //         event.target.value = '';
+    //     };
+    // };
 
-    //Ações do botão SUBMIT (Cadastrar).
-    submit = (event) => {
-        event.preventDefault();
-        if (this.state.id === 0) {  // ------------------------------------ Ação de Cadastrar um contato novo.
+    // handleChange = (e) => {
+    //     const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+    //     this.setState({ tiposSelecionados: selectedOptions });
+    // };
 
-            const contato = {
-                nome: this.state.nome,
-                fantasia: this.state.fantasia,
-                tipoPessoa: this.state.tipoPessoa,
-                contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cnpj,
-                ie_rg: this.state.ie_rg,
-                endereco: this.state.endereco,
-                numero: this.state.numero,
-                complemento: this.state.complemento,
-                bairro: this.state.bairro,
-                cep: this.state.cep,
-                cidade: this.state.cidade,
-                uf: this.state.uf,
-                fone: this.state.fone,
-                celular: this.state.celular,
-                email: this.state.email,
-                // emailNfe: this.state.emailNfe,
-                informacaoContato: this.state.informacaoContato,
-                limiteCredito: this.state.limiteCredito,
-                codigo: this.state.codigo,
-                site: this.state.site,
-                obs: this.state.obs,
-                descricao: this.state.descricao,
-            }
-            const xmlContato = parse('contato', contato);
-            console.log(xmlContato)
-            this.cadastraContato(xmlContato);
-        } else {                    // ------------------------------------ Ação de atualizar um contato existente.
-            const contato = {
-                id: this.state.id,
-                nome: this.state.nome,
-                fantasia: this.state.fantasia,
-                tipoPessoa: this.state.tipoPessoa,
-                contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cnpj,
-                ie_rg: this.state.ie_rg,
-                endereco: this.state.endereco,
-                numero: this.state.numero,
-                complemento: this.state.complemento,
-                bairro: this.state.bairro,
-                cep: this.state.cep,
-                cidade: this.state.cidade,
-                uf: this.state.uf,
-                fone: this.state.fone,
-                celular: this.state.celular,
-                email: this.state.email,
-                // emailNfe: this.state.emailNfe,
-                informacaoContato: this.state.informacaoContato,
-                limiteCredito: this.state.limiteCredito,
-                codigo: this.state.codigo,
-                site: this.state.site,
-                obs: this.state.obs,
-                descricao: this.state.descricao,
-            }
-            const xmlContato = parse('contato', contato);
-            console.log(xmlContato)
-            this.atualizarContato(xmlContato);
-        }
 
-        //Realiza a validação dos campos obrigatorios.
-        const form = event.currentTarget
-
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
-            this.setState({ validated: true }); // atribui true na validação
-        } else {
-            // Verifica se o CPF é válido
-            if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
-                event.preventDefault();
-                this.setState({ validated: false }); // atribui true na validação
-                this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
-                this.buscarContato(); // atualiza a lista de produtos após a exclusão
-            } else {
-                this.ModalCpfValido();
-            }
-        }
-    }
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //---------------- SCRIPT´S DE AÇÃO PARA OS BOTÕES DA TELA PRODUTO E GERAÇÃO DO XML DE ENVIO PARA O BLING. --------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //Ação para limpar os campos do modal após cadastrar um novo cliente.
     reset = (event) => {
@@ -661,27 +646,121 @@ class Contato extends React.Component {
                 tipoContato: '',
                 descricao: '',
                 ModalCpfValido: false,
-
-            })
+                informacaoContato: '',
+            });
 
         this.abrirModal();
-    }
+    };
+
+    //Ações do botão SUBMIT (Cadastrar).
+    submit = (event) => {
+        event.preventDefault();
+        if (this.state.id === 0) {  // ------------------------------------ Ação de Cadastrar um contato novo.
+
+            const contato = {
+                nome: this.state.nome,
+                fantasia: this.state.fantasia,
+                tipoPessoa: this.state.tipoPessoa,
+                contribuinte: this.state.contribuinte,
+                cpf_cnpj: this.state.cnpj,
+                ie_rg: this.state.ie_rg,
+                endereco: this.state.endereco,
+                numero: this.state.numero,
+                complemento: this.state.complemento,
+                bairro: this.state.bairro,
+                cep: this.state.cep,
+                cidade: this.state.cidade,
+                uf: this.state.uf,
+                fone: this.state.fone,
+                celular: this.state.celular,
+                email: this.state.email,
+                // emailNfe: this.state.emailNfe,
+                informacaoContato: this.state.informacaoContato,
+                limiteCredito: this.state.limiteCredito,
+                codigo: this.state.codigo,
+                site: this.state.site,
+                obs: this.state.obs,
+                descricao: this.state.descricao,
+                sexo: this.state.sexo,
+                situacao: this.state.situacao
+            };
+            const xmlContato = parse('contato', contato);
+            // console.log(xmlContato);
+            this.modalSalvarContato();
+            this.cadastraContato(xmlContato);
+        } else {                    // ------------------------------------ Ação de atualizar um contato existente.
+            const contato = {
+                id: this.state.id,
+                nome: this.state.nome,
+                fantasia: this.state.fantasia,
+                tipoPessoa: this.state.tipoPessoa,
+                contribuinte: this.state.contribuinte,
+                cpf_cnpj: this.state.cnpj,
+                ie_rg: this.state.ie_rg,
+                endereco: this.state.endereco,
+                numero: this.state.numero,
+                complemento: this.state.complemento,
+                bairro: this.state.bairro,
+                cep: this.state.cep,
+                cidade: this.state.cidade,
+                uf: this.state.uf,
+                fone: this.state.fone,
+                celular: this.state.celular,
+                email: this.state.email,
+                // emailNfe: this.state.emailNfe,
+                informacaoContato: this.state.informacaoContato,
+                limiteCredito: this.state.limiteCredito,
+                codigo: this.state.codigo,
+                site: this.state.site,
+                obs: this.state.obs,
+                descricao: this.state.descricao,
+                sexo: this.state.sexo,
+                situacao: this.state.situacao
+            };
+            const xmlContato = parse('contato', contato);
+            console.log(xmlContato);
+            this.modalSalvarContato();
+            this.atualizarContato(xmlContato);
+        };
+
+        //Realiza a validação dos campos obrigatorios.
+        const form = event.currentTarget
+
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
+            this.setState({ validated: true }); // atribui true na validação
+        } else {
+            // Verifica se o CPF é válido
+            if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
+                event.preventDefault();
+                this.setState({ validated: false }); // atribui true na validação
+                this.buscarContato(); // atualiza a lista de produtos após a exclusão
+                this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
+            } else {
+                this.ModalCpfValido();
+            };
+        };
+    };
+
+    //-----------------------------------------------------------------------------------------------------------------------|
+    //--------------------------------------------- SCRIPT´S DE AÇÃO DOS MODALS. --------------------------------------------|
+    //-----------------------------------------------------------------------------------------------------------------------|
 
     //Ação para fechar o modal de cadastro e atualização.
     fecharModal = () => {
         this.setState({
             modalAberta: false
         });
-
         this.buscarContato()
-    }
+    };
 
     //Ação para abrir o modal de cadastro e atualização.
     abrirModal = () => {
         this.setState({
             modalAberta: true
         });
-    }
+    };
 
     ModalCpfValido = () => {
         this.setState((prevState) => ({
@@ -689,14 +768,23 @@ class Contato extends React.Component {
         }));
     };
 
-    handleSearchChange = (event) => {
+    modalSalvarContato = () => {
+        this.setState({
+            modalSalvarContato: !this.state.modalSalvarContato
+        }, () => {
+            setTimeout(() => {
+                this.setState({
+                    modalSalvarContato: false
+                })
+            }, 1000);
+        });
+    };
+
+    campoBusca = (event) => {
         this.setState({ searchTerm: event.target.value });
     };
 
 
-    /**
-     *  -------------------- TABELA DE CLIENTES. -------------------- 
-     */
     render() {
 
         const removeAccents = (str) => {
@@ -726,14 +814,14 @@ class Contato extends React.Component {
                                     <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                     Incluir Cadastro
                                 </button>
-                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>CONTATO E FORNECEDOR</span>
+                                <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>CLIENTES E FORNECEDORES</span>
                             </div>
                         </Col>
 
                         <Col className="col">
                             <div className="d-flex align-items-center mt-3 mb-3">
                                 <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar contato:</span>
-                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.campoBusca} className="form-control ml-2" />
                             </div>
                         </Col>
                     </Container>
@@ -757,10 +845,9 @@ class Contato extends React.Component {
                                         const normalizedDescription = removeAccents(contatos.contato.nome.toLowerCase());
                                         const normalizedCodigo = contatos.contato.codigo.toLowerCase();
 
-                                        if (
-                                            normalizedDescription.includes(normalizedSearchTerm) ||
-                                            normalizedCodigo.includes(normalizedSearchTerm)
-                                        ) {
+                                        // Verifique se a situação é diferente de 'E' antes de renderizar a linha
+                                        if (contatos.contato.situacao !== 'E' && contatos.contato.situacao !== 'I' && contatos.contato.situacao !== 'S' &&
+                                            (normalizedDescription.includes(normalizedSearchTerm) || normalizedCodigo.includes(normalizedSearchTerm))) {
                                             return (
                                                 <tr key={contatos.contato.id}
                                                     onClick={() => this.atualizaContato(contatos.contato.id)}
@@ -789,45 +876,11 @@ class Contato extends React.Component {
                         </Container>
                     </div>
 
-                    {/* <Container fluid className="pb-5">
-                        <Table striped bordered hover responsive="xl" >
-                            <thead>
-                                <tr>
-                                    <th title="Identificador">ID</th>
-                                    <th title="Código">Código</th>
-                                    <th title="Nome">Nome</th>
-                                    <th title="CPF / CNPJ">CPF/CNPJ</th>
-                                    <th title="Cidade">Cidade</th>
-                                    <th title="Telefone">Telefone</th>
-                                    <th title="Opções">Opções</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    this.state.contatos.map((contatos) =>
-                                        <tr key={contatos.contato.id}>
-                                            <td>{contatos.contato.id}</td>
-                                            <td>{contatos.contato.codigo}</td>
-                                            <td>{contatos.contato.nome}</td>
-                                            <td>{contatos.contato.cnpj}</td>
-                                            <td>{contatos.contato.cidade}</td>
-                                            <td>{contatos.contato.fone}</td>
-                                            <td>
-                                                <Button variant="warning" onClick={() => this.atualizaContato(contatos.contato.id)}>
-                                                    <FaSync />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    )
-                                }
-                                {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
-                            </tbody>
-                        </Table>
-                    </Container> */}
+                    {/* ---------------------------------------------------------- MODALS ---------------------------------------------------------- */}
 
                     <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
                         <Modal.Header closeButton className="modal-contato-header">
-                            <Modal.Title>Cadastro/Atualização de Cliente e Fornecedor</Modal.Title>
+                            <Modal.Title>Cliente ou Fornecedor</Modal.Title>
                         </Modal.Header>
                         <Modal.Body className="modal-contato-body">
                             <Form noValidate validated={this.state.validated} onSubmit={this.submit}>
@@ -842,6 +895,16 @@ class Contato extends React.Component {
                                         <Form.Group controlId="codigo" className="mb-3">
                                             <Form.Label>Código</Form.Label>
                                             <Form.Control type="text" placeholder="Insira o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={{ span: 3, offset: 5 }} md={{ span: 3, offset: 5 }}>
+                                        <Form.Group controlId="situacao" className="mb-3">
+                                            <Form.Label>Situação do cadastro</Form.Label>
+                                            <Form.Select type="select" placeholder="Situação" value={this.state.situacao || ''} onChange={this.atualizaSituacao}>
+                                                <option value="A">Ativo</option>
+                                                <option value="E">Excluído</option>
+                                                <option value="S">Sem movimento</option>
+                                            </Form.Select>
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -861,7 +924,7 @@ class Contato extends React.Component {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col xs={4} md={3}>
+                                    <Col xs={12} md={3}>
                                         <Form.Group controlId="tipo" className="mb-3">
                                             <Form.Label>Tipo Pessoa</Form.Label>
                                             <Form.Select type="select" placeholder="Selecione o tipo de contato" value={this.state.tipo || ''} onChange={this.atualizaTipoPessoa} required>
@@ -873,7 +936,7 @@ class Contato extends React.Component {
                                             <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                         </Form.Group>
                                     </Col>
-                                    <Col xs={4} md={3}>
+                                    <Col xs={12} md={3}>
                                         <Form.Group controlId="cnpj" className="mb-3">
                                             <Form.Label>
                                                 {this.state.tipo === 'J' ? 'CNPJ' : 'CPF'}
@@ -889,12 +952,22 @@ class Contato extends React.Component {
                                             <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                         </Form.Group>
                                     </Col>
-                                    <Col xs={4} md={3}>
+                                    <Col xs={12} md={3}>
                                         <Form.Group controlId="ie_rg" className="mb-3">
                                             <Form.Label>
                                                 {this.state.tipo === 'J' ? 'Inscrição Estadual' : 'RG'}
                                             </Form.Label>
                                             <Form.Control type="text" placeholder="Digite IE / RG" value={this.state.ie_rg || ''} onChange={this.atualizaIe_Rg} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={12} md={3}>
+                                        <Form.Group controlId="sexo" className="mb-3">
+                                            <Form.Label>Sexo</Form.Label>
+                                            <Form.Select type="sexo" placeholder="Selecione o sexo" value={this.state.sexo || ''} onChange={this.atualizaSexo} >
+                                                <option value="">Selecione</option>
+                                                <option value="masculino">Masculino</option>
+                                                <option value="feminino">Feminino</option>
+                                            </Form.Select>
                                         </Form.Group>
                                     </Col>
                                     {/* <Col xs={4} md={3}>
@@ -1025,6 +1098,18 @@ class Contato extends React.Component {
                                             <Form.Control type="email" placeholder="Insira o e-mail" value={this.state.email || ''} onChange={this.atualizaEmail} />
                                         </Form.Group>
                                     </Col>
+                                    <Col xs={12} md={4}>
+                                        <Form.Group controlId="site" className="mb-3">
+                                            <Form.Label>Site</Form.Label>
+                                            <Form.Control type="site" placeholder="Insira o site" value={this.state.site || ''} onChange={this.atualizaSite} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={12} md={8}>
+                                        <Form.Group controlId="tiposContato" className="mb-3 tiposcontato">
+                                            <Form.Label>Tipos de contato</Form.Label>
+                                            <Form.Control as="input" type="text" value={this.state.tiposContato.map(item => item.descricao).join(', ')} disabled />
+                                        </Form.Group>
+                                    </Col>
                                     {/* <Col xs={12} md={4}>
                                         <Form.Group controlId="emailNfe" className="mb-3">
                                             <Form.Label>Email NFE</Form.Label>
@@ -1033,10 +1118,10 @@ class Contato extends React.Component {
                                         </Form.Group>
                                     </Col> */}
                                 </Row>
-                                <Form.Group controlId="informacaoContato" className="mb-3">
+                                {/* <Form.Group controlId="informacaoContato" className="mb-3">
                                     <Form.Label>Informação Contato</Form.Label>
                                     <Form.Control as="textarea" rows={3} placeholder="Insira a informação do contato" value={this.state.informacaoContato || ''} onChange={this.atualizaInformacaoContato} />
-                                </Form.Group>
+                                </Form.Group> */}
                                 <Row className="text-center">
                                     <Col>
                                         <Form.Group controlId="buttonSalvar" className="mb-3">
@@ -1067,11 +1152,17 @@ class Contato extends React.Component {
                             <Button className="botao-finalizarvenda" variant="secondary" onClick={this.ModalCpfValido}>Fechar</Button>
                         </Modal.Footer>
                     </Modal>
+
+                    <Modal show={this.state.modalSalvarContato} onHide={this.modalSalvarContato} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
+                        </Modal.Body>
+                    </Modal>
+
                 </div>
             )
         }
     }
-
 }
 
 export default Contato;

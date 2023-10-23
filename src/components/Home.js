@@ -28,23 +28,23 @@ function Home() {
             <Card border="sucess" className="custom-card">
                 <Card.Img variant="top" src="/assets/cadastro.png" />
                 <Card.Body>
-                    <Card.Title>Cadastro de produto</Card.Title>
-                    <Card.Text>
-                        Aperfeiçoe seu controle de estoque. Acesse o cadastro de produtos aqui.
-                    </Card.Text>
-                </Card.Body>
-                <Button variant="secondary" onClick={() => handleRedirect('/Produto')}>Acessar</Button>
-            </Card>
-
-            <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
-                <Card.Body>
                     <Card.Title>Cadastro de cliente e fornecedor</Card.Title>
                     <Card.Text>
                         Melhore suas relações comerciais. Acesse o cadastro de clientes e fornecedores aqui.
                     </Card.Text>
                 </Card.Body>
                 <Button variant="secondary" onClick={() => handleRedirect('/Contato')}>Acessar</Button>
+            </Card>
+
+            <Card border="sucess" className="custom-card">
+                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Body>
+                    <Card.Title>Cadastro de produto</Card.Title>
+                    <Card.Text>
+                        Aperfeiçoe seu controle de estoque. Acesse o cadastro de produtos aqui.
+                    </Card.Text>
+                </Card.Body>
+                <Button variant="secondary" onClick={() => handleRedirect('/Produto')}>Acessar</Button>
             </Card>
 
             <Card border="sucess" className="custom-card">

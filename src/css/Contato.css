@@ -29,8 +29,8 @@
 }
 
 .table-container-contato {
-  overflow-y: auto; /* Torna a tabela rolável verticalmente */
-  max-height: 98vh; /* Defina a altura máxima da altura da janela */
+  overflow-y: auto; /* Torna a tabela rolï¿½vel verticalmente */
+  max-height: 98vh; /* Defina a altura mï¿½xima da altura da janela */
 }
 
 .table-container-contato thead th {
