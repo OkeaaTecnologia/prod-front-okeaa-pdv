@@ -6,7 +6,6 @@ import Produto from "./components/Produto";
 import Categoria from "./components/Categoria";
 import FrenteCaixa from "./components/FrenteCaixa";
 import CadastroLoja from './components/CadastroLoja';
-import ListaPrecos from './components/ListaPrecos';
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -59,7 +58,6 @@ class App extends Component {
                       <NavDropdown title="Cadastros" id="nav-dropdown-dark-example" menuVariant="dark">
                         <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/Produto">Produtos</NavDropdown.Item>
-                        <NavDropdown.Item as={Link} to="/ListaPrecos">Lista Preços</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/Loja" >Unidade Loja</NavDropdown.Item>
                       </NavDropdown>
 
@@ -82,7 +80,6 @@ class App extends Component {
                 <Route path="/" element={<Home />}></Route>
                 <Route path="/Contato" element={<Contato />}></Route>
                 <Route path="/Produto" element={<Produto />}></Route>
-                <Route path="/ListaPrecos" element={<ListaPrecos />}></Route>
                 <Route path="/Categoria" element={<Categoria />}></Route>
                 <Route path="/FrenteCaixa" element={<FrenteCaixa />}></Route>
                 <Route path="/Loja" element={<CadastroLoja />}></Route>

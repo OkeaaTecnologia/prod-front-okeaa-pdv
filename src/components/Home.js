@@ -47,6 +47,18 @@ function Home() {
                 <Button variant="secondary" onClick={() => handleRedirect('/Produto')}>Acessar</Button>
             </Card>
 
+            <Card border="success" className="custom-card">
+                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Body>
+                    <Card.Title>Cadastro de Listas de Preços</Card.Title>
+                    <Card.Text>
+                        Aprimore o controle das suas listas de preços. Acesse agora o cadastro e otimize a gestão de produtos.
+                    </Card.Text>
+                </Card.Body>
+                <Button variant="secondary" onClick={() => handleRedirect('/ListaPrecos')}>Acessar</Button>
+            </Card>
+
+
             <Card border="sucess" className="custom-card">
                 <Card.Img variant="top" src="/assets/cadastro.png" />
                 <Card.Body>

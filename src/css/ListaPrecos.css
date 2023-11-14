@@ -29,8 +29,8 @@
 }
 
 .table-container-produto {
-  overflow-y: auto; /* Torna a tabela rol·vel verticalmente */
-  max-height: 98vh; /* Defina a altura m·xima como 85% da altura da janela */
+  overflow-y: auto; /* Torna a tabela rol√°vel verticalmente */
+  max-height: 98vh; /* Defina a altura m√°xima como 85% da altura da janela */
 }
 
 .table-container-produto thead th {
@@ -184,9 +184,9 @@
 }
 
 /* .modal-produto-header,
-.modal-produto-body {
-  background-color: rgba(114, 114, 114, 0.048);
-} */
+  .modal-produto-body {
+    background-color: rgba(114, 114, 114, 0.048);
+  } */
 
 /* Aumentando a largura da barra de rolagem */
 ::-webkit-scrollbar {
@@ -198,20 +198,20 @@
   background-color: #18191a;
 }
 
-/* Cor da thumb (indicador de posiÁ„o) */
+/* Cor da thumb (indicador de posi√ß√£o) */
 ::-webkit-scrollbar-thumb {
   background-color: #fda21e;
   border-radius: 60px; /* Borda arredondada para a thumb */
 }
 
-/* Cor dos botıes de scroll */
+/* Cor dos bot√µes de scroll */
 ::-webkit-scrollbar-button {
   background-color: #18191a;
 }
 
 .icon-info {
   background-color: #0eb2e8;
-  border-radius: 50%; /* Cria um cÌrculo com bordas arredondadas */
+  border-radius: 50%; /* Cria um c√≠rculo com bordas arredondadas */
 }
 
 .label-with-button {

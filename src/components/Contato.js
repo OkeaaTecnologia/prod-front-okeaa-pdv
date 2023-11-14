@@ -8,6 +8,8 @@ import { Table } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
 import { Row } from 'react-bootstrap';
 import { Container } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { BsInfoCircle } from 'react-icons/bs';
 
 import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
@@ -59,6 +61,7 @@ class Contato extends React.Component {
             carregando: true,
             modalAberta: false,
             modalSalvarContato: false,
+            modalErro: false,
             validated: false,
         };
 
@@ -158,12 +161,12 @@ class Contato extends React.Component {
                         limiteCredito: contato.limiteCredito,
                         dataNascimento: contato.dataNascimento,
                         tiposContato: tiposContato,
-                    })
+                    });
+
                 } else {
                     this.setState({ contatos: [] })
                 }
                 this.setState({ carregando: false });
-
                 this.abrirModal();
             })
             .catch(error => console.error(error));
@@ -182,7 +185,7 @@ class Contato extends React.Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ tiposDeContato: data });
-                console.log(data); // Adicione o console.log aqui
+                // console.log(data); // Adicione o console.log aqui
             })
             .catch(error => {
                 console.error('Erro ao buscar as lojas:', error);
@@ -195,13 +198,30 @@ class Contato extends React.Component {
         const xml = parser.parseFromString(xmlContato, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
 
-        fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato', {
+        return fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato', {
             method: 'POST',
             body: stringXml,
             headers: {
                 'Content-Type': 'application/xml'
             }
-        });
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
     };
 
     //PUT - MÉTODO PARA ATUALIZAR UM CONTATO EXISTENTE NA API CONTATOS
@@ -211,14 +231,32 @@ class Contato extends React.Component {
         const stringXml = new XMLSerializer().serializeToString(xml);
         const id = xml.querySelector('id').textContent;
 
-        fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/' + id, {
+        return fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/' + id, {
             method: 'PUT',
             body: stringXml,
             headers: {
                 'Content-Type': 'application/xml'
             }
-        });
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
     };
+
 
     //GET - MÉTODO DO VIACEP PARA PREENCHER OS CAMPOS DE ENDEREÇO, BAIRRO, CIDADE.
     checkCEP = (event) => {
@@ -232,7 +270,7 @@ class Contato extends React.Component {
                     cidade: data.localidade,
                     uf: data.uf,
                 });
-                console.log(data);
+                // console.log(data);
                 this.numeroRef.current.focus();
             });
     };
@@ -286,6 +324,7 @@ class Contato extends React.Component {
             if (!this.validarCPF(cpfCnpjSemPontuacao)) {
                 this.setState({
                     cnpj: cnpj,
+                    cpf_cnpj: cnpj,
                     cpfValido: false, // Define a flag de CPF válido como false
                     cnpjValido: false // Define a flag de CNPJ válido como false
                 });
@@ -295,6 +334,7 @@ class Contato extends React.Component {
             const cpfFormatado = cpfCnpjSemPontuacao.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
             this.setState({
                 cnpj: cpfFormatado,
+                cpf_cnpj: cpfFormatado,
                 cpfValido: true, // Define a flag de CPF válido como true
                 cnpjValido: false // Define a flag de CNPJ válido como false
             });
@@ -304,6 +344,7 @@ class Contato extends React.Component {
             if (!this.validarCNPJ(cpfCnpjSemPontuacao)) {
                 this.setState({
                     cnpj: cnpj,
+                    cpf_cnpj: cnpj,
                     cpfValido: false, // Define a flag de CPF válido como false
                     cnpjValido: false // Define a flag de CNPJ válido como false
                 });
@@ -313,6 +354,7 @@ class Contato extends React.Component {
             const cnpjFormatado = cpfCnpjSemPontuacao.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
             this.setState({
                 cnpj: cnpjFormatado,
+                cpf_cnpj: cnpjFormatado,
                 cpfValido: false, // Define a flag de CPF válido como false
                 cnpjValido: true // Define a flag de CNPJ válido como true
             });
@@ -321,6 +363,7 @@ class Contato extends React.Component {
         else {
             this.setState({
                 cnpj: cnpj,
+                cpf_cnpj: cnpj,
                 cpfValido: false,
                 cnpjValido: false
             });
@@ -614,7 +657,6 @@ class Contato extends React.Component {
 
     //Ação para limpar os campos do modal após cadastrar um novo cliente.
     reset = (event) => {
-        event.preventDefault();
         this.setState(
             {
                 id: 0,
@@ -647,6 +689,7 @@ class Contato extends React.Component {
                 descricao: '',
                 ModalCpfValido: false,
                 informacaoContato: '',
+                tiposContato: []
             });
 
         this.abrirModal();
@@ -655,78 +698,18 @@ class Contato extends React.Component {
     //Ações do botão SUBMIT (Cadastrar).
     submit = (event) => {
         event.preventDefault();
-        if (this.state.id === 0) {  // ------------------------------------ Ação de Cadastrar um contato novo.
-
-            const contato = {
-                nome: this.state.nome,
-                fantasia: this.state.fantasia,
-                tipoPessoa: this.state.tipoPessoa,
-                contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cnpj,
-                ie_rg: this.state.ie_rg,
-                endereco: this.state.endereco,
-                numero: this.state.numero,
-                complemento: this.state.complemento,
-                bairro: this.state.bairro,
-                cep: this.state.cep,
-                cidade: this.state.cidade,
-                uf: this.state.uf,
-                fone: this.state.fone,
-                celular: this.state.celular,
-                email: this.state.email,
-                // emailNfe: this.state.emailNfe,
-                informacaoContato: this.state.informacaoContato,
-                limiteCredito: this.state.limiteCredito,
-                codigo: this.state.codigo,
-                site: this.state.site,
-                obs: this.state.obs,
-                descricao: this.state.descricao,
-                sexo: this.state.sexo,
-                situacao: this.state.situacao
-            };
-            const xmlContato = parse('contato', contato);
-            // console.log(xmlContato);
-            this.modalSalvarContato();
-            this.cadastraContato(xmlContato);
-        } else {                    // ------------------------------------ Ação de atualizar um contato existente.
-            const contato = {
-                id: this.state.id,
-                nome: this.state.nome,
-                fantasia: this.state.fantasia,
-                tipoPessoa: this.state.tipoPessoa,
-                contribuinte: this.state.contribuinte,
-                cpf_cnpj: this.state.cnpj,
-                ie_rg: this.state.ie_rg,
-                endereco: this.state.endereco,
-                numero: this.state.numero,
-                complemento: this.state.complemento,
-                bairro: this.state.bairro,
-                cep: this.state.cep,
-                cidade: this.state.cidade,
-                uf: this.state.uf,
-                fone: this.state.fone,
-                celular: this.state.celular,
-                email: this.state.email,
-                // emailNfe: this.state.emailNfe,
-                informacaoContato: this.state.informacaoContato,
-                limiteCredito: this.state.limiteCredito,
-                codigo: this.state.codigo,
-                site: this.state.site,
-                obs: this.state.obs,
-                descricao: this.state.descricao,
-                sexo: this.state.sexo,
-                situacao: this.state.situacao
-            };
-            const xmlContato = parse('contato', contato);
-            console.log(xmlContato);
-            this.modalSalvarContato();
-            this.atualizarContato(xmlContato);
-        };
 
         //Realiza a validação dos campos obrigatorios.
-        const form = event.currentTarget
+        const form = event.currentTarget;
+        const isValid = form.checkValidity();
 
-        if (form.checkValidity() === false) {
+        if (!isValid) {
+            event.stopPropagation();
+            this.setState({ validated: true });
+            return;
+        };
+
+        if (isValid === false) {
             event.preventDefault();
             event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
             this.setState({ validated: true }); // atribui true na validação
@@ -735,8 +718,86 @@ class Contato extends React.Component {
             if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
                 event.preventDefault();
                 this.setState({ validated: false }); // atribui true na validação
-                this.buscarContato(); // atualiza a lista de produtos após a exclusão
-                this.fecharModal(); // se todos os campos estiverem preenchidos o modal é fechado
+
+                const contato = {};
+                const campos = [
+                    'id',
+                    'nome',
+                    'fantasia',
+                    'tipoPessoa',
+                    'contribuinte',
+                    'cpf_cnpj',
+                    'ie_rg',
+                    'endereco',
+                    'numero',
+                    'complemento',
+                    'bairro',
+                    'cep',
+                    'cidade',
+                    'uf',
+                    'fone',
+                    'celular',
+                    'email',
+                    'obs',
+                    'informacaoContato',
+                    'limiteCredito',
+                    'codigo',
+                    'site',
+                    'descricao',
+                    'sexo',
+                    'situacao',
+                ];
+
+                campos.forEach(campo => {
+                    if (this.state[campo] !== null && this.state[campo] !== '' && this.state[campo] !== undefined) {
+                        if (campo === 'site') {
+                            // Se o campo for 'site', substitua '<' por '&lt;' na URL
+                            contato[campo] = this.state[campo].replace(/</g, '&lt;');
+                        } else {
+                            contato[campo] = this.state[campo];
+                        }
+                    }
+                });
+
+                const xmlContato = parse('contato', contato);
+                // console.log(xmlContato);
+
+                if (this.state.id === 0) {
+                    this.cadastraContato(xmlContato)
+                        .then(responseData => {
+                            if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                                this.buscarContato();
+                                this.modalSalvarContato();
+                                this.reset();
+                                this.fecharModal();
+                            } else {
+                                this.buscarContato();
+                                this.modalErro();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro na chamada da API:', error);
+                            this.modalErro();
+                        });
+                } else {
+                    this.atualizarContato(xmlContato)
+                        .then(responseData => {
+                            if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                                this.buscarContato();
+                                this.modalSalvarContato();
+                                this.reset();
+                                this.fecharModal();
+                            } else {
+                                this.buscarContato();
+                                this.modalErro();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro na chamada da API:', error);
+                            this.modalErro();
+                        });
+
+                }
             } else {
                 this.ModalCpfValido();
             };
@@ -750,9 +811,9 @@ class Contato extends React.Component {
     //Ação para fechar o modal de cadastro e atualização.
     fecharModal = () => {
         this.setState({
-            modalAberta: false
+            modalAberta: false,
+            validated: false
         });
-        this.buscarContato()
     };
 
     //Ação para abrir o modal de cadastro e atualização.
@@ -766,6 +827,12 @@ class Contato extends React.Component {
         this.setState((prevState) => ({
             ModalCpfValido: !prevState.ModalCpfValido,
         }));
+    };
+
+    modalErro = () => {
+        this.setState({
+            modalErro: !this.state.modalErro,
+        });
     };
 
     modalSalvarContato = () => {
@@ -893,7 +960,17 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={2} md={2}>
                                         <Form.Group controlId="codigo" className="mb-3">
-                                            <Form.Label>Código</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="codigoContatoInfo">
+                                                        Opcional.
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Código <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="text" placeholder="Insira o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
                                         </Form.Group>
                                     </Col>
@@ -911,14 +988,34 @@ class Contato extends React.Component {
                                 <Row className="mb-3">
                                     <Col>
                                         <Form.Group controlId="nome" className="mb-3">
-                                            <Form.Label>Nome</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="nomeContatoInfo">
+                                                        Nome completo do contato.
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Nome <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="text" placeholder="Insira o nome" value={this.state.nome || ''} onChange={this.atualizaNome} required />
                                             <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                         </Form.Group>
                                     </Col>
                                     <Col>
                                         <Form.Group controlId="fantasia" className="mb-3">
-                                            <Form.Label>Fantasia</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="fantasiaContatoInfo">
+                                                        Nome de fantasia ou apelido.
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Fantasia <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="text" placeholder="Insira a fantasia" value={this.state.fantasia || ''} onChange={this.atualizaFantasia} />
                                         </Form.Group>
                                     </Col>
@@ -998,7 +1095,17 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={4} md={3}>
                                         <Form.Group controlId="limiteCredito" className="mb-3">
-                                            <Form.Label>Limite Crédito</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="limiteCreditoContatoInfo">
+                                                        Para não limitar o crédito do cliente, deixe este campo zerado
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Limite Crédito <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="text" placeholder="Insira o limite de crédito" value={this.state.limiteCredito || ''} onChange={this.atualizaLimiteCredito} />
                                         </Form.Group>
                                     </Col>
@@ -1012,7 +1119,17 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={5} md={4}>
                                         <Form.Group controlId="endereco" className="mb-3">
-                                            <Form.Label>Endereço</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="enderecoContatoInfo">
+                                                        Endereço Geral (Exemplo: Rua Assis Brasil)
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Endereço <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="text" placeholder="Insira o endereço" value={this.state.endereco || ''} onChange={this.atualizaEndereco} />
                                         </Form.Group>
                                     </Col>
@@ -1094,7 +1211,17 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={12} md={4}>
                                         <Form.Group controlId="email" className="mb-3">
-                                            <Form.Label>Email</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="emailContatoInfo">
+                                                        Para informar mais do que um e-mail utilize o separador ';' (ponto e vírgula) ou ',' (vírgula). Comprimento máximo de 60 caracteres para a NF-e e NFC-e e para a NFS-e de 80 caracteres.
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Email <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control type="email" placeholder="Insira o e-mail" value={this.state.email || ''} onChange={this.atualizaEmail} />
                                         </Form.Group>
                                     </Col>
@@ -1106,7 +1233,22 @@ class Contato extends React.Component {
                                     </Col>
                                     <Col xs={12} md={8}>
                                         <Form.Group controlId="tiposContato" className="mb-3 tiposcontato">
-                                            <Form.Label>Tipos de contato</Form.Label>
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={
+                                                    <Tooltip id="tiposContatoInfo">
+                                                        Fornecedor verificado: a ciência para as notas emitidas pelo fornecedor com essa tag será automatizada.
+                                                        Fornecedor: Classifica esse contato como fornecedor.
+                                                        Cliente: Classifica esse contato como cliente.
+                                                        Técnico: Classifica esse contato como técnico.
+                                                        Transportador: Classifica esse contato como transportador.
+                                                        Contador: Classifica esse contato como contador.
+                                                    </Tooltip>
+                                                }>
+                                                <Form.Label>
+                                                    Tipos de contato <BsInfoCircle className="icon-info" />
+                                                </Form.Label>
+                                            </OverlayTrigger>
                                             <Form.Control as="input" type="text" value={this.state.tiposContato.map(item => item.descricao).join(', ')} disabled />
                                         </Form.Group>
                                     </Col>
@@ -1150,6 +1292,24 @@ class Contato extends React.Component {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button className="botao-finalizarvenda" variant="secondary" onClick={this.ModalCpfValido}>Fechar</Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={this.state.modalErro} onHide={this.modalErro} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            Não foi possível salvar o produto na plataforma Bling. Estamos agora salvando o produto no banco de dados para posteriormente realizar o cadastro automaticamente no Bling.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={() => {
+                                this.modalErro();
+                                this.fecharModal()
+                            }}>
+                                Sair
+                            </Button>
                         </Modal.Footer>
                     </Modal>
 

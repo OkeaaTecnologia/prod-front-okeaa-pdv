@@ -336,6 +336,11 @@ h5 {
   border-color: red !important;
 }
 
+.icon-info {
+  background-color: #0eb2e8;
+  border-radius: 50%; /* Cria um círculo com bordas arredondadas */
+}
+
 /* 
 .busca-contatos {
   margin-bottom: 1rem;

@@ -42,7 +42,7 @@ class CadastroLoja extends React.Component {
   }
 
   buscaLojas = () => {
-    fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas')
+    fetch(`https://prod-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas`)
       .then(response => response.json())
       .then(data => {
         this.setState({ lojas: data });
@@ -51,24 +51,12 @@ class CadastroLoja extends React.Component {
         console.error('Erro ao buscar as lojas:', error);
 
         const loja1 = {
-          idLoja: '204607447',
-          nomeLoja: 'Loja - Araucaria',
+          idLoja: '204672835',
+          nomeLoja: 'Loja - Londrina',
           unidadeLoja: 'Matriz',
         };
 
-        const loja3 = {
-          idLoja: '204607448',
-          nomeLoja: 'Loja - Londrina',
-          unidadeLoja: 'Filial',
-        };
-
-        const loja2 = {
-          idLoja: '204607449',
-          nomeLoja: 'Loja - Curitiba',
-          unidadeLoja: 'Filial',
-        };
-
-        const lojasComAdicionais = [loja1, loja2, loja3];
+        const lojasComAdicionais = [loja1];
         this.setState({ lojas: lojasComAdicionais });
       });
   };

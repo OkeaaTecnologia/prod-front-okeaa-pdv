@@ -29,8 +29,8 @@
 }
 
 .table-container-contato {
-  overflow-y: auto; /* Torna a tabela rol�vel verticalmente */
-  max-height: 98vh; /* Defina a altura m�xima da altura da janela */
+  overflow-y: auto; /* Torna a tabela rolável verticalmente */
+  max-height: 98vh; /* Defina a altura máxima da altura da janela */
 }
 
 .table-container-contato thead th {
@@ -165,7 +165,12 @@
   background: #949494;
 }
 
-.modal-contato-header,
+/* .modal-contato-header,
 .modal-contato-body {
   background-color: rgba(114, 114, 114, 0.048);
+} */
+
+.icon-info {
+  background-color: #0eb2e8;
+  border-radius: 50%; /* Cria um círculo com bordas arredondadas */
 }

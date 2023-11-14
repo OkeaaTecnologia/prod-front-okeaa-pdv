@@ -11,6 +11,8 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Container } from "react-bootstrap";
 import { Image } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { BsInfoCircle } from 'react-icons/bs';
 
 import { FaTrash } from 'react-icons/fa';
 import { parse } from 'js2xmlparser';
@@ -30,6 +32,8 @@ class Produto extends React.Component {
             imagens: [],
             componente: [],
             estrutura: [],
+            produtosFornecedores: [],
+            produtosFornecedoresGet: [],
             id: 0,
             descricaoCategoria: '',
             idCategoria: '',
@@ -99,7 +103,10 @@ class Produto extends React.Component {
             modalExcluirProduto: false,
             modalExcluindoProduto: false,
             modalSalvarProduto: false,
+            modalErro: false,
+            modalListaProduto: false,
             codigoProdutoParaExcluir: null,
+            statusCode: '',
         };
     };
 
@@ -107,7 +114,6 @@ class Produto extends React.Component {
         this.buscarProdutos();
         this.buscarCategorias();
     };
-
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.idCategoria !== this.state.idCategoria) {
@@ -221,7 +227,9 @@ class Produto extends React.Component {
                         dataValidade: produto.dataValidade || '',
                         spedTipoItem: produto.spedTipoItem || '',
                         descricaoCategoria: categoria ? categoria.descricao : '' || '',
-                        idCategoria: categoria ? categoria.id : '' || ''
+                        idCategoria: categoria ? categoria.id : '' || '',
+                        idProdutoCarregado: produto.id || '',
+
                     });
 
                 } else {
@@ -232,6 +240,119 @@ class Produto extends React.Component {
             })
             .catch(error => console.error(error));
     };
+
+    carregarProdutoFornecedor = (idProduto) => {
+        fetch(`http://localhost:8081/api/v1/produtosfornecedores`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((resposta) => resposta.json())
+            .then((dados) => {
+                console.log("Resposta da API de Produtos Fornecedores: ", dados);
+
+                if (dados.retorno.produtosfornecedores && dados.retorno.produtosfornecedores.length > 0) {
+                    const produtoFornecedorEncontrado = dados.retorno.produtosfornecedores.find(
+                        (fornecedor) => fornecedor.produtofornecedores.idProduto === idProduto
+                    );
+
+                    if (produtoFornecedorEncontrado) {
+                        console.log("Produto Fornecedor Encontrado: ", produtoFornecedorEncontrado);
+
+                        const listaProdutosFornecedores = produtoFornecedorEncontrado.produtofornecedores.fornecedores;
+
+                        this.setState({
+                            produtosFornecedores: listaProdutosFornecedores,
+                            idProdutoSelecionado: idProduto,
+                        });
+                    } else {
+                        console.log("Nenhum produto do fornecedor encontrado.");
+                        this.setState({ produtosFornecedores: [], idProdutoSelecionado: null });
+                    }
+                } else {
+                    console.log("Nenhum produto do fornecedor encontrado.");
+                    this.setState({ produtosFornecedores: [], idProdutoSelecionado: null });
+                }
+            })
+            .catch(error => console.error(error));
+    };
+
+    handleChange = (campo, valor) => {
+        // Atualiza o estado conforme o campo editado
+        this.setState((prevState) => ({
+            produtosFornecedores: prevState.produtosFornecedores.map((produto) => {
+                if (produto.idProdutoFornecedor === prevState.idProdutoSelecionado) {
+                    return {
+                        ...produto,
+                        produtoFornecedor: {
+                            ...produto.produtoFornecedor,
+                            [campo]: valor,
+                        },
+                    };
+                }
+                return produto;
+            }),
+        }));
+    };
+
+    // carregarProdutoFornecedor = (idProduto) => {
+    //     fetch(`http://localhost:8081/api/v1/produtosfornecedores`, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     })
+    //         .then(resposta => resposta.json())
+    //         .then(dados => {
+    //             console.log("Resposta da API de Produtos Fornecedores: ", dados);
+
+    //             if (dados.retorno.produtosfornecedores && dados.retorno.produtosfornecedores.length > 0) {
+    //                 const produtoFornecedorEncontrado = dados.retorno.produtosfornecedores.find(
+    //                     fornecedor => fornecedor.produtofornecedores.idProduto === idProduto
+    //                 );
+
+    //                 if (produtoFornecedorEncontrado) {
+    //                     console.log("Produto Fornecedor Encontrado: ", produtoFornecedorEncontrado);
+
+    //                     const listaProdutosFornecedores = produtoFornecedorEncontrado.produtofornecedores.fornecedores;
+
+    //                     listaProdutosFornecedores.forEach(fornecedor => {
+    //                         const produtoFornecedor = fornecedor.produtoFornecedor;
+
+    //                         const idProdutoFornecedor = produtoFornecedor.idProdutoFornecedor || '';
+    //                         const idFornecedor = produtoFornecedor.idFornecedor || '';
+    //                         const produtoDescricao = produtoFornecedor.produtoDescricao || '';
+    //                         const produtoCodigo = produtoFornecedor.produtoCodigo || '';
+    //                         const precoCompra = produtoFornecedor.precoCompra || '';
+    //                         const precoCusto = produtoFornecedor.precoCusto || '';
+    //                         const produtoGarantia = produtoFornecedor.produtoGarantia || '';
+    //                         const padrao = produtoFornecedor.padrao || '';
+
+    //                         // Agora, você pode fazer o que quiser com esses valores
+    //                         console.log("ID do Produto Fornecedor:", idProdutoFornecedor);
+    //                         console.log("ID do Fornecedor:", idFornecedor);
+    //                         console.log("Descrição do Produto Fornecedor:", produtoDescricao);
+    //                         console.log("Código do Produto:", produtoCodigo);
+    //                         console.log("Preço de Compra:", precoCompra);
+    //                         console.log("Preço de Custo:", precoCusto);
+    //                         console.log("Garantia do Produto:", produtoGarantia);
+    //                         console.log("Padrão:", padrao);
+
+    //                         // Continue com o processamento dos dados conforme necessário
+    //                     });
+    //                 } else {
+    //                     console.log("Nenhum produto do fornecedor encontrado.");
+    //                     this.setState({ produtosFornecedores: [] });
+    //                 }
+    //             } else {
+    //                 console.log("Nenhum produto do fornecedor encontrado.");
+    //                 this.setState({ produtosFornecedores: [] });
+    //             }
+    //             // Continue com qualquer outra lógica que você precisa após carregar os dados do fornecedor
+    //         })
+    //         .catch(error => console.error(error));
+    // };
 
     //GET - MÉTODO PARA CONSUMO DE CATEGORIAS
     buscarCategorias = () => {
@@ -255,18 +376,17 @@ class Produto extends React.Component {
 
     //DELETE - MÉTODO PARA DELETAR UM PRODUTO
     excluirProduto(codigo) {
-        fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
+        const statusCode = fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-            .then(resposta => resposta.json())
-            .then(dados => {
-                // console.log(dados);
-                this.buscarProdutos(); // atualiza a lista de produtos após a exclusão
-            })
-            .catch(erro => console.error(erro));
+            .then(response => {
+                return response.status; // Retorna o código de status HTTP
+            });
+        console.log(statusCode)
+        return statusCode;
     };
 
     //POST - MÉTODO PARA INSERIR UM NOVO PRODUTO
@@ -275,30 +395,130 @@ class Produto extends React.Component {
         const xml = parser.parseFromString(xmlProduto, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
 
-        fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto', {
+        return fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto', {
+            // fetch('https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto', {
             method: 'POST',
             body: stringXml,
             headers: {
                 'Content-Type': 'application/xml'
             }
-        });
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                console.log('Status da API externa:', statusCode);
+                console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
+    };
+
+    cadastraProdutoFornecedor = (xmlProdutoFornecedor) => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
+        const stringXml = new XMLSerializer().serializeToString(xml);
+
+        return fetch('http://localhost:8081/api/v1/cadastrarprodutofornecedor', {
+            // fetch('https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor', {
+            method: 'POST',
+            body: stringXml,
+            headers: {
+                'Content-Type': 'application/xml'
+            }
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                console.log('Status da API externa:', statusCode);
+                console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
     };
 
     //PUT - MÉTODO PARA ATUALIZAR UM PRODUTO EXISTENTE
     atualizarProduto = (xmlProduto) => {
-        // console.log(xmlProduto)
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlProduto, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
         const codigo = xml.querySelector('codigo').textContent;
 
-        fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarproduto/' + codigo, {
+        return fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarproduto/' + codigo, {
             method: 'POST',
             body: stringXml,
             headers: {
                 'Content-Type': 'application/xml'
             }
-        });
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
+    };
+
+    atualizarProdutoFornecedor = (xmlProdutoFornecedor) => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
+        const stringXml = new XMLSerializer().serializeToString(xml);
+        const idProdutoFornecedor = xml.querySelector('idProdutoFornecedor').textContent;
+
+        return fetch('https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarprodutofornecedor/' + idProdutoFornecedor, {
+            //return fetch('https://dev-api-okeaa-produto.azurewebsites.net/api/v1/atualizarprodutofornecedor/' + idProdutoFornecedor, {
+
+            method: 'POST',
+            body: stringXml,
+            headers: {
+                'Content-Type': 'application/xml'
+            }
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
+            });
     };
 
     //-----------------------------------------------------------------------------------------------------------------------|
@@ -695,7 +915,7 @@ class Produto extends React.Component {
         ];
 
         campos.forEach(campo => {
-            if (this.state[campo] !== null && this.state[campo] !== '') {
+            if (this.state[campo] !== null && this.state[campo] !== '' && this.state[campo] !== undefined) {
                 produto[campo] = this.state[campo];
             };
         });
@@ -708,25 +928,59 @@ class Produto extends React.Component {
 
         const xmlProduto = parse('produto', produto);
         // console.log(xmlProduto);
-
         if (this.state.id === 0) {
-            this.modalSalvarProduto();
-            this.cadastraProduto(xmlProduto);
-            this.reset();
-            this.fecharModal();
+            this.cadastraProduto(xmlProduto)
+                .then(responseData => {
+                    if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                        this.buscarProdutos();
+                        this.modalSalvarProduto();
+                        this.reset();
+                        this.fecharModal();
+                    } else {
+                        this.modalErro();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na chamada da API:', error);
+                    this.modalErro();
+                });
         } else {
-            this.modalSalvarProduto();
-            this.atualizarProduto(xmlProduto);
-            this.reset();
-            this.fecharModal();
-        };
+            this.atualizarProduto(xmlProduto)
+                .then(responseData => {
+                    if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                        this.buscarProdutos();
+                        this.modalSalvarProduto();
+                        this.reset();
+                        this.fecharModal();
+                    } else {
+                        this.modalErro();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na chamada da API:', error);
+                    this.modalErro();
+                });
+        }
 
         this.setState({ validated: false });
-
-        setTimeout(() => {
-            this.buscarProdutos();
-        }, 1000);
     };
+
+    delete = () => {
+        this.modalExcluirProduto()
+        this.excluirProduto(this.state.codigoProdutoParaExcluir)
+            .then(statusCode => {
+                if (statusCode === 200) {
+                    this.modalExcluindoProduto()
+                    this.buscarProdutos();
+                } else {
+                    this.modalErro();
+                }
+            })
+            .catch(error => {
+                console.error('Erro na chamada da API:', error);
+                this.modalErro();
+            });
+    }
 
     //-----------------------------------------------------------------------------------------------------------------------|
     //--------------------------------------------- SCRIPT´S DE AÇÃO DOS MODALS. --------------------------------------------|
@@ -753,6 +1007,18 @@ class Produto extends React.Component {
         });
     };
 
+    modalErro = () => {
+        this.setState({
+            modalErro: !this.state.modalErro,
+        });
+    };
+
+    modalListaProduto = () => {
+        this.setState({
+            modalListaProduto: !this.state.modalListaProduto,
+        });
+    };
+
     modalSalvarProduto = () => {
         this.setState({
             modalSalvarProduto: !this.state.modalSalvarProduto
@@ -767,7 +1033,7 @@ class Produto extends React.Component {
 
     modalExcluindoProduto = () => {
         this.setState({
-            modalExcluindoProduto: !this.state.modalExcluindoProduto
+            modalExcluindoProduto: !this.state.modalExcluindoProduto,
         }, () => {
             setTimeout(() => {
                 this.setState({
@@ -856,7 +1122,10 @@ class Produto extends React.Component {
                                             return (
                                                 <tr
                                                     key={produtos.produto.id}
-                                                    onClick={() => this.carregarProdutos(produtos.produto.codigo)}
+                                                    onClick={() => {
+                                                        this.carregarProdutos(produtos.produto.codigo);
+                                                        this.carregarProdutoFornecedor(produtos.produto.id);
+                                                    }}
                                                     onMouseEnter={(e) => (e.currentTarget.style.cursor = 'pointer')}
                                                     onMouseLeave={(e) => (e.currentTarget.style.cursor = 'default')}
                                                 >
@@ -868,7 +1137,11 @@ class Produto extends React.Component {
                                                     {/* <td>{produtos.produto.estoqueMaximo}</td> */}
                                                     <td>
                                                         <div className="button-container-table">
-                                                            <Button variant="warning" title="Editar produto" onClick={() => this.carregarProdutos(produtos.produto.codigo)}>
+                                                            <Button variant="warning" title="Editar produto" onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                this.carregarProdutos(produtos.produto.codigo);
+                                                                this.carregarProdutoFornecedor(produtos.produto.id);
+                                                            }}>
                                                                 <BsPencilSquare />
                                                             </Button>
                                                             <Button
@@ -910,7 +1183,8 @@ class Produto extends React.Component {
 
                     {/* ---------------------------------------------------------- MODALS ---------------------------------------------------------- */}
 
-                    <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" fullscreen="xxl-down" backdrop="static" >
+                    <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" fullscreen="xxl-down" backdrop="static" dialogClassName="modal-90w"
+                        aria-labelledby="example-custom-modal-styling-title" >
                         <Modal.Header closeButton className="modal-produto-header">
                             <Modal.Title>Produtos</Modal.Title>
                         </Modal.Header>
@@ -949,7 +1223,17 @@ class Produto extends React.Component {
                                         </Col>
                                         <Col xs={12} md={3}>
                                             <Form.Group controlId="codigo" className="mb-3">
-                                                <Form.Label>Código (SKU)</Form.Label>
+                                                <OverlayTrigger
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Tooltip id="codigoProdutoInfo">
+                                                            Referência ou código SKU do produto
+                                                        </Tooltip>
+                                                    }>
+                                                    <Form.Label>
+                                                        Código (SKU) <BsInfoCircle className="icon-info" />
+                                                    </Form.Label>
+                                                </OverlayTrigger>
                                                 <Form.Control type="text" placeholder="Digite o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
                                                 <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                             </Form.Group>
@@ -994,13 +1278,33 @@ class Produto extends React.Component {
                                         </Col>
                                         <Col xs={2} md={4}>
                                             <Form.Group controlId="nome" className="mb-3">
-                                                <Form.Label>Preço venda</Form.Label>
+                                                <OverlayTrigger
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Tooltip id="precoVendaIndo">
+                                                            Produto simples ou que possua variações de características (Ex: "Cor" ou "Tamanho")
+                                                        </Tooltip>
+                                                    }>
+                                                    <Form.Label>
+                                                        Preço venda <BsInfoCircle className="icon-info" />
+                                                    </Form.Label>
+                                                </OverlayTrigger>
                                                 <Form.Control type="text" placeholder="Digite o preço de venda" value={this.state.preco || ''} onChange={this.atualizaPreco} />
                                             </Form.Group>
                                         </Col>
                                         <Col xs={2} md={4}>
                                             <Form.Group controlId="nome" className="mb-3">
-                                                <Form.Label>Unidade</Form.Label>
+                                                <OverlayTrigger
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Tooltip id="unidadeProdutoInfo">
+                                                            Exemplo: Un, Pç, Kg
+                                                        </Tooltip>
+                                                    }>
+                                                    <Form.Label>
+                                                        Unidade <BsInfoCircle className="icon-info" />
+                                                    </Form.Label>
+                                                </OverlayTrigger>
                                                 <Form.Control type="text" placeholder="Digite a unidade (pc, un, cx)" value={this.state.unidade || ''} onChange={this.atualizaUnidade} />
                                             </Form.Group>
                                         </Col>
@@ -1008,7 +1312,7 @@ class Produto extends React.Component {
                                             <Form.Group controlId="Formato" className="mb-3">
                                                 <Form.Label>Condição</Form.Label>
                                                 <Form.Select as="select" value={this.state.condicao || ''} onChange={this.atualizaCondicao} >
-                                                    <option value="">Não Especificado</option>
+                                                    <option value="NÃO ESPECIFICADO">Não Especificado</option>
                                                     <option value="NOVO">Novo</option>
                                                     <option value="USADO">Usado</option>
                                                     <option value="RECONDICIONADO">Recondicionado</option>
@@ -1024,7 +1328,17 @@ class Produto extends React.Component {
                                                     <Row>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="marca" className="mb-3">
-                                                                <Form.Label>Marca</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="marcaProdutoInfo">
+                                                                            Especifique a marca do produto. Pode ser própria.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Marca <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Digite o nome" value={this.state.marca || ''} onChange={this.atualizaMarca} />
                                                                 <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                                             </Form.Group>
@@ -1057,26 +1371,66 @@ class Produto extends React.Component {
                                                     <Row>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="pesoliquido" className="mb-3">
-                                                                <Form.Label>Peso Líquido </Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="pesoLiqProdutoInfo">
+                                                                            Em Kg.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Peso Líquido <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira o peso liquido" value={this.state.pesoLiq || ''} onChange={this.atualizaPesoLiq} />
                                                                 <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="pesobruto" className="mb-3">
-                                                                <Form.Label>Peso Bruto</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="pesoBrutoProdutoInfo">
+                                                                            Em Kg.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Peso Bruto <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira o peso bruto" value={this.state.pesoBruto || ''} onChange={this.atualizaPesoBruto} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="largura" className="mb-3">
-                                                                <Form.Label>Largura</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="pesoBrutoProdutoInfo">
+                                                                            Medida lateral de um objeto perpendicular a sua longitude. Ex.: 80 cm.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Largura <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira a largura" value={this.state.larguraProduto || ''} onChange={this.atualizaLarguraProduto} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="altura" className="mb-3">
-                                                                <Form.Label>Altura</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="alturaProdutoInfo">
+                                                                            Dimensão vertical do produto na sua posição normal. Ex.: 65 cm.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Altura <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira a altura" value={this.state.alturaProduto || ''} onChange={this.atualizaAlturaProduto} />
                                                             </Form.Group>
                                                         </Col>
@@ -1084,20 +1438,48 @@ class Produto extends React.Component {
                                                     <Row>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="profundidade" className="mb-3">
-                                                                <Form.Label>Profundidade</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="profundidadeProdutoInfo">
+                                                                            Medida da longitude desde a parte da frente até a parte de trás do produto.                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Profundidade <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira a profundidade" value={this.state.profundidadeProduto || ''} onChange={this.atualizaProfundidadeProduto} />
                                                                 <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="pesobruto" className="mb-3">
-                                                                <Form.Label>Volumes</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="volumesProdutoInfo">
+                                                                            Quantidade total de volumes que o produto precisa ser dividido para entrega.                                                                      </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Volumes <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Insira o volume" value={this.state.volumes || ''} onChange={this.atualizaVolumes} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="itenscaixa" className="mb-3">
-                                                                <Form.Label>Itens p/ caixa</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="quantidadeItensProdutoInfo">
+                                                                            Quantidade de itens por caixa/embalagem.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Itens p/ caixa <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="Digite o volume" value={this.state.itensPorCaixa || ''} onChange={this.atualizaItensPorCaixa} />
                                                             </Form.Group>
                                                         </Col>
@@ -1115,14 +1497,34 @@ class Produto extends React.Component {
                                                     <Row>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="gtin" className="mb-3">
-                                                                <Form.Label>GTIN/EAN </Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="gtinEanProdutoInfo">
+                                                                            Código GTIN (GTIN-8, GTIN-12, GTIN-13 ou GTIN-14) do produto que está sendo comercializado.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        GTIN/EAN <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="GTIN/EAN" value={this.state.gtin || ''} onChange={this.atualizaGtin} />
                                                                 <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="gtintributario" className="mb-3">
-                                                                <Form.Label>GTIN/EAN tributário</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="gtinEanTribProdutoInfo">
+                                                                            Código GTIN (GTIN-8, GTIN-12 ou GTIN-13) da menor unidade comercializada no varejo.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        GTIN/EAN tributário <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control type="text" placeholder="GTIN/EAN tributário" value={this.state.gtinEmbalagem || ''} onChange={this.atualizaGtinEmbalagem} />
                                                             </Form.Group>
                                                         </Col>
@@ -1131,8 +1533,30 @@ class Produto extends React.Component {
                                             )}
                                             <Row>
                                                 <Col xs={2} md={12}>
+                                                    <Form.Group controlId="observacoes" className="mb-3">
+                                                        <Form.Label>Listas de preço</Form.Label>
+                                                        <div className="label-with-button">
+                                                            <Button variant="dark" onClick={this.modalListaProduto}>
+                                                                Incluir uma lista de desconto
+                                                            </Button>
+                                                        </div>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col xs={2} md={12}>
                                                     <Form.Group controlId="descricaocurta" className="mb-3">
-                                                        <Form.Label>Descrição Curta (Descrição Principal) </Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="descricaoCurtaProdutoInfo">
+                                                                    Descrição do produto, utilizado na exportação do produto para lojas virtuais.
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Descrição Curta (Descrição Principal) <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control as="textarea" rows={3} placeholder="Insira a descrição curta" value={this.state.descricaoCurta || ''} onChange={this.atualizaDescricaoCurta} />
                                                     </Form.Group>
                                                 </Col>
@@ -1140,7 +1564,17 @@ class Produto extends React.Component {
                                             <Row>
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="descricaocurta" className="mb-3">
-                                                        <Form.Label>Descrição Complementar</Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="descricaoCompleProdutoInfo">
+                                                                    Campo exibido em propostas comerciais, pedidos de venda e pedidos de compra.
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Descrição Complementar <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control as="textarea" rows={3} placeholder="Insira a descrição complementar" value={this.state.descricaoComplementar || ''} onChange={this.atualizaDescricaoComplementar} />
                                                     </Form.Group>
                                                 </Col>
@@ -1148,7 +1582,17 @@ class Produto extends React.Component {
                                             <Row>
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="linkexterno" className="mb-3">
-                                                        <Form.Label>Link Externo</Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="linkExternoProdutoInfo">
+                                                                    Link do produto na loja virtual, marketplace, catálogo ....
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Link Externo <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control type="text" placeholder="insira o link externo" value={this.state.linkExterno || ''} onChange={this.atualizaLinkExterno} />
                                                     </Form.Group>
                                                 </Col>
@@ -1156,7 +1600,17 @@ class Produto extends React.Component {
                                             <Row>
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="video" className="mb-3">
-                                                        <Form.Label>Video</Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="videoProdutoInfo">
+                                                                    Vídeo do produto, utilizado na exportação do produto para lojas virtuais.
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Video <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control type="text" placeholder="insira o link do video" value={this.state.urlVideo || ''} onChange={this.atualizaUrlVideo} />
                                                     </Form.Group>
                                                 </Col>
@@ -1164,13 +1618,33 @@ class Produto extends React.Component {
                                             <Row>
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="observacoes" className="mb-3">
-                                                        <Form.Label>Observações</Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="observacoesProdutoInfo">
+                                                                    Observações gerais sobre o produto.
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Observações <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control tas="textarea" rows={3} placeholder="insira as observações" value={this.state.observacoes || ''} onChange={this.atualizaObservacoes} />
                                                     </Form.Group>
                                                 </Col>
                                                 <Col xs={2} md={12}>
                                                     <Form.Group controlId="categoria" className="mb-3">
-                                                        <Form.Label>Categoria</Form.Label>
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip id="categoriaProdutoInfo">
+                                                                    Categoria referente aos campos customizados, sem vínculo com as integrações multiloja.
+                                                                </Tooltip>
+                                                            }>
+                                                            <Form.Label>
+                                                                Categoria <BsInfoCircle className="icon-info" />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
                                                         <Form.Control as="select" placeholder="insira as observações" value={this.state.idCategoria || ''} onChange={this.atualizaCategoria} >
                                                             <option value="">Sem categoria</option>
                                                             {this.state.categorias.map((categoria) => (
@@ -1199,25 +1673,64 @@ class Produto extends React.Component {
                                                     <Row>
                                                         <Col xs={1} md={3}>
                                                             <Form.Group controlId="minimo" className="mb-3">
-                                                                <Form.Label>Minimo</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="minimoProdutoInfo">
+                                                                            Qtd mínima do produto no estoque.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Minimo <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control tas="text" placeholder="insira o minimo" value={this.state.estoqueMinimo || ''} onChange={this.atualizaEstoqueMinimo} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="maximo" className="mb-3">
-                                                                <Form.Label>Máximo</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="maximoProdutoInfo">
+                                                                            Qtd máxima do produto no estoque.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Máximo <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control tas="text" placeholder="insira o maximo" value={this.state.estoqueMaximo || ''} onChange={this.atualizaEstoqueMaximo} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="crossdocking" className="mb-3">
-                                                                <Form.Label>Crossdocking</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="crossdockingProdutoInfo">
+                                                                            Quantidade de dias para o processo de distribuição em que a mercadoria recebida é redirecionada ao consumidor final sem uma armazenagem prévia.                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Crossdocking <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control tas="text" placeholder="insira o crossdocking" value={this.state.crossdocking || ''} onChange={this.atualizaCrossdocking} />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col xs={2} md={3}>
                                                             <Form.Group controlId="localizacao" className="mb-3">
-                                                                <Form.Label>Localização</Form.Label>
+                                                                <OverlayTrigger
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Tooltip id="localizacaoProdutoInfo">
+                                                                            Localização do produto no estoque. Ex: Corredor 4, seção 2A.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <Form.Label>
+                                                                        Localização <BsInfoCircle className="icon-info" />
+                                                                    </Form.Label>
+                                                                </OverlayTrigger>
                                                                 <Form.Control tas="text" placeholder="insira a localização" value={this.state.localizacao || ''} onChange={this.atualizaLocalizacao} />
                                                             </Form.Group>
                                                         </Col>
@@ -1225,9 +1738,74 @@ class Produto extends React.Component {
                                                 </div>
                                             )}
                                         </Tab>
-                                        {/* <Tab eventKey="fornecedores" title="Fornecedores">
+                                        <Tab eventKey="fornecedores" title="Fornecedores">
+                                            <Table striped bordered hover>
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID do Fornecedor</th>
+                                                        <th>Descrição do Produto</th>
+                                                        <th>Código do Produto</th>
+                                                        <th>Preço de Compra</th>
+                                                        <th>Preço de Custo</th>
+                                                        <th>Garantia do Produto</th>
+                                                        <th>Padrão</th>
+                                                        <th>Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.produtosFornecedores.map((produto) => (
+                                                        <tr key={produto.produtoFornecedor.idProdutoFornecedor}>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.idFornecedor}
+                                                                    onChange={(e) => this.handleChange('idFornecedor', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.produtoDescricao}
+                                                                    onChange={(e) => this.handleChange('produtoDescricao', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.produtoCodigo}
+                                                                    onChange={(e) => this.handleChange('produtoCodigo', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.precoCompra}
+                                                                    onChange={(e) => this.handleChange('precoCompra', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.precoCusto}
+                                                                    onChange={(e) => this.handleChange('precoCusto', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.produtoGarantia}
+                                                                    onChange={(e) => this.handleChange('produtoGarantia', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    value={produto.produtoFornecedor.padrao}
+                                                                    onChange={(e) => this.handleChange('padrao', e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Button onClick={() => this.salvarAlteracoes()}>Salvar</Button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </Tab>
 
-                                        </Tab> */}
                                     </Tabs>
                                     <Row className="text-center">
                                         <Col>
@@ -1267,11 +1845,27 @@ class Produto extends React.Component {
                                 Não
                             </Button>
                             <Button type="button" variant="secondary" onClick={() => {
-                                this.excluirProduto(this.state.codigoProdutoParaExcluir);
-                                this.modalExcluirProduto();
-                                this.modalExcluindoProduto();
+                                this.delete(this.state.codigoProdutoParaExcluir);
                             }}>
                                 Sim
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={this.state.modalErro} onHide={this.modalErro} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            Não foi possível salvar o produto na plataforma Bling. Estamos agora salvando o produto no banco de dados para posteriormente realizar o cadastro automaticamente no Bling.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={() => {
+                                this.modalErro();
+                                this.fecharModal()
+                            }}>
+                                Sair
                             </Button>
                         </Modal.Footer>
                     </Modal>
@@ -1280,6 +1874,24 @@ class Produto extends React.Component {
                         <Modal.Body>
                             <span style={{ display: 'block' }}><strong>Excluindo produto...</strong></span>
                         </Modal.Body>
+                    </Modal>
+
+                    <Modal show={this.state.modalListaProduto} onHide={this.modalListaProduto} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            Deseja excluir o produto? Essa ação não poderá ser desfeita.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary">
+                                Não
+                            </Button>
+                            <Button type="button" variant="secondary">
+                                Sim
+                            </Button>
+                        </Modal.Footer>
                     </Modal>
                 </div >
             )
