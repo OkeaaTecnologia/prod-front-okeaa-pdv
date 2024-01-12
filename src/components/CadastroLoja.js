@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Component } from "react";
+import '../css/CadastroLoja.css';
 
 import { Button } from 'react-bootstrap';
 import { Modal } from 'react-bootstrap';
@@ -13,69 +14,80 @@ import { FaTrash } from 'react-icons/fa';
 import { BsPencilSquare } from 'react-icons/bs';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/CadastroLoja.css';
 
-class CadastroLoja extends React.Component {
+class CadastroLoja extends Component {
 
 
   constructor(props) {
     super(props);
 
     this.state = {
-      lojas: [],
       modalEditarProduto: false,
+      id: '',
+      idLoja: '',
+      nomeLoja: '',
+      unidadeLoja: '',
+      modalCadastrarLoja: false,
+      listaLojas: [],
+      searchTerm: '',
+      data: '',
     };
   }
 
   componentDidMount() {
-    this.buscaLojas();
+    this.buscarLojas();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { modalEditarLoja } = this.state;
-    const prevModalEditarLoja = prevState.modalEditarLoja;
 
-    if (prevModalEditarLoja && !modalEditarLoja) {
-      // Se o modal estiver fechando, chame a função para buscar as lojas novamente
-      this.buscaLojas();
-    }
   }
 
-  buscaLojas = () => {
-    fetch(`https://prod-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas`)
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ lojas: data });
-      })
-      .catch(error => {
-        console.error('Erro ao buscar as lojas:', error);
+  buscarLojas = () => {
+    return new Promise((resolve, reject) => {
+      fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/selecionarLojas')
+        .then((resposta) => {
+          if (!resposta.ok) {
+            throw new Error('Erro na chamada da API');
+          }
+          return resposta.json();
+        })
+        .then(data => {
+          this.setState({
+            listaLojas: data,
+          });
+          resolve(data); // Resolve com os dados obtidos da API
+        })
+        .catch(error => {
+          console.error('Erro ao buscar as lojas:', error);
 
-        const loja1 = {
-          idLoja: '204672835',
-          nomeLoja: 'Loja - Londrina',
-          unidadeLoja: 'Matriz',
-        };
-
-        const lojasComAdicionais = [loja1];
-        this.setState({ lojas: lojasComAdicionais });
-      });
+          this.setState({
+            listaLojas: [],
+          });
+          reject(error);
+        });
+    });
   };
 
   buscarIdLoja = (idLoja) => {
     fetch(`https://prod-api-forma-pagamento.azurewebsites.net/api/v1/${idLoja}`)
       .then(response => response.json())
       .then(data => {
-        console.log('Resposta da API:', data);
+        // console.log('Resposta da API:', data);
 
-        if (data && data.length > 0) {
-          console.log('Loja encontrada:', data[0]);
+        const id = data.id;
+        const idLoja = data.idLoja;
+        const nomeLoja = data.nomeLoja;
+        const unidadeLoja = data.unidadeLoja;
 
-          // Caso a loja seja encontrada, você pode atualizar o estado com a loja encontrada
-          this.setState({ lojaEncontrada: data[0] });
-        } else {
-          console.log('Loja não encontrada.');
-          // Caso a loja não seja encontrada, você pode mostrar uma mensagem de erro ou fazer alguma outra tratativa
-        }
+        this.setState({
+          id: id,
+          idLoja: idLoja,
+          nomeLoja: nomeLoja,
+          unidadeLoja: unidadeLoja,
+        });
+
+        this.modalCadastrarLoja(this.state.selecionaLoja);
+
       })
       .catch(error => {
         console.error('Erro ao buscar a loja:', error);
@@ -91,7 +103,7 @@ class CadastroLoja extends React.Component {
           throw new Error('Erro ao deletar loja');
         }
         // Atualizar o estado após a deleção bem-sucedida (opcional)
-        this.buscaLojas();
+        this.buscarLojas();
       })
       .catch(error => {
         console.error('Erro ao deletar a loja:', error);
@@ -99,124 +111,194 @@ class CadastroLoja extends React.Component {
   };
 
   adicionarLoja = (selecionaLoja) => {
-    fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/adicionarLoja/', {
+    // console.log(selecionaLoja)
+    return fetch('https://prod-api-forma-pagamento.azurewebsites.net/api/v1/adicionarLoja/', {
+
+      //    fetch('https://dev-api-forma-pagamento.azurewebsites.net/api/v1/adicionarLoja/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(selecionaLoja),
+      body: selecionaLoja,
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erro ao adicionar loja');
-        }
-        // Atualizar o estado após a adição bem-sucedida (opcional)
-        this.buscaLojas();
-      })
-      .catch(error => {
-        console.error('Erro ao adicionar a loja:', error);
+      .then(async response => {
+        const statusCode = response.status; // Obtém o status da API externa
+        const data = await response.text(); // Obtém os dados da resposta
+
+        // Crie um objeto que inclui o status e os dados da API externa
+        const responseData = {
+          statusCode,
+          data,
+        };
+
+        // Registre o status e os dados no console
+        // console.log('Status da API externa:', statusCode);
+        // console.log('Dados da resposta:', data);
+
+        // Retorna a resposta, incluindo o status da API externa
+        return responseData;
       });
   };
 
-  handleModalEditarLoja = (loja) => {
-    // Verificar se a loja existe
-    if (loja) {
-      // Caso a loja exista, setar o estado com os dados para edição
-      this.setState({
-        modalEditarLoja: true,
-        selecionaLoja: {
-          idLoja: loja.idLoja,
-          nomeLoja: loja.nomeLoja,
-          unidadeLoja: loja.unidadeLoja,
-        },
+  //PUT - MÉTODO PARA ATUALIZAR UM PRODUTO EXISTENTE
+  atualizarLoja = (selecionaLoja) => {
+    const id = this.state.id;
+
+    return fetch(`http://localhost:8080/api/v1/atualizarLoja/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: selecionaLoja,
+    })
+      .then(async response => {
+        const statusCode = response.status; // Obtém o status da API externa
+        const data = await response.text(); // Obtém os dados da resposta
+
+        // Crie um objeto que inclui o status e os dados da API externa
+        const responseData = {
+          statusCode,
+          data,
+        };
+
+        // Registre o status e os dados no console
+        // console.log('Status da API externa:', statusCode);
+        // console.log('Dados da resposta:', data);
+
+        // Retorna a resposta, incluindo o status da API externa
+        return responseData;
       });
-    } else {
-      // Caso a loja não exista, setar o estado com os dados para adicionar nova loja
-      this.setState({
-        modalEditarLoja: true,
-        selecionaLoja: {
-          idLoja: '',
-          nomeLoja: '',
-          unidadeLoja: '',
-        },
-      });
-    }
   };
 
-  fecharModalEditarLoja = () => {
-    // Limpe os dados da loja editando quando o modal for fechado
-    this.setState({
-      modalEditarLoja: false,
-      selecionaLoja: null,
-    });
-  };
-
-  handleCadastrarClick = () => {
-    // Chamar a função handleModalEditarLoja sem nenhum argumento para abrir o modal de cadastro de nova loja
-    this.handleModalEditarLoja(null);
-  };
 
   atualizarIDLoja = (event) => {
     const idLoja = event.target.value;
-    this.setState(prevState => ({
-      selecionaLoja: {
-        ...prevState.selecionaLoja,
-        idLoja,
-      },
-    }));
+    // console.log('idLoja: ', idLoja);
+    this.setState({
+      idLoja: idLoja
+    });
   };
 
-  // Função para atualizar o estado com o valor do campo Nome da Loja
   atualizarNomeLoja = (event) => {
     const nomeLoja = event.target.value;
-    this.setState(prevState => ({
-      selecionaLoja: {
-        ...prevState.selecionaLoja,
-        nomeLoja,
-      },
-    }));
+    // console.log('nomeLoja: ', nomeLoja);
+    this.setState({
+      nomeLoja: nomeLoja
+    });
   };
 
-  // Função para atualizar o estado com o valor do campo Unidade de Negócio
   atualizarUnidadeLoja = (event) => {
     const unidadeLoja = event.target.value;
-    this.setState(prevState => ({
-      selecionaLoja: {
-        ...prevState.selecionaLoja,
-        unidadeLoja,
-      },
-    }));
+    // console.log('unidadeLoja: ', unidadeLoja);
+    this.setState({
+      unidadeLoja: unidadeLoja
+    });
+  };
+
+  reset = () => {
+    this.setState({
+      id: '',
+      idLoja: '',
+      nomeLoja: '',
+      unidadeLoja: '',
+      listaLojas: [],
+      searchTerm: '',
+    });
   };
 
   salvarLoja = () => {
-    const { selecionaLoja } = this.state;
+    const { idLoja, nomeLoja, unidadeLoja } = this.state;
+    const id = this.state.id;
 
-    this.adicionarLoja(selecionaLoja);
-    this.fecharModalEditarLoja();
+    const lista = {
+      idLoja,
+      nomeLoja,
+      unidadeLoja,
+    };
+
+    const selecionaLoja = JSON.stringify(lista);
+
+    // console.log(selecionaLoja);
+
+    if (id === '') {
+      this.adicionarLoja(selecionaLoja)
+        .then(responseData => {
+          if (responseData.data !== '') {
+            this.buscarLojas();
+            this.reset();
+            this.fecharModalCadastrar()
+          } else {
+            this.modalErro();
+          }
+        })
+        .catch(error => {
+          console.error('Erro na chamada da API:', error);
+          this.modalErro();
+        });
+    } else {
+      this.atualizarLoja(selecionaLoja)
+        .then(responseData => {
+          if (responseData.data !== '') {
+            this.buscarLojas();
+            this.reset();
+            this.fecharModalCadastrar()
+          } else {
+            this.modalErro();
+          }
+        })
+        .catch(error => {
+          console.error('Erro na chamada da API:', error);
+          this.modalErro();
+        });
+    };
+  };
+
+  campoBusca = (event) => {
+    this.setState({ searchTerm: event.target.value });
+  };
+
+  modalCadastrarLoja = () => {
+    this.setState({
+      modalCadastrarLoja: !this.state.modalCadastrarLoja
+    });
+  };
+
+  fecharModalCadastrar = () => {
+    this.setState({
+      modalCadastrarLoja: false
+    });
   };
 
   render() {
 
-    const { lojas, modalEditarLoja, selecionaLoja } = this.state;
+    const { searchTerm, selecionaLoja, listaLojas, idLoja, nomeLoja, unidadeLoja, modalCadastrarLoja } = this.state;
+
+    const removeAccents = (str) => {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    };
 
     return (
       <div className="grid-loja">
         <Container fluid>
           <Col className="col">
             <div className="d-flex align-items-center mt-3 mb-3">
-              <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar uma nova loja:</span>
+              <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>
+                Cadastrar uma nova loja:
+              </span>
               <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-              <button onClick={this.handleCadastrarClick} className="d-flex align-items-center botao-cadastro-loja">
+              <button onClick={this.modalCadastrarLoja} className="d-flex align-items-center botao-cadastro-loja">
                 <BsPersonAdd style={{ marginRight: '0.8rem' }} />
                 Incluir Cadastro
               </button>
-              <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>UNIDADE LOJA</span>
+              <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>
+                UNIDADE LOJA
+              </span>
             </div>
 
             <Col className="col">
               <div className="d-flex align-items-center mt-3 mb-3">
                 <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar contato:</span>
-                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.handleSearchChange} className="form-control ml-2" />
+                <input type="text" placeholder="Digite o termo de busca..." value={searchTerm} onChange={this.campoBusca} className="form-control ml-2" />
               </div>
             </Col>
           </Col>
@@ -234,86 +316,107 @@ class CadastroLoja extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {lojas.map(loja => (
-                  <tr key={loja.id}
-                    onClick={() => this.handleModalEditarLoja(loja)}
-                    onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
-                    onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}
-                  >
-                    <td>{loja.idLoja}</td>
-                    <td>{loja.nomeLoja}</td>
-                    <td>{loja.unidadeLoja}</td>
-                    <td>
-                      <div className="button-container-table">
-                        <Button variant="warning" title="Editar loja" onClick={() => { this.handleModalEditarLoja(loja) }}>
-                          <BsPencilSquare />
-                        </Button>
-                        <Button variant="danger" title="Excluir loja" onClick={() => { this.deletarLoja(loja.idLoja) }}>
-                          <FaTrash />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {listaLojas.map((listaLojas, index) => {
+                  const normalizedSearchTerm = removeAccents(searchTerm.toLowerCase());
+                  const normalizedDescription = removeAccents(listaLojas.nomeLoja.toLowerCase());
+                  const normalizedCodigo = listaLojas.idLoja.toLowerCase();
+
+                  if (
+                    normalizedDescription.includes(normalizedSearchTerm) ||
+                    normalizedCodigo.includes(normalizedSearchTerm)
+                  ) {
+                    return (
+                      <tr
+                        key={listaLojas.id}
+                        onClick={() => this.buscarIdLoja(listaLojas.idLoja)}
+                        onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
+                        onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}
+                      >
+                        <td>{listaLojas.idLoja}</td>
+                        <td>{listaLojas.nomeLoja}</td>
+                        <td>{listaLojas.unidadeLoja}</td>
+                        <td>
+                          <div className="button-container-table">
+                            <Button variant="warning" title="Editar loja" onClick={(e) => { e.stopPropagation(); this.modalCadastrarLoja(listaLojas) }}>
+                              <BsPencilSquare />
+                            </Button>
+                            <Button variant="danger" title="Excluir loja" onClick={(e) => { e.stopPropagation(); this.deletarLoja(listaLojas.idLoja) }}>
+                              <FaTrash />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>);
+                  } else {
+                    return null;
+                  }
+                })}
+                {listaLojas.length === 0 && <tr><td colSpan="6">Nenhuma loja cadastrada.</td>
+                  <td>
+                    <div className="button-container-table">
+                      <Button variant="warning" title="Editar produto" disabled>
+                        <BsPencilSquare />
+                      </Button>
+                      <Button variant="danger" title="Excluir produto" disabled>
+                        <FaTrash />
+                      </Button>
+                    </div>
+                  </td></tr>}
               </tbody>
             </Table>
           </Container>
         </div>
 
-        {/* Modal */}
-        <Modal show={modalEditarLoja} onHide={this.fecharModalEditarLoja} size="lg" centered>
+        <Modal show={modalCadastrarLoja} onHide={this.modalCadastrarLoja} size="lg" centered>
           <Modal.Header closeButton className="modal-loja-header">
             <Modal.Title>{selecionaLoja ? 'Editar Loja' : 'Adicionar Nova Loja'}</Modal.Title>
           </Modal.Header>
           <Modal.Body className="modal-loja-body">
-            {selecionaLoja && (
-              <div>
-                <Row>
-                  <Col>
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="idLoja" className="texto-campos">ID Loja</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="idLoja"
-                        className="form-control"
-                        name="idLoja"
-                        value={selecionaLoja.idLoja}
-                        onChange={this.atualizarIDLoja}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="nomeLoja" className="texto-campos">Nome da Loja</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="nomeLoja"
-                        className="form-control"
-                        name="nomeLoja"
-                        value={selecionaLoja.nomeLoja}
-                        onChange={this.atualizarNomeLoja}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="unidadeNegocio" className="texto-campos">Unidade de Negócio</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="unidadeNegocio"
-                        className="form-control"
-                        name="unidadeNegocio"
-                        value={selecionaLoja.unidadeLoja}
-                        onChange={this.atualizarUnidadeLoja}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </div>
-            )}
+            <div>
+              <Row>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Label htmlFor="idLoja" className="texto-campos">ID Loja</Form.Label>
+                    <Form.Control
+                      type="text"
+                      id="idLoja"
+                      className="form-control"
+                      name="idLoja"
+                      value={idLoja || ''}
+                      onChange={this.atualizarIDLoja}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Label htmlFor="nomeLoja" className="texto-campos">Nome da Loja</Form.Label>
+                    <Form.Control
+                      type="text"
+                      id="nomeLoja"
+                      className="form-control"
+                      name="nomeLoja"
+                      value={nomeLoja || ''}
+                      onChange={this.atualizarNomeLoja}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Label htmlFor="unidadeNegocio" className="texto-campos">Unidade de Negócio</Form.Label>
+                    <Form.Control
+                      type="text"
+                      id="unidadeNegocio"
+                      className="form-control"
+                      name="unidadeNegocio"
+                      value={unidadeLoja || ''}
+                      onChange={this.atualizarUnidadeLoja}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </div>
           </Modal.Body>
           <Modal.Footer className="modal-loja-footer">
-            <button className="botao-cancelar-loja" onClick={this.fecharModalEditarLoja}>Cancelar</button>
+            <button className="botao-cancelar-loja" onClick={this.fecharModalCadastrar}>Cancelar</button>
             <button className="botao-cadastro-loja" onClick={() => this.salvarLoja()}>Salvar</button>
           </Modal.Footer>
         </Modal>

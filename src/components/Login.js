@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../css/Login.css';
+import '../css/Login.css';
 
 import Form from "react-bootstrap/Form";
 

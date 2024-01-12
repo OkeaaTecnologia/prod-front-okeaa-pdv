@@ -1,17 +1,17 @@
 import React from "react";
+import '../css/Contato.css';
 
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
+// import Form from "react-bootstrap/Form";
+// import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Table from 'react-bootstrap/Table';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import { Container } from "react-bootstrap";
-import { FaSync, VscNewFile } from 'react-icons/fa';
+// import Col from 'react-bootstrap/Col';
+// import Row from 'react-bootstrap/Row';
+// import { Container } from "react-bootstrap";
+import { FaSync } from 'react-icons/fa';
 import Spinner from 'react-bootstrap/Spinner';
 
-import '../css/Contato.css';
-import { parse } from 'js2xmlparser';
+// import { parse } from 'js2xmlparser';
 
 
 class Categoria extends React.Component {

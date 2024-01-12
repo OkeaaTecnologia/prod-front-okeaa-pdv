@@ -76,6 +76,7 @@ input:focus {
   color: #fda21e;
   box-shadow: 0 0 5px #f47b0233, inset 0 0 1px #f47b0233;
   animation: glow 0.8s ease-out infinite alternate;
+  border-width: 2.5px; /* Ajuste o valor conforme necessário */
 }
 
 @keyframes glow {

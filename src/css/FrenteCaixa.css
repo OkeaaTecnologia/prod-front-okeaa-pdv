@@ -85,20 +85,17 @@ body {
   padding: 1rem;
   max-width: auto;
   opacity: 0;
-  transform: translateY(50%);
-  animation: bolha 0.9s ease forwards;
+  animation: fadeIn 0.5s ease forwards;
   z-index: 1;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes bolha {
-  0% {
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    transform: translateY(50%);
   }
-  100% {
+  to {
     opacity: 1;
-    transform: translateY(0%);
   }
 }
 
@@ -339,6 +336,34 @@ h5 {
 .icon-info {
   background-color: #0eb2e8;
   border-radius: 50%; /* Cria um círculo com bordas arredondadas */
+}
+
+.com-borda {
+  border: 1px solid #d8d8d8; /* Adapte a cor conforme necessário */
+}
+
+.product-details {
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.product-details h2 {
+  margin-bottom: 15px;
+}
+
+.product-details .strike-through {
+  margin-bottom: 100px;
+  text-decoration: line-through;
+}
+
+.discount-message {
+  color: red;
+  margin-bottom: 100px;
+}
+
+.product-details .total-price {
+  font-size: 30px;
+  font-weight: bold;
 }
 
 /* 

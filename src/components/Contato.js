@@ -9,12 +9,16 @@ import { Col } from 'react-bootstrap';
 import { Row } from 'react-bootstrap';
 import { Container } from "react-bootstrap";
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { BsInfoCircle } from 'react-icons/bs';
 
+import { BsInfoCircle } from 'react-icons/bs';
 import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
-import { BsPencilSquare } from 'react-icons/bs';
+
 import { parse } from 'js2xmlparser';
+
+// import { BsPencilSquare } from 'react-icons/bs';
+// import DatePicker from 'react-datepicker';
+//import 'react-datepicker/dist/react-datepicker.css';
 
 
 class Contato extends React.Component {
@@ -51,26 +55,39 @@ class Contato extends React.Component {
             sexo: '',
             clienteDesde: '',
             limiteCredito: '',
-            dataNascimento: '',
             tipoContato: '',
             descricao: '',
             logradouro: '',
             localidade: '',
+            obs: '',
+            informacaoContato: '',
+            emailNfe: '',
             cpfValido: '',
-            searchTerm: '', // Estado para o termo de busca
+            cnpjValido: '',
+            searchTerm: '',
+            statusCode: '',
             carregando: true,
+            ModalCpfValido: false,
             modalAberta: false,
             modalSalvarContato: false,
             modalErro: false,
             validated: false,
+            selectedListId: null,
+            showRenderTelaLista: false,
+            dadosCarregados: false,
+            dataNascimento: null,
         };
 
         this.numeroRef = React.createRef();
     };
 
-    componentDidMount() {
-        this.buscarContato();
-        this.buscarTipoContato();
+    async componentDidMount() {
+        try {
+            this.buscarContato();
+            this.buscarTipoContato();
+        } catch (error) {
+            this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
+        }
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -115,6 +132,8 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DE UM CONTATO PELO ID
     atualizaContato = (id) => {
+    	this.setState({ carregando: true, dadosCarregados: false });
+
         fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/${id}`, {
             method: 'GET',
             headers: {
@@ -126,11 +145,25 @@ class Contato extends React.Component {
                 // console.log("Linha 80", dados)
                 if (dados.retorno.contatos) {
 
+
                     const contato = dados.retorno.contatos[0].contato;
                     const tiposContato = contato.tiposContato.map(item => ({
                         tipoContato: item.tipoContato,
                         descricao: item.tipoContato.descricao
                     }));
+
+                    const converterDataFormato = (data) => {
+                        const [ano, mes, dia] = data.split('-');
+                        return `${dia}/${mes}/${ano}`;
+                    };
+
+                    const formatarDataHora = (dataHora) => {
+                        const [data, hora] = dataHora.split(' ');
+                        const [ano, mes, dia] = data.split('-');
+                        const [horas, minutos, segundos] = hora.split(':');
+
+                        return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+                    };
 
                     // console.log(tiposContato); // Adicione o console.log aqui
                     this.setState({
@@ -154,22 +187,25 @@ class Contato extends React.Component {
                         contribuinte: contato.contribuinte,
                         site: contato.site,
                         celular: contato.celular,
-                        dataAlteracao: contato.dataAlteracao,
+                        dataAlteracao: formatarDataHora(contato.dataAlteracao),
                         dataInclusao: contato.dataInclusao,
                         sexo: contato.sexo,
-                        clienteDesde: contato.clienteDesde,
+                        clienteDesde: converterDataFormato(contato.clienteDesde),
                         limiteCredito: contato.limiteCredito,
-                        dataNascimento: contato.dataNascimento,
+                        dataNascimento: converterDataFormato(contato.dataNascimento),
                         tiposContato: tiposContato,
+                        dadosCarregados: true, // Define que os dados foram carregados com sucesso
                     });
 
                 } else {
                     this.setState({ contatos: [] })
                 }
                 this.setState({ carregando: false });
-                this.abrirModal();
             })
-            .catch(error => console.error(error));
+            .catch(error => {
+                console.error(error);
+                this.setState({ carregando: false, dadosCarregados: false });
+            });
     };
 
     //GET - MÉTODO PARA CONSUMO DE TIPOS DE CONTATO DO BANCO DE DADOS.
@@ -606,11 +642,46 @@ class Contato extends React.Component {
         });
     };
 
-    // atualizaEmailNfe = (event) => {
-    //     console.log(event.target.value); // Verifica se o valor do campo está sendo capturado corretamente
+    atualizaDataNascimento = (event) => {
+        // Obtém o valor do campo de input
+        let valorInput = event.target.value;
 
+        // Remove caracteres não numéricos
+        valorInput = valorInput.replace(/\D/g, '');
+
+        // Formata a data enquanto o usuário digita
+        if (valorInput.length >= 2 && valorInput.length < 4) {
+            valorInput = valorInput.replace(/(\d{2})(\d{0,2})/, '$1/$2');
+        } else if (valorInput.length >= 4) {
+            valorInput = valorInput.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+        }
+
+        // Atualiza o estado com o valor do campo de input
+        this.setState({ dataNascimento: valorInput });
+    };
+
+    atualizaClienteDesde = (event) => {
+        // Obtém o valor do campo de input
+        let valorInput = event.target.value;
+
+        // Remove caracteres não numéricos
+        valorInput = valorInput.replace(/\D/g, '');
+
+        // Formata a data enquanto o usuário digita
+        if (valorInput.length >= 2 && valorInput.length < 4) {
+            valorInput = valorInput.replace(/(\d{2})(\d{0,2})/, '$1/$2');
+        } else if (valorInput.length >= 4) {
+            valorInput = valorInput.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+        }
+
+        // Atualiza o estado com o valor do campo de input
+        this.setState({ clienteDesde: valorInput });
+    };
+
+    // atualizaEmailNfe = (event) => {
+    //     const emailNfe = event.target.value
     //     this.setState({
-    //         emailNfe: event.target.value
+    //         emailNfe: emailNfe
     //     })
     // }
 
@@ -620,6 +691,14 @@ class Contato extends React.Component {
     //         informacaoContato: informacaoContato
     //     })
     // }
+
+    // atualizaObs = (event) => {
+    //     const obs = event.target.value
+    //     this.setState({
+    //         obs: obs
+    //     })
+    // }
+
 
     // handleSelectChange = (event) => {
     //     const selectedItem = event.target.value;
@@ -655,7 +734,7 @@ class Contato extends React.Component {
     //---------------- SCRIPT´S DE AÇÃO PARA OS BOTÕES DA TELA PRODUTO E GERAÇÃO DO XML DE ENVIO PARA O BLING. --------------|
     //-----------------------------------------------------------------------------------------------------------------------|
 
-    //Ação para limpar os campos do modal após cadastrar um novo cliente.
+    //Ação para limpar os campos da tela após cadastrar um novo cliente.
     reset = (event) => {
         this.setState(
             {
@@ -679,20 +758,20 @@ class Contato extends React.Component {
                 contribuinte: '',
                 site: '',
                 celular: '',
-                dataAlteracao: '',
                 dataInclusao: '',
                 sexo: '',
                 clienteDesde: '',
                 limiteCredito: '',
                 dataNascimento: '',
+                dataAlteracao: '',
                 tipoContato: '',
                 descricao: '',
                 ModalCpfValido: false,
                 informacaoContato: '',
-                tiposContato: []
+                obs: '',
+                emailNfe: '',
+                tiposContato: [],
             });
-
-        this.abrirModal();
     };
 
     //Ações do botão SUBMIT (Cadastrar).
@@ -712,12 +791,12 @@ class Contato extends React.Component {
         if (isValid === false) {
             event.preventDefault();
             event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
-            this.setState({ validated: true }); // atribui true na validação
+            this.setState({ validated: true });
         } else {
             // Verifica se o CPF é válido
             if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
                 event.preventDefault();
-                this.setState({ validated: false }); // atribui true na validação
+                this.setState({ validated: false });
 
                 const contato = {};
                 const campos = [
@@ -746,6 +825,9 @@ class Contato extends React.Component {
                     'descricao',
                     'sexo',
                     'situacao',
+                    'emailNfe',
+                    'dataNascimento',
+                    'clienteDesde'
                 ];
 
                 campos.forEach(campo => {
@@ -768,8 +850,10 @@ class Contato extends React.Component {
                             if (responseData.data !== '') { // Verifique se a resposta não está vazia
                                 this.buscarContato();
                                 this.modalSalvarContato();
-                                this.reset();
-                                this.fecharModal();
+                                setTimeout(() => {
+                                    this.novaRenderizacao();
+                                    this.reset();
+                                }, 1000);
                             } else {
                                 this.buscarContato();
                                 this.modalErro();
@@ -785,8 +869,10 @@ class Contato extends React.Component {
                             if (responseData.data !== '') { // Verifique se a resposta não está vazia
                                 this.buscarContato();
                                 this.modalSalvarContato();
-                                this.reset();
-                                this.fecharModal();
+                                setTimeout(() => {
+                                    this.novaRenderizacao();
+                                    this.reset();
+                                }, 1000);
                             } else {
                                 this.buscarContato();
                                 this.modalErro();
@@ -796,7 +882,6 @@ class Contato extends React.Component {
                             console.error('Erro na chamada da API:', error);
                             this.modalErro();
                         });
-
                 }
             } else {
                 this.ModalCpfValido();
@@ -809,19 +894,19 @@ class Contato extends React.Component {
     //-----------------------------------------------------------------------------------------------------------------------|
 
     //Ação para fechar o modal de cadastro e atualização.
-    fecharModal = () => {
-        this.setState({
-            modalAberta: false,
-            validated: false
-        });
-    };
+    // fecharModal = () => {
+    //     this.setState({
+    //         modalAberta: false,
+    //         validated: false
+    //     });
+    // };
 
-    //Ação para abrir o modal de cadastro e atualização.
-    abrirModal = () => {
-        this.setState({
-            modalAberta: true
-        });
-    };
+    // //Ação para abrir o modal de cadastro e atualização.
+    // abrirModal = () => {
+    //     this.setState({
+    //         modalAberta: true
+    //     });
+    // };
 
     ModalCpfValido = () => {
         this.setState((prevState) => ({
@@ -851,14 +936,39 @@ class Contato extends React.Component {
         this.setState({ searchTerm: event.target.value });
     };
 
+    novaRenderizacao = (contato) => {
+        this.setState({
+            selectedListId: contato,
+            showRenderTelaLista: false
+        });
+    };
+
+    abrirTelaRenderTelaLista = (contato) => {
+        this.setState({ selectedListId: contato });
+    };
+
+    abrirRenderTelaLista = () => {
+        this.setState({ showRenderTelaLista: true });
+    };
+
 
     render() {
+
+        const { selectedListId, showRenderTelaLista, carregando, searchTerm, modalSalvarContato, contatos } = this.state
+
+        if (showRenderTelaLista) {
+            return this.renderTelaLista();
+        }
+
+        if (selectedListId) {
+            return this.renderTelaLista();
+        }
 
         const removeAccents = (str) => {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         };
 
-        if (this.state.carregando) {
+        if (carregando) {
             return (
                 <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
@@ -871,24 +981,28 @@ class Contato extends React.Component {
             )
         } else {
             return (
-                <div className="grid-contato">
+                <div className="grid-contato-table">
                     <Container fluid>
                         <Col className="col">
                             <div className="d-flex align-items-center mt-3 mb-3">
                                 <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Cadastrar um novo contato:</span>
                                 <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
-                                <button onClick={this.reset} className="d-flex align-items-center botao-cadastro-contato">
+                                <button onClick={() => {
+                                    this.setState({ dadosCarregados: true });
+                                    this.abrirRenderTelaLista();
+                                    this.reset();
+                                }}
+                                    className="d-flex align-items-center botao-cadastro-contato">
                                     <BsPersonAdd style={{ marginRight: '0.6rem', fontSize: '1.3rem' }} />
                                     Incluir Cadastro
                                 </button>
                                 <span style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'white', fontSize: '1.9rem', fontStyle: 'italic' }}>CLIENTES E FORNECEDORES</span>
                             </div>
                         </Col>
-
                         <Col className="col">
                             <div className="d-flex align-items-center mt-3 mb-3">
                                 <span style={{ marginLeft: '0.8rem', fontWeight: 'bold', color: 'white' }}>Buscar contato:</span>
-                                <input type="text" placeholder="Digite o termo de busca..." value={this.state.searchTerm} onChange={this.campoBusca} className="form-control ml-2" />
+                                <input type="text" placeholder="Digite o termo de busca..." value={searchTerm} onChange={this.campoBusca} className="form-control ml-2" />
                             </div>
                         </Col>
                     </Container>
@@ -903,12 +1017,12 @@ class Contato extends React.Component {
                                         <th title="CPF / CNPJ">CPF/CNPJ</th>
                                         <th title="Cidade">Cidade</th>
                                         <th title="Telefone">Telefone</th>
-                                        <th title="Opções">Opções</th>
+                                        {/* <th title="Opções">Opções</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {this.state.contatos.map((contatos) => {
-                                        const normalizedSearchTerm = removeAccents(this.state.searchTerm.toLowerCase());
+                                    {contatos.map((contatos) => {
+                                        const normalizedSearchTerm = removeAccents(searchTerm.toLowerCase());
                                         const normalizedDescription = removeAccents(contatos.contato.nome.toLowerCase());
                                         const normalizedCodigo = contatos.contato.codigo.toLowerCase();
 
@@ -917,7 +1031,10 @@ class Contato extends React.Component {
                                             (normalizedDescription.includes(normalizedSearchTerm) || normalizedCodigo.includes(normalizedSearchTerm))) {
                                             return (
                                                 <tr key={contatos.contato.id}
-                                                    onClick={() => this.atualizaContato(contatos.contato.id)}
+                                                    onClick={() => {
+                                                        this.atualizaContato(contatos.contato.id);
+                                                        this.novaRenderizacao(contatos.contato.id)
+                                                    }}
                                                     onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
                                                     onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}>
                                                     <td>{contatos.contato.id}</td>
@@ -926,148 +1043,217 @@ class Contato extends React.Component {
                                                     <td>{contatos.contato.cnpj}</td>
                                                     <td>{contatos.contato.cidade}</td>
                                                     <td>{contatos.contato.fone}</td>
-                                                    <td>
+                                                    {/* <td>
                                                         <Button variant="warning" title="Editar contato" onClick={() => this.atualizaContato(contatos.contato.id)}>
                                                             <BsPencilSquare />
                                                         </Button>
-                                                    </td>
+                                                    </td> */}
                                                 </tr>
                                             );
                                         } else {
                                             return null;
                                         }
                                     })}
-                                    {this.state.contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
+                                    {contatos.length === 0 && <tr><td colSpan="6">Nenhum contato cadastrado.</td></tr>}
                                 </tbody>
                             </Table>
                         </Container>
+
+                        <Modal show={modalSalvarContato} onHide={this.modalSalvarContato} centered>
+                            <Modal.Body>
+                                <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
+                            </Modal.Body>
+                        </Modal>
                     </div>
+                </div >
 
-                    {/* ---------------------------------------------------------- MODALS ---------------------------------------------------------- */}
+            );
+        }
+    }
 
-                    <Modal show={this.state.modalAberta} onHide={this.fecharModal} size="xl" backdrop="static">
-                        <Modal.Header closeButton className="modal-contato-header">
-                            <Modal.Title>Cliente ou Fornecedor</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body className="modal-contato-body">
-                            <Form noValidate validated={this.state.validated} onSubmit={this.submit}>
-                                <Row>
-                                    <Col xs={2} md={2}>
-                                        <Form.Group controlId="id" className="mb-3 form-row" as={Col}>
-                                            <Form.Label type="text">ID</Form.Label>
-                                            <Form.Control type="text" value={this.state.id || ''} readOnly disabled />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={2} md={2}>
-                                        <Form.Group controlId="codigo" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="codigoContatoInfo">
-                                                        Opcional.
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Código <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="text" placeholder="Insira o código" value={this.state.codigo || ''} onChange={this.atualizaCodigo} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={{ span: 3, offset: 5 }} md={{ span: 3, offset: 5 }}>
-                                        <Form.Group controlId="situacao" className="mb-3">
-                                            <Form.Label>Situação do cadastro</Form.Label>
-                                            <Form.Select type="select" placeholder="Situação" value={this.state.situacao || ''} onChange={this.atualizaSituacao}>
-                                                <option value="A">Ativo</option>
-                                                <option value="E">Excluído</option>
-                                                <option value="S">Sem movimento</option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row className="mb-3">
-                                    <Col>
-                                        <Form.Group controlId="nome" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="nomeContatoInfo">
-                                                        Nome completo do contato.
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Nome <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="text" placeholder="Insira o nome" value={this.state.nome || ''} onChange={this.atualizaNome} required />
-                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col>
-                                        <Form.Group controlId="fantasia" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="fantasiaContatoInfo">
-                                                        Nome de fantasia ou apelido.
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Fantasia <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="text" placeholder="Insira a fantasia" value={this.state.fantasia || ''} onChange={this.atualizaFantasia} />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={12} md={3}>
-                                        <Form.Group controlId="tipo" className="mb-3">
-                                            <Form.Label>Tipo Pessoa</Form.Label>
-                                            <Form.Select type="select" placeholder="Selecione o tipo de contato" value={this.state.tipo || ''} onChange={this.atualizaTipoPessoa} required>
-                                                <option value="">Selecione o tipo de pessoa</option>
-                                                <option value="J">Pessoa Jurídica</option>
-                                                <option value="F">Pessoa Física</option>
-                                                <option value="E">Estrangeiro</option>
-                                            </Form.Select>
-                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={3}>
-                                        <Form.Group controlId="cnpj" className="mb-3">
+    renderTelaLista = () => {
+
+        const { validated, cpfValido, cnpjValido, tiposContato, ModalCpfValido, modalErro, dadosCarregados, modalSalvarContato } = this.state;
+        const { id, codigo, situacao, nome, fantasia, tipo, cnpj, ie_rg, sexo, contribuinte, limiteCredito, cep, endereco, numero, complemento, bairro, cidade, uf, fone, celular, email, site, dataAlteracao, dataNascimento, clienteDesde } = this.state;
+
+        if (!dadosCarregados) {
+            return (
+                <div className="spinner-container" >
+                    <div className="d-flex align-items-center justify-content-center">
+                        <div className="custom-loader"></div>
+                    </div>
+                    <div>
+                        <div className="text-loading text-white">Carregando contato...</div>
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <Container fluid className="pb-5" >
+                    <Form noValidate validated={validated} onSubmit={this.submit}>
+                        <div className="grid-cadastro-contato">
+                            <Row>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <span className="mb-3" style={{ fontWeight: 'bold', color: 'gray', fontSize: '1.6rem', fontStyle: 'italic' }}>CLIENTES E FORNECEDORES</span>
+                                    <Form.Group controlId="buttonSalvar" className="mb-3">
+                                        <div className="button-container d-flex">
+                                            <button
+                                                type="submit"
+                                                className="botao-salvar-contato"
+                                            >
+                                                Salvar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    this.novaRenderizacao();
+                                                    this.reset();
+                                                }}
+                                                className="botao-cancelar-contato"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </Form.Group>
+                                </div>
+                            </Row>
+                            <div className="mb-4">
+                                <div>
+                                    {Boolean(id) && (
+                                        <h5 style={{ fontSize: '15px' }}>Data alteração: {dataAlteracao}</h5>
+                                    )}
+                                    <h5>Dados Cadastrais</h5>
+                                </div>
+                            </div>
+                            <Row>
+                                <Col xs={2} md={2}>
+                                    <Form.Group controlId="id" className="mb-3 form-row" as={Col}>
+                                        <Form.Label type="text">ID</Form.Label>
+                                        <Form.Control type="text" value={id || ''} readOnly disabled />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={2} md={2}>
+                                    <Form.Group controlId="codigo" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="codigoContatoInfo">
+                                                    Opcional.
+                                                </Tooltip>
+                                            }>
                                             <Form.Label>
-                                                {this.state.tipo === 'J' ? 'CNPJ' : 'CPF'}
+                                                Código <BsInfoCircle className="icon-info" />
                                             </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                className={`form-control ${!this.state.cpfValido && this.state.cnpj.length === 11 && !this.state.cnpjValido ? 'is-invalid' : ''}`}
-                                                placeholder="Insira o CPF / CNPJ"
-                                                value={this.state.cnpj || ''}
-                                                onChange={this.atualizaCpfCnpj}
-                                                onBlur={this.validarCpf}
-                                                required />
-                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={3}>
-                                        <Form.Group controlId="ie_rg" className="mb-3">
+                                        </OverlayTrigger>
+                                        <Form.Control type="text" placeholder="Digite o código" value={codigo || ''} onChange={this.atualizaCodigo} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={{ span: 2, offset: 2 }} md={{ span: 2, offset: 2 }}>
+                                    <Form.Group controlId="dataNascimento" className="mb-3">
+                                        <Form.Label>Cliente desde</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="dd/mm/yyyy"
+                                            value={clienteDesde || new Date().toLocaleDateString()}
+                                            onChange={this.atualizaClienteDesde}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={{ span: 4 }}>
+                                    <Form.Group controlId="situacao" className="mb-3">
+                                        <Form.Label>Situação do cadastro</Form.Label>
+                                        <Form.Select type="select" placeholder="Situação" value={situacao || ''} onChange={this.atualizaSituacao}>
+                                            <option value="A">Ativo</option>
+                                            <option value="E">Excluído</option>
+                                            <option value="S">Sem movimento</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Row className="mb-3">
+                                <Col>
+                                    <Form.Group controlId="nome" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="nomeContatoInfo">
+                                                    Nome completo do contato.
+                                                </Tooltip>
+                                            }>
                                             <Form.Label>
-                                                {this.state.tipo === 'J' ? 'Inscrição Estadual' : 'RG'}
+                                                Nome <BsInfoCircle className="icon-info" />
                                             </Form.Label>
-                                            <Form.Control type="text" placeholder="Digite IE / RG" value={this.state.ie_rg || ''} onChange={this.atualizaIe_Rg} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={3}>
-                                        <Form.Group controlId="sexo" className="mb-3">
-                                            <Form.Label>Sexo</Form.Label>
-                                            <Form.Select type="sexo" placeholder="Selecione o sexo" value={this.state.sexo || ''} onChange={this.atualizaSexo} >
-                                                <option value="">Selecione</option>
-                                                <option value="masculino">Masculino</option>
-                                                <option value="feminino">Feminino</option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    {/* <Col xs={4} md={3}>
+                                        </OverlayTrigger>
+                                        <Form.Control type="text" placeholder="Digite o nome" value={nome || ''} onChange={this.atualizaNome} required />
+                                        <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col>
+                                    <Form.Group controlId="fantasia" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="fantasiaContatoInfo">
+                                                    Nome de fantasia ou apelido.
+                                                </Tooltip>
+                                            }>
+                                            <Form.Label>
+                                                Fantasia <BsInfoCircle className="icon-info" />
+                                            </Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control type="text" placeholder="Digite a fantasia" value={fantasia || ''} onChange={this.atualizaFantasia} />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={12} md={3}>
+                                    <Form.Group controlId="tipo" className="mb-3">
+                                        <Form.Label>Tipo Pessoa</Form.Label>
+                                        <Form.Select type="select" placeholder="Selecione o tipo de contato" value={tipo || ''} onChange={this.atualizaTipoPessoa} required>
+                                            <option value="">Selecione o tipo de pessoa</option>
+                                            <option value="J">Pessoa Jurídica</option>
+                                            <option value="F">Pessoa Física</option>
+                                            {/* <option value="E">Estrangeiro</option> */}
+                                        </Form.Select>
+                                        <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={3}>
+                                    <Form.Group controlId="cnpj" className="mb-3">
+                                        <Form.Label>
+                                            {tipo === 'J' ? 'CNPJ' : 'CPF'}
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            className={`form-control ${!cpfValido && cnpj.length === 11 && !cnpjValido ? 'is-invalid' : ''}`}
+                                            placeholder="Digite o CPF / CNPJ"
+                                            value={cnpj || ''}
+                                            onChange={this.atualizaCpfCnpj}
+                                            onBlur={this.validarCpf}
+                                            required />
+                                        <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={3}>
+                                    <Form.Group controlId="ie_rg" className="mb-3">
+                                        <Form.Label>
+                                            {tipo === 'J' ? 'Inscrição Estadual' : 'RG'}
+                                        </Form.Label>
+                                        <Form.Control type="text" placeholder="Digite IE / RG" value={ie_rg || ''} onChange={this.atualizaIe_Rg} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={3}>
+                                    <Form.Group controlId="sexo" className="mb-3">
+                                        <Form.Label>Sexo</Form.Label>
+                                        <Form.Select type="sexo" placeholder="Selecione o sexo" value={sexo || ''} onChange={this.atualizaSexo} >
+                                            <option value="">Selecione</option>
+                                            <option value="masculino">Masculino</option>
+                                            <option value="feminino">Feminino</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                {/* <Col xs={4} md={3}>
                                         <Form.Group controlId="descricao" className="mb-3">
                                             <Form.Label>Tipo Contato</Form.Label>
                                             <Form.Select as="select" placeholder="Selecione o tipo de contato" value={this.state.descricao || ''} onChange={this.atualizaDescricao} >
@@ -1079,247 +1265,274 @@ class Contato extends React.Component {
                                             </Form.Select>
                                         </Form.Group>
                                     </Col> */}
-                                </Row>
-                                <Row>
-                                    <Col xs={4} md={9}>
-                                        <Form.Group controlId="contribuinte" className="mb-3">
-                                            <Form.Label>Contribuinte</Form.Label>
-                                            <Form.Select as="select" placeholder="Selecione o tipo de pessoa" value={this.state.contribuinte || ''} onChange={this.atualizaContribuinte} required>
-                                                <option value="">Selecione o tipo de pessoa</option>
-                                                <option value="1">1 - Contribuinte ICMS</option>
-                                                <option value="2">2 - Contribuinte isento de Inscrição no Cadastro de Contribuintes</option>
-                                                <option value="9">9 - Não contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes</option>
-                                            </Form.Select>
-                                            <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={4} md={3}>
-                                        <Form.Group controlId="limiteCredito" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="limiteCreditoContatoInfo">
-                                                        Para não limitar o crédito do cliente, deixe este campo zerado
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Limite Crédito <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="text" placeholder="Insira o limite de crédito" value={this.state.limiteCredito || ''} onChange={this.atualizaLimiteCredito} />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={4} md={3}>
-                                        <Form.Group controlId="cep" className="mb-3">
-                                            <Form.Label>CEP</Form.Label>
-                                            <Form.Control type="text" placeholder="Digite o CEP" value={this.state.cep || ''} onChange={this.atualizaCep} onBlur={this.checkCEP} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={5} md={4}>
-                                        <Form.Group controlId="endereco" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="enderecoContatoInfo">
-                                                        Endereço Geral (Exemplo: Rua Assis Brasil)
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Endereço <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="text" placeholder="Insira o endereço" value={this.state.endereco || ''} onChange={this.atualizaEndereco} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={2} md={2}>
-                                        <Form.Group controlId="numero" className="mb-3">
-                                            <Form.Label>Número</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o número" value={this.state.numero || ''} onChange={this.atualizaNumero} ref={this.numeroRef} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={4} md={3}>
-                                        <Form.Group controlId="complemento" className="mb-3">
-                                            <Form.Label>Complemento</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o complemento" value={this.state.complemento || ''} onChange={this.atualizaComplemento} />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={6} md={4}>
-                                        <Form.Group controlId="bairro" className="mb-3">
-                                            <Form.Label>Bairro</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o bairro" value={this.state.bairro || ''} onChange={this.atualizaBairro} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={6} md={4}>
-                                        <Form.Group controlId="cidade" className="mb-3">
-                                            <Form.Label>Cidade</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira a cidade" value={this.state.cidade || ''} onChange={this.atualizaCidade} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={6} md={4}>
-                                        <Form.Group controlId="uf" className="mb-3">
-                                            <Form.Label>UF</Form.Label>
-                                            <Form.Select as="select" placeholder="Selecione o UF" value={this.state.uf || ''} onChange={this.atualizaUf} >
-                                                <option value="">Selecione UF</option>
-                                                <option value="AC">Acre</option>
-                                                <option value="AL">Alagoas</option>
-                                                <option value="AP">Amapá</option>
-                                                <option value="AM">Amazonas</option>
-                                                <option value="BA">Bahia</option>
-                                                <option value="CE">Ceará</option>
-                                                <option value="DF">Distrito Federal</option>
-                                                <option value="ES">Espírito Santo</option>
-                                                <option value="GO">Goiás</option>
-                                                <option value="MA">Maranhão</option>
-                                                <option value="MT">Mato Grosso</option>
-                                                <option value="MS">Mato Grosso do Sul</option>
-                                                <option value="MG">Minas Gerais</option>
-                                                <option value="PA">Pará</option>
-                                                <option value="PB">Paraíba</option>
-                                                <option value="PR">Paraná</option>
-                                                <option value="PE">Pernambuco</option>
-                                                <option value="PI">Piauí</option>
-                                                <option value="RJ">Rio de Janeiro</option>
-                                                <option value="RN">Rio Grande do Norte</option>
-                                                <option value="RS">Rio Grande do Sul</option>
-                                                <option value="RO">Rondônia</option>
-                                                <option value="RR">Roraima</option>
-                                                <option value="SC">Santa Catarina</option>
-                                                <option value="SP">São Paulo</option>
-                                                <option value="SE">Sergipe</option>
-                                                <option value="TO">Tocantins</option>
-                                                <option value="EX">Estrangeiro</option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col xs={12} md={4}>
-                                        <Form.Group controlId="fone" className="mb-3">
-                                            <Form.Label>Fone</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o numero do telefone" value={this.state.fone || ''} onChange={this.atualizaFone} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={4}>
-                                        <Form.Group controlId="celular" className="mb-3">
-                                            <Form.Label>Celular</Form.Label>
-                                            <Form.Control type="text" placeholder="Insira o numero do celular" value={this.state.celular || ''} onChange={this.atualizaCelular} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={4}>
-                                        <Form.Group controlId="email" className="mb-3">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="emailContatoInfo">
-                                                        Para informar mais do que um e-mail utilize o separador ';' (ponto e vírgula) ou ',' (vírgula). Comprimento máximo de 60 caracteres para a NF-e e NFC-e e para a NFS-e de 80 caracteres.
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Email <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control type="email" placeholder="Insira o e-mail" value={this.state.email || ''} onChange={this.atualizaEmail} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={4}>
-                                        <Form.Group controlId="site" className="mb-3">
-                                            <Form.Label>Site</Form.Label>
-                                            <Form.Control type="site" placeholder="Insira o site" value={this.state.site || ''} onChange={this.atualizaSite} />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12} md={8}>
-                                        <Form.Group controlId="tiposContato" className="mb-3 tiposcontato">
-                                            <OverlayTrigger
-                                                placement="bottom"
-                                                overlay={
-                                                    <Tooltip id="tiposContatoInfo">
-                                                        Fornecedor verificado: a ciência para as notas emitidas pelo fornecedor com essa tag será automatizada.
-                                                        Fornecedor: Classifica esse contato como fornecedor.
-                                                        Cliente: Classifica esse contato como cliente.
-                                                        Técnico: Classifica esse contato como técnico.
-                                                        Transportador: Classifica esse contato como transportador.
-                                                        Contador: Classifica esse contato como contador.
-                                                    </Tooltip>
-                                                }>
-                                                <Form.Label>
-                                                    Tipos de contato <BsInfoCircle className="icon-info" />
-                                                </Form.Label>
-                                            </OverlayTrigger>
-                                            <Form.Control as="input" type="text" value={this.state.tiposContato.map(item => item.descricao).join(', ')} disabled />
-                                        </Form.Group>
-                                    </Col>
-                                    {/* <Col xs={12} md={4}>
+                            </Row>
+                            <Row>
+                                <Col xs={4} md={9}>
+                                    <Form.Group controlId="contribuinte" className="mb-3">
+                                        <Form.Label>Contribuinte</Form.Label>
+                                        <Form.Select as="select" placeholder="Selecione o tipo de contribuinte" value={contribuinte || ''} onChange={this.atualizaContribuinte} required>
+                                            <option value="">Selecione o tipo de contribuinte</option>
+                                            <option value="1">1 - Contribuinte ICMS</option>
+                                            <option value="2">2 - Contribuinte isento de Inscrição no Cadastro de Contribuintes</option>
+                                            <option value="9">9 - Não contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes</option>
+                                        </Form.Select>
+                                        <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={4} md={3}>
+                                    <Form.Group controlId="limiteCredito" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="limiteCreditoContatoInfo">
+                                                    Para não limitar o crédito do cliente, deixe este campo zerado
+                                                </Tooltip>
+                                            }>
+                                            <Form.Label>
+                                                Limite Crédito <BsInfoCircle className="icon-info" />
+                                            </Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control type="text" placeholder="Digite o limite de crédito" value={limiteCredito || ''} onChange={this.atualizaLimiteCredito} />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <div className="mb-4">
+                                <h5>Endereço</h5>
+                            </div>
+                            <Row>
+                                <Col xs={4} md={3}>
+                                    <Form.Group controlId="cep" className="mb-3">
+                                        <Form.Label>CEP</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o CEP" value={cep || ''} onChange={this.atualizaCep} onBlur={this.checkCEP} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={5} md={4}>
+                                    <Form.Group controlId="endereco" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="enderecoContatoInfo">
+                                                    Endereço Geral (Exemplo: Rua Assis Brasil)
+                                                </Tooltip>
+                                            }>
+                                            <Form.Label>
+                                                Endereço <BsInfoCircle className="icon-info" />
+                                            </Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control type="text" placeholder="Digite o endereço" value={endereco || ''} onChange={this.atualizaEndereco} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={2} md={2}>
+                                    <Form.Group controlId="numero" className="mb-3">
+                                        <Form.Label>Número</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o número" value={numero || ''} onChange={this.atualizaNumero} ref={this.numeroRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={4} md={3}>
+                                    <Form.Group controlId="complemento" className="mb-3">
+                                        <Form.Label>Complemento</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o complemento" value={complemento || ''} onChange={this.atualizaComplemento} />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={6} md={4}>
+                                    <Form.Group controlId="bairro" className="mb-3">
+                                        <Form.Label>Bairro</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o bairro" value={bairro || ''} onChange={this.atualizaBairro} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6} md={4}>
+                                    <Form.Group controlId="cidade" className="mb-3">
+                                        <Form.Label>Cidade</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite a cidade" value={cidade || ''} onChange={this.atualizaCidade} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6} md={4}>
+                                    <Form.Group controlId="uf" className="mb-3">
+                                        <Form.Label>UF</Form.Label>
+                                        <Form.Select as="select" placeholder="Selecione o UF" value={uf || ''} onChange={this.atualizaUf} >
+                                            <option value="">Selecione UF</option>
+                                            <option value="AC">Acre</option>
+                                            <option value="AL">Alagoas</option>
+                                            <option value="AP">Amapá</option>
+                                            <option value="AM">Amazonas</option>
+                                            <option value="BA">Bahia</option>
+                                            <option value="CE">Ceará</option>
+                                            <option value="DF">Distrito Federal</option>
+                                            <option value="ES">Espírito Santo</option>
+                                            <option value="GO">Goiás</option>
+                                            <option value="MA">Maranhão</option>
+                                            <option value="MT">Mato Grosso</option>
+                                            <option value="MS">Mato Grosso do Sul</option>
+                                            <option value="MG">Minas Gerais</option>
+                                            <option value="PA">Pará</option>
+                                            <option value="PB">Paraíba</option>
+                                            <option value="PR">Paraná</option>
+                                            <option value="PE">Pernambuco</option>
+                                            <option value="PI">Piauí</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                            <option value="RN">Rio Grande do Norte</option>
+                                            <option value="RS">Rio Grande do Sul</option>
+                                            <option value="RO">Rondônia</option>
+                                            <option value="RR">Roraima</option>
+                                            <option value="SC">Santa Catarina</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="SE">Sergipe</option>
+                                            <option value="TO">Tocantins</option>
+                                            <option value="EX">Estrangeiro</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="fone" className="mb-3">
+                                        <Form.Label>Fone</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o numero do telefone" value={fone || ''} onChange={this.atualizaFone} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="celular" className="mb-3">
+                                        <Form.Label>Celular</Form.Label>
+                                        <Form.Control type="text" placeholder="Digite o numero do celular" value={celular || ''} onChange={this.atualizaCelular} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="email" className="mb-3">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="emailContatoInfo">
+                                                    Para informar mais do que um e-mail utilize o separador ';' (ponto e vírgula) ou ',' (vírgula). Comprimento máximo de 60 caracteres para a NF-e e NFC-e e para a NFS-e de 80 caracteres.
+                                                </Tooltip>
+                                            }>
+                                            <Form.Label>
+                                                Email <BsInfoCircle className="icon-info" />
+                                            </Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control type="email" placeholder="Digite o e-mail" value={email || ''} onChange={this.atualizaEmail} />
+                                    </Form.Group>
+                                </Col>
+                                <div className="mb-4">
+                                    <h5>Dados adicionais</h5>
+                                </div>
+                                {/* <Col xs={12} md={4}>
+                                <Form.Group controlId="informacaoContato" className="mb-3">
+                                    <Form.Label>Informação Contato</Form.Label>
+                                    <Form.Control type="text" placeholder="Digite a informação do contato" value={informacaoContato || ''} onChange={this.atualizaInformacaoContato} />
+                                </Form.Group>
+                            </Col> */}
+                                <Col xs={4} md={3}>
+                                    <Form.Group controlId="dataNascimento" className="mb-3">
+                                        <Form.Label>Data de Nascimento</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Digite a data de nascimento"
+                                            value={dataNascimento}
+                                            onChange={this.atualizaDataNascimento}
+                                        />
+                                    </Form.Group>
+                                </Col>
+
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="site" className="mb-3">
+                                        <Form.Label>Site</Form.Label>
+                                        <Form.Control type="site" placeholder="Digite o site" value={site || ''} onChange={this.atualizaSite} />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="tiposContato" className="mb-3 tiposcontato">
+                                        <OverlayTrigger
+                                            placement="bottom"
+                                            overlay={
+                                                <Tooltip id="tiposContatoInfo">
+                                                    Fornecedor verificado: a ciência para as notas emitidas pelo fornecedor com essa tag será automatizada.
+                                                    Fornecedor: Classifica esse contato como fornecedor.
+                                                    Cliente: Classifica esse contato como cliente.
+                                                    Técnico: Classifica esse contato como técnico.
+                                                    Transportador: Classifica esse contato como transportador.
+                                                    Contador: Classifica esse contato como contador.
+                                                </Tooltip>
+                                            }>
+                                            <Form.Label>
+                                                Tipos de contato <BsInfoCircle className="icon-info" />
+                                            </Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control as="input" type="text" value={tiposContato.map(item => item.descricao).join(', ')} disabled />
+                                    </Form.Group>
+                                </Col>
+                                {/* <Col xs={12} md={12}>
+                                <Form.Group controlId="Observações" className="mb-3">
+                                    <Form.Label>Observações</Form.Label>
+                                    <Form.Control as="textarea" rows={3} value={obs || ''} onChange={this.atualizaObs} />
+                                </Form.Group>
+                            </Col> */}
+                                {/* <Col xs={12} md={4}>
                                         <Form.Group controlId="emailNfe" className="mb-3">
                                             <Form.Label>Email NFE</Form.Label>
-                                            <Form.Control type="email" placeholder="Insira o e-mail NFE" value={this.state.emailNfe || ''} onChange={this.atualizaEmailNfe} required />
+                                            <Form.Control type="email" placeholder="Digite o e-mail NFE" value={this.state.emailNfe || ''} onChange={this.atualizaEmailNfe} required />
                                             <Form.Control.Feedback type="invalid">Campo obrigatório.</Form.Control.Feedback>
                                         </Form.Group>
                                     </Col> */}
-                                </Row>
-                                {/* <Form.Group controlId="informacaoContato" className="mb-3">
-                                    <Form.Label>Informação Contato</Form.Label>
-                                    <Form.Control as="textarea" rows={3} placeholder="Insira a informação do contato" value={this.state.informacaoContato || ''} onChange={this.atualizaInformacaoContato} />
-                                </Form.Group> */}
-                                <Row className="text-center">
-                                    <Col>
-                                        <Form.Group controlId="buttonSalvar" className="mb-3">
-                                            <div className="button-container d-flex justify-content-center">
-                                                <button type="submit" className="botao-cadastro-contato">
-                                                    Salvar
-                                                </button>
-                                                <button type="button" onClick={this.fecharModal} className="botao-cancelar-contato">
-                                                    Cancelar
-                                                </button>
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Form>
-                        </Modal.Body>
-                    </Modal>
+                            </Row>
 
-                    <Modal show={this.state.ModalCpfValido} onHide={this.ModalCpfValido} centered>
-                        <Modal.Header closeButton className="bg-danger text-white">
-                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
-                            <Modal.Title>Atenção</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body style={{ padding: '20px' }}>
-                            CPF | CNPJ inválido. Corrija o campo antes de finalizar o cadastro.
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button className="botao-finalizarvenda" variant="secondary" onClick={this.ModalCpfValido}>Fechar</Button>
-                        </Modal.Footer>
-                    </Modal>
+                            {/* <Row className="text-center">
+                            <Col>
+                                <Form.Group controlId="buttonSalvar" className="mb-3">
+                                    <div className="button-container d-flex justify-content-center">
+                                        <button type="submit" className="botao-cadastro-contato">
+                                            Salvar
+                                        </button>
+                                        <button type="button" onClick={() => this.novaRenderizacao()}
+                                            className="botao-cancelar-contato">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </Form.Group>
+                            </Col>
+                        </Row> */}
 
-                    <Modal show={this.state.modalErro} onHide={this.modalErro} centered>
-                        <Modal.Header closeButton className="bg-danger text-white">
-                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
-                            <Modal.Title>Atenção </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body style={{ padding: '20px' }}>
-                            Não foi possível salvar o produto na plataforma Bling. Estamos agora salvando o produto no banco de dados para posteriormente realizar o cadastro automaticamente no Bling.
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={() => {
-                                this.modalErro();
-                                this.fecharModal()
-                            }}>
-                                Sair
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
 
-                    <Modal show={this.state.modalSalvarContato} onHide={this.modalSalvarContato} centered>
-                        <Modal.Body>
-                            <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
-                        </Modal.Body>
-                    </Modal>
+                            <Modal show={modalErro} onHide={this.modalErro} centered>
+                                <Modal.Header closeButton className="bg-danger text-white">
+                                    <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                                    <Modal.Title>Atenção </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body style={{ padding: '20px' }}>
+                                    Não foi possível salvar o produto na plataforma Bling. Estamos agora salvando o produto no banco de dados para posteriormente realizar o cadastro automaticamente no Bling.
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={() => {
+                                        this.modalErro();
+                                        this.novaRenderizacao()
+                                    }}>
+                                        Sair
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
 
-                </div>
+                            <Modal show={ModalCpfValido} onHide={this.ModalCpfValido} centered>
+                                <Modal.Header closeButton className="bg-danger text-white">
+                                    <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                                    <Modal.Title>Atenção</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body style={{ padding: '20px' }}>
+                                    CPF | CNPJ inválido. Corrija o campo antes de finalizar o cadastro.
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button className="botao-finalizarvenda" variant="secondary" onClick={this.ModalCpfValido}>Fechar</Button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <Modal show={modalSalvarContato} onHide={this.modalSalvarContato} centered>
+                                <Modal.Body>
+                                    <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
+                                </Modal.Body>
+                            </Modal>
+                        </div>
+                    </Form>
+                </Container>
             )
         }
     }
