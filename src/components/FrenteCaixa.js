@@ -181,6 +181,7 @@ class FrenteCaixa extends React.Component {
             subTotalLista: 0,
             objeto: '',
             modalPedidoExcluido: false,
+            situacaoCaixa: ''
         };
 
         this.atualizaDesconto = this.atualizaDesconto.bind(this);
@@ -188,6 +189,47 @@ class FrenteCaixa extends React.Component {
         this.adicionarParcela = this.adicionarParcela.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangePrazo = this.handleChangePrazo.bind(this);
+
+        // Ambiente Local
+        // this.buscarProdutosEndpoint = 'http://localhost:8081/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'http://localhost:8081/api/v1/selecionarListas'
+        // this.buscarContatoEndpoint = 'http://localhost:8080/api/v1/contatos'
+        // this.buscarVendedorEndpoint = 'http://localhost:8080/api/v1/contatos'
+        // this.buscarPedidoEndpoint = 'http://localhost:8080/api/v1/pedidos'
+        // this.buscarFormaDePagamentoEndpoint = 'http://localhost:8080/api/v1/formaspagamento'
+        // this.buscarLojaEndpoint = 'http://localhost:8080/api/v1/selecionarLojas'
+        // this.cadastrarPedidoEndpoint = 'http://localhost:8080/api/v1/cadastrarpedido'
+        // this.buscarListasCaixaEndpoint = 'http://localhost:8080/api/v1/controleCaixas'
+        // this.buscarIdListaCaixaEndpoint = 'http://localhost:8080/api/v1/controleCaixa'
+        // this.cadastrarListaCaixaEndpoint = 'http://localhost:8080/api/v1/adicionarControleCaixa'
+
+
+        // Ambiente Desenvolvimento
+        // this.buscarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+        // this.buscarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.buscarVendedorEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.buscarPedidoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos'
+        // this.buscarFormaDePagamentoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
+        // this.buscarLojaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
+        // this.cadastrarPedidoEndpoint = 'hhttps://dev-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido'
+        // this.buscarListasCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
+        // this.buscarIdListaCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
+        // this.cadastrarListaCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
+
+         // Ambiente Produção
+         this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+         this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+         this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+         this.buscarVendedorEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+         this.buscarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos'
+         this.buscarFormaDePagamentoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
+         this.buscarLojaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
+         this.cadastrarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido'
+         this.buscarListasCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
+         this.buscarIdListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
+         this.cadastrarListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
+
     };
 
     modalCadastrarCliente = () => {
@@ -304,9 +346,6 @@ class FrenteCaixa extends React.Component {
             this.atualizaSubTotalLista({ target: { value: this.state.descontoItemLista } });
         }
 
-        if (prevState.idLoja !== this.state.idLoja) {
-            this.atualizaNomeLoja({ target: { value: this.state.idLoja } });
-        }
 
         if (
             prevState.produtosSelecionados !== this.state.produtosSelecionados ||
@@ -323,11 +362,108 @@ class FrenteCaixa extends React.Component {
      *  -------------------- CHAMADAS E CONSUMO DAS API´s QUE COMPÕE O PDV. -------------------- 
      */
 
+    // buscarProdutos = (value) => {
+    //     return new Promise((resolve, reject) => {
+    //         this.setState({ buscaProduto: value, carregando: false, produtoNaoLocalizado: false });
+
+    //         fetch(this.buscarProdutosEndpoint)
+    //             .then((resposta) => {
+    //                 if (!resposta.ok) {
+    //                     throw new Error('Erro na chamada da API');
+    //                 }
+    //                 return resposta.json();
+    //             })
+    //             .then((dados) => {
+    //                 // console.log("Produto: ", dados)
+    //                 if (dados.retorno.produtos) {
+    //                     const palavrasBusca = value.toLowerCase().split(' ');
+
+    //                     const produtosFiltrados = dados.retorno.produtos.filter((produto) => {
+    //                         const descricao = this.normalizeString(produto.produto.descricao || '').toLowerCase();
+    //                         const codigo = this.normalizeString(produto.produto.codigo || '').toLowerCase();
+    //                         const gtin = this.normalizeString(produto.produto.gtin || '').toLowerCase();
+    //                         const gtinEmbalagem = this.normalizeString(produto.produto.gtinEmbalagem || '').toLowerCase();
+    //                         const descricaoFornecedor = this.normalizeString(produto.produto.descricaoFornecedor || '').toLowerCase();
+    //                         const nomeFornecedor = this.normalizeString(produto.produto.nomeFornecedor || '').toLowerCase();
+    //                         const codigoFabricante = this.normalizeString(produto.produto.codigoFabricante || '').toLowerCase();
+
+    //                         return palavrasBusca.every((palavra) =>
+    //                             descricao.includes(palavra) ||
+    //                             codigo.includes(palavra) ||
+    //                             gtin.includes(palavra) ||
+    //                             gtinEmbalagem.includes(palavra) ||
+    //                             descricaoFornecedor.includes(palavra) ||
+    //                             nomeFornecedor.includes(palavra) ||
+    //                             codigoFabricante.includes(palavra)
+    //                         );
+    //                     });
+
+    //                     if (produtosFiltrados.length === 0) {
+    //                         // Nenhum produto encontrado
+    //                         this.setState({
+    //                             produtos: [],
+    //                             produtoSelecionado: null,
+    //                             carregando: false,
+    //                             produtoNaoLocalizado: true
+    //                         });
+    //                     } else {
+    //                         // Produtos encontrados
+    //                         this.setState({
+    //                             produtos: produtosFiltrados,
+    //                             produtoSelecionado: null,
+    //                             carregando: false,
+    //                             produtoNaoLocalizado: false
+    //                         });
+    //                     }
+    //                 } else {
+    //                     // Nenhum produto encontrado
+    //                     this.setState({
+    //                         produtos: [],
+    //                         carregando: false,
+    //                         produtoNaoLocalizado: true
+    //                     });
+    //                 }
+    //                 resolve();
+    //             })
+    //             .catch((error) => {
+    //                 this.setState({
+    //                     produtos: [],
+    //                     carregando: false,
+    //                     produtoNaoLocalizado: true
+    //                 });
+    //                 reject(error);
+    //             });
+    //     });
+    // };
+
+
     buscarProdutos = (value) => {
         return new Promise((resolve, reject) => {
+            const sanitizedValue = this.normalizeString(value).toLowerCase();
+            let endpoint = this.buscarProdutosEndpoint;
+
+            // Verifica se o valor de entrada é um código (todos os dígitos)
+            if (/^\d+$/.test(sanitizedValue)) {
+                endpoint += `?codigo=${sanitizedValue}`;
+            }
+            // Verifica se o valor de entrada é um GTIN (todos os dígitos e comprimento entre 8 e 14)
+            else if (/^\d+$/.test(sanitizedValue) && sanitizedValue.length >= 8 && sanitizedValue.length <= 14) {
+                endpoint += `?gtin=${sanitizedValue}`;
+            }
+            // Se não for código nem GTIN, assume que é uma descrição
+            else if (sanitizedValue !== null && sanitizedValue.trim() !== "") {
+                endpoint += `?descricao=${this.normalizeString(sanitizedValue)}`;
+            } else {
+                // Caso nenhum dos casos anteriores se aplique, você pode lidar com a situação conforme necessário
+                // Por exemplo, lançar um erro, definir um valor padrão, etc.
+                console.error("Entrada inválida. Pelo menos um dos parâmetros (código, GTIN, descrição) deve ser fornecido.");
+                reject(new Error("Entrada inválida"));
+                return;
+            }
+
             this.setState({ buscaProduto: value, carregando: false, produtoNaoLocalizado: false });
 
-            fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos`)
+            fetch(endpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error('Erro na chamada da API');
@@ -335,30 +471,8 @@ class FrenteCaixa extends React.Component {
                     return resposta.json();
                 })
                 .then((dados) => {
-                    // console.log("Produto: ", dados)
                     if (dados.retorno.produtos) {
-                        const palavrasBusca = value.toLowerCase().split(' ');
-
-                        const produtosFiltrados = dados.retorno.produtos.filter((produto) => {
-                            const descricao = this.normalizeString(produto.produto.descricao || '').toLowerCase();
-                            const codigo = this.normalizeString(produto.produto.codigo || '').toLowerCase();
-                            const gtin = this.normalizeString(produto.produto.gtin || '').toLowerCase();
-                            const gtinEmbalagem = this.normalizeString(produto.produto.gtinEmbalagem || '').toLowerCase();
-                            const descricaoFornecedor = this.normalizeString(produto.produto.descricaoFornecedor || '').toLowerCase();
-                            const nomeFornecedor = this.normalizeString(produto.produto.nomeFornecedor || '').toLowerCase();
-                            const codigoFabricante = this.normalizeString(produto.produto.codigoFabricante || '').toLowerCase();
-
-                            return palavrasBusca.every((palavra) =>
-                                descricao.includes(palavra) ||
-                                codigo.includes(palavra) ||
-                                gtin.includes(palavra) ||
-                                gtinEmbalagem.includes(palavra) ||
-                                descricaoFornecedor.includes(palavra) ||
-                                nomeFornecedor.includes(palavra) ||
-                                codigoFabricante.includes(palavra)
-                            );
-                        });
-
+                        const produtosFiltrados = dados.retorno.produtos;
                         if (produtosFiltrados.length === 0) {
                             // Nenhum produto encontrado
                             this.setState({
@@ -398,107 +512,150 @@ class FrenteCaixa extends React.Component {
     };
 
     normalizeString = (str) => {
-        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (str === null || str === undefined) {
+            return '';
+        }
+
+        const normalizedString = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        // console.log(`Original: ${str}, Normalized: ${normalizedString}`);
+
+        return normalizedString;
     };
 
     //----------------------------------------- API BUSCA CONTATO  ----------------------------------------------------------
 
-    buscarContato = (value) => {
-        const sanitizedValue = this.sanitizeString(value).toLowerCase();
-        this.setState({ buscaContato: value, carregando: true, contatoNaoLocalizado: false });
+    buscarContato = (nome, cnpj, value) => {
+        return new Promise((resolve, reject) => {
 
-        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
-            .then((resposta) => {
-                if (!resposta.ok) {
-                    throw new Error('Erro na chamada da API');
-                }
-                return resposta.json();
-            })
-            .then((dados) => {
-                if (dados.retorno.contatos) {
-                    const contatosFiltrados = dados.retorno.contatos.filter((contato) => {
-                        const nome = this.sanitizeString(contato.contato.nome || '');
-                        const cnpj = this.sanitizeString(contato.contato.cnpj || '');
-                        const rg = this.sanitizeString(contato.contato.rg || '');
-                        const ie_rg = this.sanitizeString(contato.contato.ie_rg || '');
-                        const contribuinte = this.sanitizeString(contato.contato.contribuinte || '');
-                        const cidade = this.sanitizeString(contato.contato.cidade || '');
-                        const endereco = this.sanitizeString(contato.contato.endereco || '');
-                        const numero = this.sanitizeString(contato.contato.numero || '');
-                        const bairro = this.sanitizeString(contato.contato.bairro || '');
-                        const complemento = this.sanitizeString(contato.contato.complemento || '');
-                        const cep = this.sanitizeString(contato.contato.cep || '');
-                        const uf = this.sanitizeString(contato.contato.uf || '');
-                        const email = this.sanitizeString(contato.contato.email || '');
-                        const celular = this.sanitizeString(contato.contato.celular || '');
-                        const fone = this.sanitizeString(contato.contato.fone || '');
+            const sanitizedValue = this.sanitizeString(value).toLowerCase();
+            const sanitizedNome = this.sanitizeString(nome);
+            const sanitizedCnpj = this.sanitizeString(cnpj);
 
-                        return (
-                            nome.toLowerCase().includes(sanitizedValue) ||
-                            cnpj.toLowerCase().includes(sanitizedValue) ||
-                            rg.toLowerCase().includes(sanitizedValue) ||
-                            ie_rg.toLowerCase().includes(sanitizedValue) ||
-                            contribuinte.toLowerCase().includes(sanitizedValue) ||
-                            cidade.toLowerCase().includes(sanitizedValue) ||
-                            endereco.toLowerCase().includes(sanitizedValue) ||
-                            numero.toLowerCase().includes(sanitizedValue) ||
-                            bairro.toLowerCase().includes(sanitizedValue) ||
-                            complemento.toLowerCase().includes(sanitizedValue) ||
-                            cep.toLowerCase().includes(sanitizedValue) ||
-                            uf.toLowerCase().includes(sanitizedValue) ||
-                            email.toLowerCase().includes(sanitizedValue) ||
-                            celular.toLowerCase().includes(sanitizedValue) ||
-                            fone.toLowerCase().includes(sanitizedValue)
-                        );
-                    });
+            let endpoint = this.buscarContatoEndpoint;
 
-                    if (contatosFiltrados.length === 0) {
+            if (sanitizedNome && !isNaN(parseFloat(sanitizedNome))) {
+                endpoint += `?cnpj=${sanitizedNome}`;
+            } else if (sanitizedCnpj && !isNaN(parseFloat(sanitizedCnpj))) {
+                endpoint += `?cnpj=${sanitizedCnpj}`;
+            } else {
+                endpoint += `?nome=${sanitizedNome}`;
+            }
+
+            this.setState({ buscaContato: value, carregando: true, contatoNaoLocalizado: false });
+
+
+            fetch(endpoint)
+                .then((resposta) => {
+                    if (!resposta.ok) {
+                        throw new Error('Erro na chamada da API');
+                    }
+                    return resposta.json();
+                })
+                .then((dados) => {
+                    if (dados.retorno.contatos) {
+                        const contatosFiltrados = dados.retorno.contatos.filter((contato) => {
+                            const nome = this.sanitizeString(contato.contato.nome || '');
+                            const cnpj = this.sanitizeString(contato.contato.cnpj || '');
+                            const rg = this.sanitizeString(contato.contato.rg || '');
+                            const ie_rg = this.sanitizeString(contato.contato.ie_rg || '');
+                            const contribuinte = this.sanitizeString(contato.contato.contribuinte || '');
+                            const cidade = this.sanitizeString(contato.contato.cidade || '');
+                            const endereco = this.sanitizeString(contato.contato.endereco || '');
+                            const numero = this.sanitizeString(contato.contato.numero || '');
+                            const bairro = this.sanitizeString(contato.contato.bairro || '');
+                            const complemento = this.sanitizeString(contato.contato.complemento || '');
+                            const cep = this.sanitizeString(contato.contato.cep || '');
+                            const uf = this.sanitizeString(contato.contato.uf || '');
+                            const email = this.sanitizeString(contato.contato.email || '');
+                            const celular = this.sanitizeString(contato.contato.celular || '');
+                            const fone = this.sanitizeString(contato.contato.fone || '');
+
+                            return (
+                                nome.toLowerCase().includes(sanitizedValue) ||
+                                cnpj.toLowerCase().includes(sanitizedValue) ||
+                                rg.toLowerCase().includes(sanitizedValue) ||
+                                ie_rg.toLowerCase().includes(sanitizedValue) ||
+                                contribuinte.toLowerCase().includes(sanitizedValue) ||
+                                cidade.toLowerCase().includes(sanitizedValue) ||
+                                endereco.toLowerCase().includes(sanitizedValue) ||
+                                numero.toLowerCase().includes(sanitizedValue) ||
+                                bairro.toLowerCase().includes(sanitizedValue) ||
+                                complemento.toLowerCase().includes(sanitizedValue) ||
+                                cep.toLowerCase().includes(sanitizedValue) ||
+                                uf.toLowerCase().includes(sanitizedValue) ||
+                                email.toLowerCase().includes(sanitizedValue) ||
+                                celular.toLowerCase().includes(sanitizedValue) ||
+                                fone.toLowerCase().includes(sanitizedValue)
+                            );
+                        });
+
+                        if (contatosFiltrados.length === 0) {
+                            // Nenhum contato encontrado
+                            this.setState({
+                                contatos: [],
+                                contatoSelecionado: null,
+                                carregando: false,
+                                contatoNaoLocalizado: true
+                            });
+                        } else {
+                            // Contatos encontrados
+                            this.setState({
+                                contatos: contatosFiltrados,
+                                contatoSelecionado: null,
+                                carregando: false,
+                                contatoNaoLocalizado: false
+                            });
+                        }
+                    } else {
                         // Nenhum contato encontrado
                         this.setState({
                             contatos: [],
-                            contatoSelecionado: null,
                             carregando: false,
                             contatoNaoLocalizado: true
                         });
-                    } else {
-                        // Contatos encontrados
-                        this.setState({
-                            contatos: contatosFiltrados,
-                            contatoSelecionado: null,
-                            carregando: false,
-                            contatoNaoLocalizado: false
-                        });
                     }
-                } else {
-                    // Nenhum contato encontrado
+                    resolve();
+                })
+                .catch((error) => {
+                    // console.log("Erro ao buscar contatos:", error);
                     this.setState({
                         contatos: [],
                         carregando: false,
                         contatoNaoLocalizado: true
                     });
-                }
-            })
-            .catch((error) => {
-                // console.log("Erro ao buscar contatos:", error);
-                this.setState({
-                    contatos: [],
-                    carregando: false,
-                    contatoNaoLocalizado: true
+                    reject(error);
                 });
-            });
+        });
     };
+
 
     sanitizeString = (str) => {
         return str.replace(/[\.\,\;\-\/]/g, '');
     };
 
+
     //----------------------------------------- API BUSCA VENDEDOR ----------------------------------------------------------
 
-    buscarVendedor = (value) => {
+    buscarVendedor = (nome, codigo, value) => {
         return new Promise((resolve, reject) => {
+
+            const sanitizedNome = this.sanitizeString(nome);
+            const sanitizedCodigo = this.sanitizeString(codigo);
+
+            let endpoint = this.buscarVendedorEndpoint;
+
+            if (sanitizedNome && !isNaN(parseFloat(sanitizedNome))) {
+                endpoint += `?nome=${sanitizedNome}`;
+            } else if (sanitizedCodigo && !isNaN(parseFloat(sanitizedCodigo))) {
+                endpoint += `?codigo=${sanitizedCodigo}`;
+            } else {
+                endpoint += `?nome=${sanitizedNome}`;
+            }
+
             this.setState({ buscaVendedor: value, carregando: true, vendedorNaoLocalizado: false });
 
-            fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`)
+            fetch(endpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error("Erro na chamada da API");
@@ -602,7 +759,7 @@ class FrenteCaixa extends React.Component {
         return new Promise((resolve, reject) => {
             this.setState({ buscaPedido: value, carregando: true });
 
-            fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos`)
+            fetch(this.buscarPedidoEndpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error("Erro na chamada da API");
@@ -645,7 +802,7 @@ class FrenteCaixa extends React.Component {
     buscarFormaDePagamento = () => {
         return new Promise((resolve, reject) => {
 
-            fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento`)
+            fetch(this.buscarFormaDePagamentoEndpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error("Erro na chamada da API");
@@ -683,8 +840,8 @@ class FrenteCaixa extends React.Component {
 
     buscarLoja = () => {
         return new Promise((resolve, reject) => {
-
-            fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas`)
+            // Primeiro fetch para buscar os dados da loja
+            fetch(this.buscarLojaEndpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error("Erro na chamada da API");
@@ -692,29 +849,72 @@ class FrenteCaixa extends React.Component {
                     return resposta.json();
                 })
                 .then((dados) => {
+                    // console.log('Fetch 1', dados)
+
                     if (dados && dados.length > 0) {
-                        // Suponha que você deseja armazenar a primeira loja da lista
                         const primeiraLoja = dados[0];
 
+                        // Atualiza o estado com os dados da primeira loja
                         this.setState({
                             idLoja: primeiraLoja.idLoja,
                             nomeLoja: primeiraLoja.nomeLoja,
-                            unidadeLoja: primeiraLoja.unidadeLoja,
                             objeto: dados,
                             dadosCarregados: true,
                         });
+
+                        // Segundo fetch para buscar outras informações
+                        let endpoint = this.buscarListasCaixaEndpoint;
+                        fetch(endpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(dadosSegundoFetch => {
+                                // console.log('Fetch 2', dadosSegundoFetch)
+
+                                // Encontra os dados do segundo fetch que correspondem ao idLoja do primeiro fetch
+                                const dadosCorrespondentes = dadosSegundoFetch.find(item => item.idLoja === primeiraLoja.idLoja && item.situacao === "Aberto");
+
+                                if (dadosCorrespondentes) {
+                                    // Atualiza o estado com os dados correspondentes do segundo fetch
+                                    this.setState({
+                                        listasCaixa: dadosSegundoFetch,
+                                        idCaixa: dadosCorrespondentes.id,
+                                        situacaoCaixa: dadosCorrespondentes.situacao,
+                                        carregando: false,
+                                        dadosCarregados: true,
+                                    });
+
+                                    // Chama a função para buscar a loja com o id correspondente do segundo fetch
+                                    this.buscarIdLoja(dadosCorrespondentes.id);
+                                } else {
+                                    // Caso não haja correspondência, mantém o estado sem alterações
+                                    this.setState({
+                                        carregando: false,
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                // Trate os erros do segundo fetch aqui
+                                console.error('Erro ao buscar as listas de caixa:', error);
+                                this.setState({
+                                    carregando: false,
+                                });
+                            });
                     } else {
                         this.setState({
                             idLoja: null,
                             nomeLoja: null,
-                            unidadeLoja: null,
+                            unidadLoja: null,
                             objeto: [],
                             dadosCarregados: false,
                         });
+                        this.setState({
+                            carregando: false,
+                        });
                     }
-                    this.setState({
-                        carregando: false,
-                    });
                     resolve();
                 })
                 .catch(error => {
@@ -723,19 +923,109 @@ class FrenteCaixa extends React.Component {
                         carregando: false,
                         idLoja: null,
                         nomeLoja: null,
-                        unidadeLoja: null,
                         objeto: [],
                         dadosCarregados: false,
                     });
+                    resolve();
                 });
         });
     };
 
+    buscarIdLoja = (id) => {
+        fetch(`${this.buscarIdListaCaixaEndpoint}/${id}`)
+            .then((resposta) => {
+                if (!resposta.ok) {
+                    throw new Error("Erro na chamada da API");
+                }
+                return resposta.json();
+            })
+            .then((dados) => {
+                if (dados) {
+                    this.setState({
+                        descricaoLoja: dados.descricaoLoja,
+                        situacaoCaixa: dados.situacao,
+                        trocoCaixa: dados.trocoCaixa,
+                    });
+                } else {
+                    this.setState({
+                        descricaoLoja: null,
+                        situacao: null,
+                        trocoCaixa: null,
+                    });
+                }
+                this.setState({
+                    carregando: false,
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                this.setState({
+                    descricaoLoja: null,
+                    situacao: null,
+                    trocoCaixa: null,
+                });
+            });
+    };
+
+    atualizaIdLoja = (idLoja) => {
+        console.log("idLoja: ", idLoja);
+        console.log("idLoja: ", this.state.idLoja);
+        const lojaSelecionada = this.state.objeto.find(obj => obj.idLoja === idLoja);
+        if (lojaSelecionada) {
+            let endpoint = this.buscarListasCaixaEndpoint;
+            fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(dadosSegundoFetch => {
+                    console.log('Fetch 2', dadosSegundoFetch);
+
+                    // Encontra os dados do segundo fetch que correspondem ao idLoja do primeiro fetch
+                    const dadosCorrespondentes = dadosSegundoFetch.find(item => item.idLoja === lojaSelecionada.idLoja && item.situacao === "Aberto");
+
+                    if (dadosCorrespondentes) {
+                        // Atualiza o estado com os dados correspondentes do segundo fetch
+                        this.setState({
+                            idLoja: idLoja,
+                            trocoCaixa: dadosCorrespondentes.trocoCaixa,
+                            situacaoCaixa: dadosCorrespondentes.situacao,
+                            idCaixa: dadosCorrespondentes.id,
+                        });
+
+                        // Chama a função para buscar a loja com o id correspondente do segundo fetch
+                        this.buscarIdLoja(dadosCorrespondentes.id);
+                    } else {
+                        // Caso não haja correspondência, mantém o estado sem alterações
+                        this.setState({
+                            idLoja: idLoja,
+                            trocoCaixa: lojaSelecionada.trocoCaixa,
+                            situacaoCaixa: lojaSelecionada.situacao,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar as listas de caixa:', error);
+                    this.setState({
+                        carregando: false,
+                    });
+                });
+        }
+    };
+
+    atualizaNomeLoja = (nomeLoja) => {
+        // console.log("nomeLoja: ", nomeLoja);
+        this.setState({
+            nomeLoja: nomeLoja
+        });
+    };
 
     //----------------------------------------- API BUSCA LISTA DE PREÇO ----------------------------------------------------------
 
     buscarListaPreco = () => {
-        fetch("http://localhost:8081/api/v1/selecionarListas", {
+        fetch(this.buscarListaPrecoEndpoint, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -777,8 +1067,7 @@ class FrenteCaixa extends React.Component {
         const xml = parser.parseFromString(xmlPedido, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
 
-        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido`, {
-
+        fetch(this.cadastrarPedidoEndpoint, {
             method: 'POST',
             body: stringXml,
             headers: {
@@ -810,6 +1099,33 @@ class FrenteCaixa extends React.Component {
                 this.atualizaEndereco({ target: { value: logradouro } });
                 this.atualizaBairro({ target: { value: bairro } });
                 // console.log("CHECKCEP", data);
+            });
+    };
+
+    cadastrarLista = (controleCaixa) => {
+        return fetch(this.cadastrarListaCaixaEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: controleCaixa,
+        })
+            .then(async response => {
+                const statusCode = response.status; // Obtém o status da API externa
+                const data = await response.text(); // Obtém os dados da resposta
+
+                // Crie um objeto que inclui o status e os dados da API externa
+                const responseData = {
+                    statusCode,
+                    data,
+                };
+
+                // Registre o status e os dados no console
+                console.log('Status da API externa:', statusCode);
+                console.log('Dados da resposta:', data);
+
+                // Retorna a resposta, incluindo o status da API externa
+                return responseData;
             });
     };
 
@@ -1668,21 +1984,7 @@ class FrenteCaixa extends React.Component {
     // -------------------------------------- FUNÇÕES TELA SELEÇÃO DE LOJA E UNIDADE ----------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------------|
 
-    atualizaIdLoja = (event) => {
-        const idLoja = event.target.value;
-        // console.log("idLoja: ", idLoja);
-        this.setState({
-            idLoja: idLoja,
-        });
-    };
 
-    atualizaNomeLoja = (event) => {
-        const nomeLoja = event.target.value;
-        // console.log("idLoja: ", idLoja);
-        this.setState({
-            nomeLoja: nomeLoja,
-        });
-    };
 
     atualizaUnidadeNegocio = (event) => {
         const unidadeLojaSelecionada = event.target.value;
@@ -1719,6 +2021,55 @@ class FrenteCaixa extends React.Component {
     //-----------------------------------------------------------------------------------------------------------------------|
     // -------------------------------------------------- FUNÇÕES BOTÕES ----------------------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------------|
+
+    submitCadastrar = () => {
+        const situacao = this.state.situacaoCaixa;
+
+        if (situacao !== 'Aberto') {
+            const idLoja = this.state.idLoja;
+            const descricaoLoja = this.state.nomeLoja;
+            const operadorAbertura = this.state.operadorAbertura;
+            const dataAbertura = this.obterTimestampFormatado();
+            const trocoCaixaAnterior = this.trocoCaixaAnterior;
+            const trocoCaixa = this.state.trocoCaixa;
+
+            const lista = {
+                idLoja: idLoja,
+                descricaoLoja: descricaoLoja,
+                operadorAbertura: operadorAbertura,
+                dataAbertura: dataAbertura,
+                trocoCaixaAnterior: trocoCaixaAnterior,
+                trocoCaixa: trocoCaixa,
+            };
+
+            const controleCaixa = JSON.stringify(lista);
+
+            console.log(controleCaixa);
+
+            if (this.state.idLista === '') {
+                this.cadastrarLista(controleCaixa)
+                    .then(responseData => {
+                        if (responseData.data !== '') {
+                            this.resetCaixa();
+                        } else {
+                            this.modalErro();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na chamada da API:', error);
+                        this.modalErro();
+                    });
+            }
+        }
+    };
+
+
+    resetCaixa = () => {
+        // Condição para fechar o modal apenas se estiver aberto
+        if (this.state.modalSelecionarLoja) {
+            this.modalSelecionarLoja(); // Fechar o modal
+        }
+    };
 
     excluirPedido = () => {
         this.setState({
@@ -1930,7 +2281,8 @@ class FrenteCaixa extends React.Component {
                 data: parcela.data,
                 valor: parcela.valor,
                 observacao: parcela.observacao,
-                forma: parcela.forma
+                forma: parcela.forma,
+                descricaoForma: parcela.descricaoForma
             };
             prazo.push(parcelas);
         });
@@ -1938,9 +2290,9 @@ class FrenteCaixa extends React.Component {
         if (itens.length === 0) {
             this.modalFinalizarVendaSemItem();
             return;
-        } else if (!condicao || condicao === 'Selecione a forma') {
-            this.modalFormaPagamento();
-            return;
+            // } else if (!condicao || condicao === 'Selecione a forma') {
+            // this.modalFormaPagamento();
+            //return;
         } else {
             this.canvasFinalizarPedido();
         };
@@ -2017,13 +2369,15 @@ class FrenteCaixa extends React.Component {
                     ${createXmlNodeIfNotEmpty('vlr', parcelas.valor)}
                     ${createXmlNodeIfNotEmpty('obs', parcelas.observacao)}
                     <forma_pagamento>
-                      ${createXmlNodeIfNotEmpty('id', parcelas.forma)}
-                    </forma_pagamento>
+                    ${createXmlNodeIfNotEmpty('id', parcelas.forma)}
+                    ${createXmlNodeIfNotEmpty('descricaoPagamento', parcelas.descricaoForma)}
+                  </forma_pagamento>
+                  
                   </parcela>`).join('')}
               </parcelas>
             </pedido>`;
 
-        // console.log(xml);
+        console.log(xml);
 
         const xmlContato = ('xml', xml);
 
@@ -2039,38 +2393,7 @@ class FrenteCaixa extends React.Component {
     // ------------------------------------------------- FUNÇÕES PARCELAS ---------------------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------------|
 
-    handleChange(event) {
-        this.setState({
-            condicao: event.target.value,
-        });
-    };
 
-    handleChangePrazo(event) {
-        this.setState({
-            prazo: event.target.value
-        });
-    };
-
-    handleChangeDias = (index, value) => {
-        const { parcelas } = this.state;
-        const newParcelas = [...parcelas];
-
-        newParcelas[index].dias = value;
-
-        // Atualize o valor da data com base nos dias alterados
-        newParcelas[index].data = this.calcularData(value);
-        this.setState({
-            parcelas: newParcelas
-        });
-    };
-
-    handleChangeParcela(index, campo, valor) {
-        const parcelas = [...this.state.parcelas];
-        parcelas[index][campo] = valor;
-        this.setState({
-            parcelas
-        });
-    };
 
     // PARCELA POR PARCELA EXEMPLO: 30 GERAR PARCELA, 60 GERAR PARCELA, 90 GERAR PARCELA, UMA POR UMA 
     // adicionarParcela() {
@@ -2119,9 +2442,42 @@ class FrenteCaixa extends React.Component {
     //     // console.log("data", dataFormatada)
     // };
 
+    handleChange(event) {
+        this.setState({
+            condicao: event.target.value,
+        });
+    };
+
+    handleChangePrazo(event) {
+        this.setState({
+            prazo: event.target.value
+        });
+    };
+
+    handleChangeDias = (index, value) => {
+        const { parcelas } = this.state;
+        const newParcelas = [...parcelas];
+
+        newParcelas[index].dias = value;
+
+        // Atualize o valor da data com base nos dias alterados
+        newParcelas[index].data = this.calcularData(value);
+        this.setState({
+            parcelas: newParcelas
+        });
+    };
+
+    handleChangeParcela(index, campo, valor) {
+        const parcelas = [...this.state.parcelas];
+        parcelas[index][campo] = valor;
+        this.setState({
+            parcelas
+        });
+    };
+
     //VARIAS PARCELAS EXEMPLO: 30 60 90 GERAR PARCELAS, AO GERAR É CRIADO 3 LINHAS CONFORME 30, 60 E 90 DIAS.
     adicionarParcela = () => {
-        const { condicao, prazo } = this.state;
+        const { condicao, prazo, formaspagamento } = this.state;
 
         // Remova os espaços e divida a string em números
         const dias = prazo.trim().split(/\s+/).map(valor => parseInt(valor));
@@ -2143,11 +2499,15 @@ class FrenteCaixa extends React.Component {
         const dataFormatada = hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
         const novasParcelas = dias.map((valor, index) => {
+            const formaSelecionada = formaspagamento.find(forma => forma.id === condicao);
+            const descricaoForma = formaSelecionada ? formaSelecionada.descricao : '';
+
             return {
                 dias: valor,
                 data: this.calcularData(valor),
                 valor: '',
-                forma,
+                forma: condicao,
+                descricaoForma: descricaoForma, // Defina a descrição aqui
                 observacao: '',
                 acao: '',
             };
@@ -2166,6 +2526,8 @@ class FrenteCaixa extends React.Component {
             parcelas: [...newParcelas],
         }));
     };
+
+
 
     handleValorChangeParcela(index, campo, valor) {
         const parcelas = [...this.state.parcelas];
@@ -2198,12 +2560,31 @@ class FrenteCaixa extends React.Component {
     };
 
     handleFormaChange = (index, event) => {
+        const formaId = event.target.value; // Extrair o ID da opção selecionada
         const parcelas = [...this.state.parcelas];
-        parcelas[index].forma = event.target.value;
+        parcelas[index].forma = formaId;
+
+        console.log('Forma ID selecionada:', formaId);
+        console.log('Dados da parcela atualizados:', parcelas[index]);
+
         this.setState({
             parcelas
         });
     };
+
+    handleDescricaoChange = (index, descricao) => {
+        const parcelas = [...this.state.parcelas];
+        parcelas[index].descricaoForma = descricao;
+
+        console.log('Descrição selecionada:', descricao);
+        console.log('Dados da parcela atualizados:', parcelas[index]);
+
+        this.setState({
+            parcelas
+        });
+    };
+
+
 
     handleObservacaoChange = (index, event) => {
         const parcelas = [...this.state.parcelas];
@@ -2445,8 +2826,44 @@ class FrenteCaixa extends React.Component {
         });
     };
 
+    atualizaTrocoCaixa = (event) => {
+        const inputTroco = event.target.value;
+        const trocoCaixa = inputTroco.replace(',', '.').replace(/[^\d.]/g, ''); // Substitui vírgula por ponto e remove caracteres não numéricos, exceto ponto decimal
+        this.setState({
+            trocoCaixa: trocoCaixa,
+        });
+    };
+
+    formatarTrocoCaixa = (event) => {
+        const trocoCaixa = event.target.value.trim();
+        this.setState({
+            trocoCaixa: trocoCaixa !== '' && !isNaN(trocoCaixa) ? parseFloat(trocoCaixa).toFixed(2) : ''
+        });
+    };
+
+    obterTimestampFormatado = () => {
+        // Criar um objeto Date representando o momento atual
+        const dataAtual = new Date();
+
+        // Função para formatar um número com dois dígitos
+        const formatarDoisDigitos = (numero) => (numero < 10 ? `0${numero}` : numero);
+
+        // Obter componentes de data e hora
+        const dia = formatarDoisDigitos(dataAtual.getDate());
+        const mes = formatarDoisDigitos(dataAtual.getMonth() + 1); // Meses são indexados de 0 a 11
+        const ano = dataAtual.getFullYear();
+        const horas = formatarDoisDigitos(dataAtual.getHours());
+        const minutos = formatarDoisDigitos(dataAtual.getMinutes());
+        const segundos = formatarDoisDigitos(dataAtual.getSeconds());
+
+        // Construir a string de timestamp
+        const timestamp = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+
+        return timestamp;
+    }
+
     //-----------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------- BOTÃO LEITOR DE CODIGO DE BARRAS ----------------------------------------
+    // --------------------------------------- BOTÃO LEITOR DE CODIGO DE BARRAS ---------------------------------------------
     //-----------------------------------------------------------------------------------------------------------------------
 
     render() {
@@ -2463,7 +2880,7 @@ class FrenteCaixa extends React.Component {
             modalInserirParcela, modalSalvarPedido, modalSelecionarLoja, modalPedidoExcluido, canvasFinalizarPedido, validated, idLoja, objeto, unidadeLoja, nomeLoja, cpfValido, cnpjValido, dadosCarregados } = this.state;
         //Listas de preço.
         const { idLista, listaspreco, descontoInicialProduto, opcaoDescontoItem, valorLista, quantidadeLista, descontoItemLista,
-            opcaoDescontoLista, valorUnitarioLista, subTotalLista, prazo, parcelas, ultimoPedido } = this.state;
+            opcaoDescontoLista, valorUnitarioLista, subTotalLista, prazo, parcelas, ultimoPedido, codigo, value, trocoCaixa } = this.state;
 
 
         let quantidadeTotal = 0;
@@ -2498,7 +2915,7 @@ class FrenteCaixa extends React.Component {
                                                 <Form.Label htmlFor="tipo" className="texto-campos">Lista de preço</Form.Label>
                                                 <Form.Select as="select" id="tipo" className="form-control" name="tipo" value={idLista || ''} onChange={this.selecionaListaDesconto}>
                                                     <option value="undefined">Selecione uma lista de preço</option>
-                                                    {listaspreco && listaspreco.map(lista => (
+                                                    {Array.isArray(listaspreco) && listaspreco.map(lista => (
                                                         <option key={lista.idLista} value={lista.idLista}>
                                                             {lista.nomeLista}
                                                         </option>
@@ -2515,12 +2932,12 @@ class FrenteCaixa extends React.Component {
                                                             if (e.key === 'Enter') {
                                                                 e.preventDefault(); // Evita o comportamento padrão de submit do formulário
                                                                 if (buscaVendedor) {
-                                                                    this.buscarVendedor(buscaVendedor);
+                                                                    this.buscarVendedor(buscaVendedor, nome, codigo);
                                                                 }
                                                             }
                                                         }}
                                                     />
-                                                    <Button variant="secondary" onClick={() => { if (buscaVendedor) { this.buscarVendedor(buscaVendedor) } }} >
+                                                    <Button variant="secondary" onClick={() => { if (buscaVendedor) { this.buscarVendedor(buscaVendedor, nome, codigo) } }} >
                                                         <FontAwesomeIcon icon={faSearch} />
                                                     </Button>
                                                 </InputGroup>
@@ -2584,7 +3001,7 @@ class FrenteCaixa extends React.Component {
                                                             if (e.key === 'Enter') {
                                                                 e.preventDefault();
                                                                 if (buscaProduto) {
-                                                                    this.buscarProdutos(buscaProduto);
+                                                                    this.buscarProdutos(buscaProduto, value);
                                                                 }
                                                             }
                                                         }}
@@ -2593,7 +3010,7 @@ class FrenteCaixa extends React.Component {
                                                         variant="secondary"
                                                         onClick={() => {
                                                             if (buscaProduto) {
-                                                                this.buscarProdutos(buscaProduto);
+                                                                this.buscarProdutos(buscaProduto, value);
                                                             }
                                                         }}
                                                     >
@@ -2960,7 +3377,7 @@ class FrenteCaixa extends React.Component {
                                                             </Form.Label>
                                                         </OverlayTrigger>
                                                         <InputGroup>
-                                                            <Form.Control required type="text" className="form-control" placeholder="Digite o nome do cliente" value={buscaContato || nome} onChange={this.atualizarBuscaContato}
+                                                            <Form.Control required type="text" className="form-control" placeholder="Digite o nome do cliente" value={buscaContato || ''} onChange={this.atualizarBuscaContato}
                                                                 onKeyDown={(e) => {
                                                                     if (e.key === 'Enter') {
                                                                         e.preventDefault(); // Evita o comportamento padrão de submit do formulário
@@ -3304,7 +3721,7 @@ class FrenteCaixa extends React.Component {
                                         </Col>
                                     </Row>
                                     <Row className="row align-items-center">
-                                        <Col className="col mb-3" xs={3}>
+                                        {/* <Col className="col mb-3" xs={3}>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Formas de pagamento</Form.Label>
                                                 <Form.Select as="select" type="number" placeholder="Digite a condição" value={condicao || ''} onChange={this.handleChange} >
@@ -3316,8 +3733,8 @@ class FrenteCaixa extends React.Component {
                                                     ))}
                                                 </Form.Select>
                                             </Form.Group>
-                                        </Col>
-                                        <Col className="col mb-3" xs={2}>
+                                        </Col> */}
+                                        <Col className="col mb-3" xs={3}>
                                             <Form.Group className="mb-3">
                                                 <OverlayTrigger
                                                     placement="bottom"
@@ -3413,10 +3830,16 @@ class FrenteCaixa extends React.Component {
                                                             <td>
                                                                 <Form.Select
                                                                     as="select"
-                                                                    value={parcela.forma || ''}
-                                                                    onChange={(e) => this.handleFormaChange(index, e)}>
+                                                                    value={`${parcela.forma || ''}-${parcela.descricaoForma || ''}`}
+                                                                    onChange={(e) => {
+                                                                        const [formaId, descricao] = e.target.value.split('-');
+                                                                        this.handleFormaChange(index, { target: { value: formaId } });
+                                                                        this.handleDescricaoChange(index, descricao);
+                                                                    }}
+                                                                >
+                                                                    <option value="">Selecione pagamento</option>
                                                                     {this.state.formaspagamento.map((formapagamento) => (
-                                                                        <option key={formapagamento.formapagamento.id} value={formapagamento.formapagamento.id}>
+                                                                        <option key={formapagamento.formapagamento.id} value={`${formapagamento.formapagamento.id}-${formapagamento.formapagamento.descricao}`}>
                                                                             {formapagamento.formapagamento.descricao}
                                                                         </option>
                                                                     ))}
@@ -3700,7 +4123,7 @@ class FrenteCaixa extends React.Component {
                         </Modal.Body>
                     </Modal>
 
-                    <Modal show={modalSelecionarLoja} onHide={this.modalSelecionarLoja} backdrop="static" centered>
+                    <Modal show={modalSelecionarLoja} onHide={this.modalSelecionarLoja} backdrop="static" size='lg' centered>
                         <Modal.Header closeButton className="bg-secondary text-white">
                             <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                             <Modal.Title>Selecione uma loja </Modal.Title>
@@ -3709,35 +4132,60 @@ class FrenteCaixa extends React.Component {
                             <div className="text-center" style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', color: '#6c757d' }}>
                                 Bem vindo ao frente de caixa!
                             </div>
+
+                            {this.state.situacaoCaixa === "Aberto" && (
+                                <Alert variant="success">
+                                    <Alert.Heading>Caixa aberto.</Alert.Heading>
+                                    <hr />
+                                    O caixa para a loja <strong>{nomeLoja}</strong> já está aberto. Clique em OK para prosseguir.
+                                </Alert>
+                            )}
+
                             <Col className="col">
+
                                 <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="depositolancamento" className="texto-campos">Selecione a loja</Form.Label>
-                                    <Form.Select as="select" className="form-control" id="depositolancamento" name="depositolancamento" value={idLoja !== null ? idLoja.toString() : ''} onChange={this.atualizaIdLoja}>
+                                    <Form.Label htmlFor="selecionaLoja" className="texto-campos">Selecione a loja</Form.Label>
+                                    <Form.Select
+                                        as="select"
+                                        className="form-control"
+                                        id="selecionaLoja"
+                                        name="selecionaLoja"
+                                        value={this.state.idLoja || ''}
+                                        onChange={(event) => {
+                                            const selectedId = event.target.value;
+                                            let selectedName = '';
+                                            if (selectedId) {
+                                                selectedName = objeto.find(obj => obj.idLoja === selectedId)?.nomeLoja || '';
+                                            }
+                                            this.atualizaIdLoja(selectedId);
+                                            this.atualizaNomeLoja(selectedName);
+                                        }}
+                                    >
                                         <option value="">Selecione a loja</option>
-                                        {objeto && objeto.map((objeto) => (
-                                            <option key={objeto.idLoja} value={objeto.idLoja.toString()}>
-                                                {objeto.nomeLoja}
+                                        {objeto && objeto.map((obj) => (
+                                            <option key={obj.idLoja} value={obj.idLoja}>
+                                                {obj.nomeLoja}
                                             </option>
                                         ))}
                                     </Form.Select>
                                 </Form.Group>
-                            </Col>
-                            <Col className="col">
+
                                 <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="unidadenegocio" className="texto-campos">Unidade de negócio</Form.Label>
-                                    <Form.Select as="select" className="form-control" id="unidadenegocio" name="unidadenegocio" value={unidadeLoja !== null ? unidadeLoja.toString() : ''} onChange={this.atualizaUnidadeNegocio}>
-                                        <option value="">Selecione a unidade de negócio</option>
-                                        {objeto && objeto.map((objeto) => (
-                                            <option key={objeto.idLoja} value={objeto.unidadeLoja.toString()}>
-                                                {objeto.unidadeLoja}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
+                                    <Form.Label htmlFor="trocoCaixa" className="texto-campos">Troco</Form.Label>
+                                    <Form.Control type="text"
+                                        className="form-control"
+                                        id="trocoCaixa"
+                                        name="trocoCaixa"
+                                        value={this.state.trocoCaixa || ''}
+                                        onChange={this.atualizaTrocoCaixa}
+                                        onBlur={this.formatarTrocoCaixa}
+                                        disabled={this.state.situacaoCaixa === "Aberto"}
+                                    />
                                 </Form.Group>
                             </Col>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={this.modalSelecionarLoja}>Salvar</Button>
+                            <Button variant="secondary" onClick={() => { this.submitCadastrar(); this.resetCaixa(); }}>Salvar</Button>
                         </Modal.Footer>
                     </Modal>
                 </Container >
@@ -3747,4 +4195,3 @@ class FrenteCaixa extends React.Component {
 }
 
 export default FrenteCaixa;
-

@@ -57,24 +57,282 @@ class ListaPrecos extends Component {
             modalExcluindoLista: false,
             produtoNaoLocalizado: false,
             listaspreco: [],
-            searchTerm: '',          // Adicionando o campo searchTerm
+            searchTerm: '',
             produtos: [],
             codigo: 0,
             buscaProduto: '',
+            dadosCarregados: false
         };
+
+        // Ambiente Local
+        // this.buscarProdutosEndpoint = 'http://localhost:8081/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'http://localhost:8081/api/v1/selecionarListas'
+        // this.buscarIdListaEndpoint = 'http://localhost:8081/api/v1/selecionarLista'
+        // this.deletarListaEndpoint = 'http://localhost:8081/api/v1/deletarLista'
+        // this.cadastrarListaEndpoint = 'http://localhost:8081/api/v1/adicionarLista'
+        // this.atualizarListaEndpoint = 'http://localhost:8081/api/v1/atualizarLista'
+
+        // Ambiente Desenvolvimento
+        // this.buscarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+        // this.buscarIdListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarLista'
+        // this.deletarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto'
+        // this.cadastrarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
+        // this.atualizarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/atualizarLista'
+
+        // Ambiente Produção
+         this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+         this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+         this.buscarIdListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarLista'
+         this.deletarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
+         this.cadastrarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
+         this.atualizarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarLista'
     };
 
-    componentDidMount() {
-        this.buscarListaPreco();
+    async componentDidMount() {
+        try {
+            this.buscarListaPreco();
+        } catch (error) {
+            this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
+        }
     };
+
+    //----------------------------------------- API BUSCA LISTAS ----------------------------------------------------------
+
+    buscarListaPreco = () => {
+        return new Promise((resolve, reject) => {
+            this.setState({ carregando: true, dadosCarregados: false });
+
+            fetch(this.buscarListaPrecoEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Assume que data é um array onde cada elemento possui uma propriedade produtoLista
+                    console.log(data);
+                    if (data) {
+                        // Calcula o número de itens em cada lista dentro de cada elemento
+                        const numerosDeItens = data.map(item => item.produtoLista.length);
+
+                        // Extrai a primeira instância de fatorAplicado e baseado
+                        const primeiraInstancia = data[0];
+                        const fatorAplicado = primeiraInstancia ? primeiraInstancia.fatorAplicado : undefined;
+                        const baseado = primeiraInstancia ? primeiraInstancia.baseado : undefined;
+
+                        console.log(numerosDeItens, fatorAplicado, baseado)
+
+                        this.setState({
+                            listaspreco: data,
+                            numerosDeItens: numerosDeItens,
+                            fatorAplicado: fatorAplicado,
+                            baseado: baseado,
+                            carregando: false,
+                            dadosCarregados: true,
+                        });
+                    } else {
+                        resolve();
+                        this.setState({ carregando: false });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar as lojas:', error);
+                    reject(error);
+                    this.setState({
+                        nomeListas: [],
+                        listaspreco: [],
+                        numerosDeItens: [],
+                        carregando: false,
+                        dadosCarregados: false
+                    });
+                });
+        })
+    };
+
+    //----------------------------------------- API BUSCA IDLISTA ----------------------------------------------------------
+
+    buscarIdLista = (idLista) => {
+        return new Promise((resolve, reject) => {
+            this.setState({ carregando: true, dadosCarregados: false });
+
+            fetch(`${this.buscarIdListaEndpoint}/${idLista}`)
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('Resposta da API:', data);
+
+                    const idLista = data.idLista;
+                    const nomeLista = data.nomeLista;
+                    const quantidadeProduto = data.quantidadeProduto;
+                    const regraLista = data.regraLista;
+                    const baseado = data.baseado;
+                    const fatorAplicado = data.fatorAplicado;
+                    const tipoLista = data.tipoLista;
+
+                    if (idLista !== undefined) {
+                        const produtoLista = data.produtoLista;
+
+                        console.log("nome lista: ", nomeLista);
+
+                        // Certifique-se de limpar a lista antes de adicionar novos produtos
+                        const produtosSelecionados = produtoLista.map((produto) => ({
+                            produto: produto,
+                            quantidade: 1, // ou qualquer valor padrão que você deseja
+                            preco: produto.preco, // ou qualquer lógica para definir o preço padrão
+                            precoProduto: produto.preco, // ou qualquer lógica para definir o preço padrão
+                            precoLista: produto.precoLista
+                            // Outras propriedades...
+                        }));
+
+                        this.setState({
+                            idLista: idLista,
+                            nomeLista: nomeLista,
+                            quantidadeProduto: quantidadeProduto,
+                            regraLista: regraLista,
+                            baseado: baseado,
+                            fatorAplicado: fatorAplicado,
+                            tipoLista: tipoLista,
+                            produtoLista: produtoLista,
+                            produtosSelecionados: produtosSelecionados,
+                            dadosCarregados: true,
+                        });
+
+                        if (produtoLista && produtoLista.length > 0) {
+                            console.log('Produto Lista encontrada:', produtoLista[0]);
+
+                            // Caso a loja seja encontrada, você pode atualizar o estado com a loja encontrada
+                            this.setState({ listaEncontrada: produtoLista[0] });
+                        } else {
+                            console.log('Lista não encontrada.');
+                            // Caso a loja não seja encontrada, você pode mostrar uma mensagem de erro ou fazer alguma outra tratativa
+                        }
+                    }
+                    resolve();
+                    this.setState({ carregando: false });
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar a loja:', error);
+                    reject(error);
+                    this.setState({ carregando: false, dadosCarregados: false });
+                });
+        })
+    };
+
+    //----------------------------------------- API BUSCA PRODUTOS ----------------------------------------------------------
+
+    // buscarProdutos = (value) => {
+    //     return new Promise((resolve, reject) => {
+    //         this.setState({ buscaProduto: value, carregando: false, produtoNaoLocalizado: false });
+
+    //         fetch(this.buscarProdutosEndpoint)
+
+    //             .then((resposta) => {
+    //                 if (!resposta.ok) {
+    //                     throw new Error('Erro na chamada da API');
+    //                 }
+    //                 return resposta.json();
+    //             })
+    //             .then((dados) => {
+    //                 console.log("Produto: ", dados)
+    //                 if (dados.retorno.produtos) {
+    //                     const palavrasBusca = value.toLowerCase().split(' ');
+    //                     const produto = dados.retorno.produtos[0].produto;
+
+    //                     const produtosFiltrados = dados.retorno.produtos.filter((produto) => {
+    //                         const descricao = this.normalizeString(produto.produto.descricao || '').toLowerCase();
+    //                         const codigo = this.normalizeString(produto.produto.codigo || '').toLowerCase();
+    //                         const gtin = this.normalizeString(produto.produto.gtin || '').toLowerCase();
+    //                         const gtinEmbalagem = this.normalizeString(produto.produto.gtinEmbalagem || '').toLowerCase();
+    //                         const descricaoFornecedor = this.normalizeString(produto.produto.descricaoFornecedor || '').toLowerCase();
+    //                         const nomeFornecedor = this.normalizeString(produto.produto.nomeFornecedor || '').toLowerCase();
+    //                         const codigoFabricante = this.normalizeString(produto.produto.codigoFabricante || '').toLowerCase();
+
+    //                         return palavrasBusca.every((palavra) =>
+    //                             descricao.includes(palavra) ||
+    //                             codigo.includes(palavra) ||
+    //                             gtin.includes(palavra) ||
+    //                             gtinEmbalagem.includes(palavra) ||
+    //                             descricaoFornecedor.includes(palavra) ||
+    //                             nomeFornecedor.includes(palavra) ||
+    //                             codigoFabricante.includes(palavra)
+    //                         );
+    //                     });
+
+    //                     this.setState({
+    //                         preco: parseFloat(produto.preco).toFixed(2) || '',
+    //                         precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
+    //                     });
+
+    //                     if (produtosFiltrados.length === 0) {
+    //                         // Nenhum produto encontrado
+    //                         this.setState({
+    //                             produtos: [],
+    //                             produtoSelecionado: null,
+    //                             carregando: false,
+    //                             produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+    //                         });
+    //                     } else {
+    //                         // Produtos encontrados
+    //                         this.setState({
+    //                             produtos: produtosFiltrados,
+    //                             produtoSelecionado: null,
+    //                             carregando: false,
+    //                             produtoNaoLocalizado: false // Reinicie a variável para false caso tenha sido setada anteriormente
+    //                         });
+    //                     }
+    //                 } else {
+    //                     // Nenhum produto encontrado
+    //                     this.setState({
+    //                         produtos: [],
+    //                         carregando: false,
+    //                         produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+    //                     });
+    //                 }
+    //                 resolve();
+    //             })
+    //             .catch((error) => {
+    //                 this.setState({
+    //                     produtos: [],
+    //                     carregando: false,
+    //                     produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+    //                 });
+    //                 reject(error);
+    //             });
+    //     });
+    // };
+
+    // normalizeString = (str) => {
+    //     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    // };
 
     buscarProdutos = (value) => {
         return new Promise((resolve, reject) => {
+            const sanitizedValue = this.normalizeString(value).toLowerCase();
+            let endpoint = this.buscarProdutosEndpoint;
+
+            // Verifica se o valor de entrada é um código (todos os dígitos)
+            if (/^\d+$/.test(sanitizedValue)) {
+                endpoint += `?codigo=${sanitizedValue}`;
+            }
+            // Verifica se o valor de entrada é um GTIN (todos os dígitos e comprimento entre 8 e 14)
+            else if (/^\d+$/.test(sanitizedValue) && sanitizedValue.length >= 8 && sanitizedValue.length <= 14) {
+                endpoint += `?gtin=${sanitizedValue}`;
+            }
+            // Se não for código nem GTIN, assume que é uma descrição
+            else if (sanitizedValue !== null && sanitizedValue.trim() !== "") {
+                endpoint += `?descricao=${this.normalizeString(sanitizedValue)}`;
+            } else {
+                // Caso nenhum dos casos anteriores se aplique, você pode lidar com a situação conforme necessário
+                // Por exemplo, lançar um erro, definir um valor padrão, etc.
+                console.error("Entrada inválida. Pelo menos um dos parâmetros (código, GTIN, descrição) deve ser fornecido.");
+                reject(new Error("Entrada inválida"));
+                return;
+            }
+
             this.setState({ buscaProduto: value, carregando: false, produtoNaoLocalizado: false });
 
-            fetch(`https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos`)
-                // fetch(`http://localhost:8081/api/v1/produtos`)
-
+            fetch(endpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
                         throw new Error('Erro na chamada da API');
@@ -82,43 +340,15 @@ class ListaPrecos extends Component {
                     return resposta.json();
                 })
                 .then((dados) => {
-                    console.log("Produto: ", dados)
                     if (dados.retorno.produtos) {
-                        const palavrasBusca = value.toLowerCase().split(' ');
-                        const produto = dados.retorno.produtos[0].produto;
-
-                        const produtosFiltrados = dados.retorno.produtos.filter((produto) => {
-                            const descricao = this.normalizeString(produto.produto.descricao || '').toLowerCase();
-                            const codigo = this.normalizeString(produto.produto.codigo || '').toLowerCase();
-                            const gtin = this.normalizeString(produto.produto.gtin || '').toLowerCase();
-                            const gtinEmbalagem = this.normalizeString(produto.produto.gtinEmbalagem || '').toLowerCase();
-                            const descricaoFornecedor = this.normalizeString(produto.produto.descricaoFornecedor || '').toLowerCase();
-                            const nomeFornecedor = this.normalizeString(produto.produto.nomeFornecedor || '').toLowerCase();
-                            const codigoFabricante = this.normalizeString(produto.produto.codigoFabricante || '').toLowerCase();
-
-                            return palavrasBusca.every((palavra) =>
-                                descricao.includes(palavra) ||
-                                codigo.includes(palavra) ||
-                                gtin.includes(palavra) ||
-                                gtinEmbalagem.includes(palavra) ||
-                                descricaoFornecedor.includes(palavra) ||
-                                nomeFornecedor.includes(palavra) ||
-                                codigoFabricante.includes(palavra)
-                            );
-                        });
-
-                        this.setState({
-                            preco: parseFloat(produto.preco).toFixed(2) || '',
-                            precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
-                        });
-
+                        const produtosFiltrados = dados.retorno.produtos;
                         if (produtosFiltrados.length === 0) {
                             // Nenhum produto encontrado
                             this.setState({
                                 produtos: [],
                                 produtoSelecionado: null,
                                 carregando: false,
-                                produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+                                produtoNaoLocalizado: true
                             });
                         } else {
                             // Produtos encontrados
@@ -126,7 +356,7 @@ class ListaPrecos extends Component {
                                 produtos: produtosFiltrados,
                                 produtoSelecionado: null,
                                 carregando: false,
-                                produtoNaoLocalizado: false // Reinicie a variável para false caso tenha sido setada anteriormente
+                                produtoNaoLocalizado: false
                             });
                         }
                     } else {
@@ -134,7 +364,7 @@ class ListaPrecos extends Component {
                         this.setState({
                             produtos: [],
                             carregando: false,
-                            produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+                            produtoNaoLocalizado: true
                         });
                     }
                     resolve();
@@ -143,118 +373,30 @@ class ListaPrecos extends Component {
                     this.setState({
                         produtos: [],
                         carregando: false,
-                        produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
+                        produtoNaoLocalizado: true
                     });
                     reject(error);
+                    this.setState({ carregando: false });
                 });
         });
     };
 
     normalizeString = (str) => {
-        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (str === null || str === undefined) {
+            return '';
+        }
+
+        const normalizedString = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        console.log(`Original: ${str}, Normalized: ${normalizedString}`);
+
+        return normalizedString;
     };
 
-    buscarListaPreco = () => {
-        fetch("http://localhost:8081/api/v1/selecionarListas", {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Assume que data é um array onde cada elemento possui uma propriedade produtoLista
-                console.log(data);
-
-                // Calcula o número de itens em cada lista dentro de cada elemento
-                const numerosDeItens = data.map(item => item.produtoLista.length);
-
-                // Extrai a primeira instância de fatorAplicado e baseado
-                const primeiraInstancia = data[0];
-                const fatorAplicado = primeiraInstancia ? primeiraInstancia.fatorAplicado : undefined;
-                const baseado = primeiraInstancia ? primeiraInstancia.baseado : undefined;
-
-                console.log(numerosDeItens, fatorAplicado, baseado)
-
-                this.setState({
-                    listaspreco: data,
-                    numerosDeItens: numerosDeItens,
-                    fatorAplicado: fatorAplicado,
-                    baseado: baseado
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar as lojas:', error);
-
-                this.setState({
-                    nomeListas: [],
-                    listaspreco: [],
-                    numerosDeItens: []
-                });
-            });
-    };
-
-    buscarIdLista = (idLista) => {
-        fetch(`http://localhost:8081/api/v1/selecionarLista/${idLista}`)
-            .then(response => response.json())
-            .then(data => {
-                // console.log('Resposta da API:', data);
-
-                const idLista = data.idLista;
-                const nomeLista = data.nomeLista;
-                const quantidadeProduto = data.quantidadeProduto;
-                const regraLista = data.regraLista;
-                const baseado = data.baseado;
-                const fatorAplicado = data.fatorAplicado;
-                const tipoLista = data.tipoLista;
-
-                if (idLista !== undefined) {
-                    const produtoLista = data.produtoLista;
-
-                    console.log("nome lista: ", nomeLista);
-
-                    // Certifique-se de limpar a lista antes de adicionar novos produtos
-                    const produtosSelecionados = produtoLista.map((produto) => ({
-                        produto: produto,
-                        quantidade: 1, // ou qualquer valor padrão que você deseja
-                        preco: produto.preco, // ou qualquer lógica para definir o preço padrão
-                        precoProduto: produto.preco, // ou qualquer lógica para definir o preço padrão
-                        precoLista: produto.precoLista
-                        // Outras propriedades...
-                    }));
-
-                    this.setState({
-                        idLista: idLista,
-                        nomeLista: nomeLista,
-                        quantidadeProduto: quantidadeProduto,
-                        regraLista: regraLista,
-                        baseado: baseado,
-                        fatorAplicado: fatorAplicado,
-                        tipoLista: tipoLista,
-                        produtoLista: produtoLista,
-                        produtosSelecionados: produtosSelecionados,
-                    });
-
-                    if (produtoLista && produtoLista.length > 0) {
-                        console.log('Produto Lista encontrada:', produtoLista[0]);
-
-                        // Caso a loja seja encontrada, você pode atualizar o estado com a loja encontrada
-                        this.setState({ listaEncontrada: produtoLista[0] });
-                    } else {
-                        console.log('Lista não encontrada.');
-                        // Caso a loja não seja encontrada, você pode mostrar uma mensagem de erro ou fazer alguma outra tratativa
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao buscar a loja:', error);
-            });
-    };
+    //----------------------------------------- API DELETE IDLISTA ----------------------------------------------------------
 
     deletarLista(idLista) {
-        const statusCode = fetch(`http://localhost:8081/api/v1/deletarLista/${idLista}`, {
-            // fetch(`https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto/${codigo}`, {
-
+        const statusCode = fetch(`${this.deletarListaEndpoint}/${idLista}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -267,8 +409,10 @@ class ListaPrecos extends Component {
         return statusCode;
     };
 
+    //----------------------------------------- API CADASTRAR LISTA ----------------------------------------------------------
+
     cadastrarLista = (listaPrecoResponse) => {
-        return fetch('http://localhost:8081/api/v1/adicionarLista/', {
+        return fetch(this.cadastrarListaEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -294,11 +438,12 @@ class ListaPrecos extends Component {
             });
     };
 
-    //PUT - MÉTODO PARA ATUALIZAR UM PRODUTO EXISTENTE
+    //----------------------------------------- API ATUALIZAR LISTA ----------------------------------------------------------
+
     atualizarLista = (listaPrecoResponse) => {
         const idLista = this.state.idLista;
 
-        return fetch(`http://localhost:8081/api/v1/atualizarLista/${idLista}`, {
+        return fetch(`${this.atualizarListaEndpoint}/${idLista}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -644,7 +789,7 @@ class ListaPrecos extends Component {
 
     render() {
 
-        const { listaspreco, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens } = this.state;
+        const { carregando, listaspreco, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens } = this.state;
 
         const removeAccents = (str) => {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -655,7 +800,7 @@ class ListaPrecos extends Component {
             return this.renderTelaLista();
         }
 
-        if (this.state.carregando) {
+        if (carregando) {
             return (
                 <div className="spinner-container" >
                     <div className="d-flex align-items-center justify-content-center">
@@ -676,6 +821,7 @@ class ListaPrecos extends Component {
                                 <span style={{ marginRight: '0.8rem' }}>&nbsp;</span>
                                 <button
                                     onClick={() => {
+                                        this.setState({ dadosCarregados: true });
                                         this.modalCadastrarLista();
                                         this.reset();
                                     }}
@@ -782,14 +928,7 @@ class ListaPrecos extends Component {
                     </div>
 
                     <Modal
-                        show={this.state.modalCadastrarLista}
-                        onHide={this.modalCadastrarLista}
-                        size="xl"
-                        fullscreen="xxl-down"
-                        backdrop="static"
-                        dialogClassName="modal-90w"
-                        aria-labelledby="example-custom-modal-styling-title"
-                    >
+                        show={this.state.modalCadastrarLista} onHide={this.modalCadastrarLista} size="xl" fullscreen="xxl-down" backdrop="static" dialogClassName="modal-90w" aria-labelledby="example-custom-modal-styling-title">
                         <Modal.Header closeButton className="modal-produto-header">
                             <Modal.Title>Lista de preços</Modal.Title>
                         </Modal.Header>

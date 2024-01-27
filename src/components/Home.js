@@ -70,6 +70,17 @@ function Home() {
                 </Card.Body>
                 <Button variant="secondary" onClick={() => handleRedirect('/Loja')}>Acessar</Button>
             </Card>
+
+            <Card border="sucess" className="custom-card">
+                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Body>
+                    <Card.Title>Controle de caixa</Card.Title>
+                    <Card.Text>
+                        Mantenha um registro detalhado das transações financeiras da sua empresa com o controle de caixa.
+                    </Card.Text>
+                </Card.Body>
+                <Button variant="secondary" onClick={() => handleRedirect('/ControleCaixa')}>Acessar</Button>
+            </Card>
         </div>
     );
 }

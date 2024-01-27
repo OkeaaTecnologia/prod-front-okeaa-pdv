@@ -8,6 +8,7 @@ import { Table } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
 import { Row } from 'react-bootstrap';
 import { Container } from "react-bootstrap";
+import { Pagination } from "react-bootstrap";
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { BsInfoCircle } from 'react-icons/bs';
@@ -15,11 +16,6 @@ import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
 
 import { parse } from 'js2xmlparser';
-
-// import { BsPencilSquare } from 'react-icons/bs';
-// import DatePicker from 'react-datepicker';
-//import 'react-datepicker/dist/react-datepicker.css';
-
 
 class Contato extends React.Component {
 
@@ -76,9 +72,32 @@ class Contato extends React.Component {
             showRenderTelaLista: false,
             dadosCarregados: false,
             dataNascimento: null,
+            paginaAtual: 1,
+            totalPaginas: ''
         };
 
         this.numeroRef = React.createRef();
+
+        // Ambiente Local
+        // this.buscarContatoEndpoint = 'http://localhost:8080/api/v1/contatos'
+        // this.atualizaContatoEndpoint = 'http://localhost:8080/api/v1/contato'
+        // this.buscarTipoContatoEndpoint = 'http://localhost:8080/api/v1/selecionartipocontato'
+        // this.cadastraContatoEndpoint = 'http://localhost:8080/api/v1/cadastrarcontato'
+        // this.atualizarContatoEndpoint = 'http://localhost:8080/api/v1/atualizarcontato/'
+
+        // Ambiente Desenvolvimento
+        // this.buscarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.atualizaContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contato'
+        // this.buscarTipoContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.cadastraContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato'
+        // this.atualizarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/'
+
+        //Ambiente Produção
+        this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        this.atualizaContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato'
+        this.buscarTipoContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        this.cadastraContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato'
+        this.atualizarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/'
     };
 
     async componentDidMount() {
@@ -109,9 +128,11 @@ class Contato extends React.Component {
     //--------------------------------------- CHAMADAS E CONSUMO DA API DE CONTATOS. ----------------------------------------|  
     //-----------------------------------------------------------------------------------------------------------------------|
 
-    //GET - MÉTODO PARA CONSUMO DA API CONTATOS
-    buscarContato = () => {
-        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`, {
+    buscarContato = (pagina) => {
+        // Se a página não for fornecida, utilize a página atual do estado
+        const paginaRequisicao = pagina !== undefined ? pagina : this.state.paginaAtual;
+
+        fetch(`${this.buscarContatoEndpoint}/page=${paginaRequisicao}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -122,19 +143,29 @@ class Contato extends React.Component {
                 if (dados.retorno.contatos) {
                     this.setState({
                         contatos: dados.retorno.contatos,
+                        paginaAtual: paginaRequisicao,  // Atualiza a página atual no estado
+                        carregando: false
                     });
                 } else {
-                    this.setState({ contatos: [] })
-                };
-                this.setState({ carregando: false })
+                    this.setState({ carregando: false });
+                }
+            })
+            .catch(erro => {
+                console.error('Erro ao buscar contatos:', erro);
+                this.setState({ carregando: false });
             });
+    };
+
+    handleSelecionaPagina = (pagina) => {
+        this.setState({ carregando: true });
+        this.buscarContato(pagina);
     };
 
     //GET - MÉTODO PARA CONSUMO DE UM CONTATO PELO ID
     atualizaContato = (id) => {
-    	this.setState({ carregando: true, dadosCarregados: false });
+        this.setState({ carregando: true, dadosCarregados: false });
 
-        fetch(`https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato/${id}`, {
+        fetch(`${this.atualizaContatoEndpoint}/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -167,33 +198,33 @@ class Contato extends React.Component {
 
                     // console.log(tiposContato); // Adicione o console.log aqui
                     this.setState({
-                        id: contato.id,
-                        codigo: contato.codigo,
-                        nome: contato.nome,
-                        fantasia: contato.fantasia,
-                        tipo: contato.tipo,
-                        cnpj: contato.cnpj,
-                        ie_rg: contato.ie_rg,
-                        endereco: contato.endereco,
-                        numero: contato.numero,
-                        bairro: contato.bairro,
-                        cep: contato.cep,
-                        cidade: contato.cidade,
-                        complemento: contato.complemento,
-                        uf: contato.uf,
-                        fone: contato.fone,
-                        email: contato.email,
-                        situacao: contato.situacao,
-                        contribuinte: contato.contribuinte,
-                        site: contato.site,
-                        celular: contato.celular,
-                        dataAlteracao: formatarDataHora(contato.dataAlteracao),
-                        dataInclusao: contato.dataInclusao,
-                        sexo: contato.sexo,
-                        clienteDesde: converterDataFormato(contato.clienteDesde),
-                        limiteCredito: contato.limiteCredito,
-                        dataNascimento: converterDataFormato(contato.dataNascimento),
-                        tiposContato: tiposContato,
+                        id: contato.id || '',
+                        codigo: contato.codigo || '',
+                        nome: contato.nome || '',
+                        fantasia: contato.fantasia || '',
+                        tipo: contato.tipo || '',
+                        cnpj: contato.cnpj || '',
+                        ie_rg: contato.ie_rg || '',
+                        endereco: contato.endereco || '',
+                        numero: contato.numero || '',
+                        bairro: contato.bairro || '',
+                        cep: contato.cep || '',
+                        cidade: contato.cidade || '',
+                        complemento: contato.complemento || '',
+                        uf: contato.uf || '',
+                        fone: contato.fone || '',
+                        email: contato.email || '',
+                        situacao: contato.situacao || '',
+                        contribuinte: contato.contribuinte || '',
+                        site: contato.site || '',
+                        celular: contato.celular || '',
+                        dataAlteracao: formatarDataHora(contato.dataAlteracao) || '',
+                        dataInclusao: contato.dataInclusao || '',
+                        sexo: contato.sexo || '',
+                        clienteDesde: converterDataFormato(contato.clienteDesde) || '',
+                        limiteCredito: parseFloat(contato.limiteCredito).toFixed(2) || '',
+                        dataNascimento: converterDataFormato(contato.dataNascimento) || '',
+                        tiposContato: tiposContato || '',
                         dadosCarregados: true, // Define que os dados foram carregados com sucesso
                     });
 
@@ -210,9 +241,7 @@ class Contato extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DE TIPOS DE CONTATO DO BANCO DE DADOS.
     buscarTipoContato = () => {
-        // fetch(`https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos`, {
-        fetch("http://localhost:8080/api/v1/selecionartipocontato", {
-
+        fetch(this.buscarTipoContatoEndpoint, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -234,7 +263,8 @@ class Contato extends React.Component {
         const xml = parser.parseFromString(xmlContato, 'text/xml');
         const stringXml = new XMLSerializer().serializeToString(xml);
 
-        return fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato', {
+        return fetch(this.cadastraContatoEndpoint, {
+
             method: 'POST',
             body: stringXml,
             headers: {
@@ -267,7 +297,7 @@ class Contato extends React.Component {
         const stringXml = new XMLSerializer().serializeToString(xml);
         const id = xml.querySelector('id').textContent;
 
-        return fetch('https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/' + id, {
+        return fetch(this.atualizarContatoEndpoint + id, {
             method: 'PUT',
             body: stringXml,
             headers: {
@@ -955,6 +985,7 @@ class Contato extends React.Component {
     render() {
 
         const { selectedListId, showRenderTelaLista, carregando, searchTerm, modalSalvarContato, contatos } = this.state
+        const { paginaAtual, totalPaginas } = this.state;
 
         if (showRenderTelaLista) {
             return this.renderTelaLista();
@@ -1008,7 +1039,7 @@ class Contato extends React.Component {
                     </Container>
                     <div className="table-container-contato">
                         <Container fluid className="pb-5">
-                            <Table striped bordered hover responsive="xl">
+                            <Table id="tabelaContatos" striped bordered hover responsive="xl">
                                 <thead>
                                     <tr>
                                         <th title="Identificador">ID</th>
@@ -1065,8 +1096,36 @@ class Contato extends React.Component {
                             </Modal.Body>
                         </Modal>
                     </div>
-                </div >
-
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
+                        <div>
+                            <Pagination>
+                                <Pagination.Prev
+                                    onClick={() => {
+                                        this.handleSelecionaPagina(paginaAtual - 1);
+                                    }}
+                                    disabled={paginaAtual === 1}
+                                />
+                                {[...Array(totalPaginas)].map((_, index) => (
+                                    <Pagination.Item
+                                        key={index + 1}
+                                        active={index + 1 === paginaAtual}
+                                        onClick={() => {
+                                            this.handleSelecionaPagina(index + 1);
+                                        }}
+                                    >
+                                        {index + 1}
+                                    </Pagination.Item>
+                                ))}
+                                <Pagination.Next
+                                    onClick={() => {
+                                        this.handleSelecionaPagina(paginaAtual + 1);
+                                    }}
+                                    disabled={paginaAtual === totalPaginas}
+                                />
+                            </Pagination>
+                        </div>
+                    </div>
+                </div>
             );
         }
     }

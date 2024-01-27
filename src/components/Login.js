@@ -25,7 +25,7 @@ class Login extends React.Component {
         const { username, password } = this.state;
 
         // Verificar as credenciais
-        if (username === 'okeaa' && password === 'Okeaa@123') {
+        if (username === 'Administrador' && password === 'Teste2024') {
             // Salvar a informação de autenticação no Local Storage
             localStorage.setItem('isLoggedIn', 'true');
 
