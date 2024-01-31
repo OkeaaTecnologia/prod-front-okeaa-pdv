@@ -6,8 +6,9 @@ html {
 }
 
 body {
-  background: linear-gradient(to bottom, #0f0f0f, #afafaf);
+  background: linear-gradient(to bottom, #000000, #555758);
   background-attachment: fixed;
+  /* background: #272822 */
 }
 
 .navbar-brand {

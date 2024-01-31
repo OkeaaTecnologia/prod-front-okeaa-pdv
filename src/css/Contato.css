@@ -64,13 +64,20 @@ h5 {
   margin-bottom: 10px;
 }
 
-.table-container-contato tbody td {
-  padding: 15px; /* Ajusta o tamanho da altura da linha da tabela */
-}
-
 .table-container-contato {
   overflow-y: auto; /* Torna a tabela rolável verticalmente */
-  max-height: 98vh; /* Defina a altura máxima da altura da janela */
+  max-height: 90vh; /* Defina a altura máxima da altura da janela */
+}
+
+.table-container-contato tbody td {
+  padding: 10px; /* Ajusta o tamanho da altura da linha da tabela */
+  line-height: 1.5; /* Reduz a altura da linha definindo a altura da linha para 1 */
+  color: #000000; /* Altera a cor do texto ao passar o mouse */
+}
+
+/* Estilos de hover para a linha inteira com cor mais transparente */
+.table-container-contato tbody tr:hover td {
+  background-color: rgb(255, 225, 185); /* Cor mais transparente */
 }
 
 .table-container-contato thead th {
@@ -97,12 +104,24 @@ h5 {
 
 .spinner-container {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo com opacidade */
+  /* backdrop-filter: blur(5px);  */
+  z-index: 1000; /* Garante que o spinner fique sobreposto a outros elementos */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza na horizontal */
+  align-items: center; /* Centraliza na vertical */
 }
 
-.spinner {
+.modal-erro {
+  z-index: 9999; /* Defina um z-index maior para o modal */
+}
+
+.spinner-loader {
   display: inline-block;
   width: 50px;
   height: 50px;
@@ -110,6 +129,12 @@ h5 {
   border-radius: 50%;
   border-top-color: #ffffff;
   animation: spinner 1s ease-in-out infinite;
+}
+
+.text-loading {
+  margin-top: 10px; /* Espaçamento entre o spinner e o texto */
+  text-align: center; /* Alinha o texto ao centro */
+  color: white; /* Cor do texto */
 }
 
 @keyframes spinner {
@@ -229,4 +254,8 @@ h5 {
 .icon-info {
   background-color: #0eb2e8;
   border-radius: 50%; /* Cria um círculo com bordas arredondadas */
+}
+
+.pagination-contato {
+  background: #fda21e;
 }

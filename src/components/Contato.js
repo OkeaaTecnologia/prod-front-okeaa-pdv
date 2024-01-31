@@ -73,7 +73,11 @@ class Contato extends React.Component {
             dadosCarregados: false,
             dataNascimento: null,
             paginaAtual: 1,
-            totalPaginas: ''
+            totalPaginas: '',
+            selectedTiposContato: [],
+            tiposContatoSelecionados: [], // Inicializa com os tiposContato passados ou um array vazio
+            showModal: false,
+            errorMessage: ''
         };
 
         this.numeroRef = React.createRef();
@@ -86,28 +90,29 @@ class Contato extends React.Component {
         // this.atualizarContatoEndpoint = 'http://localhost:8080/api/v1/atualizarcontato/'
 
         // Ambiente Desenvolvimento
-        // this.buscarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        // this.atualizaContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contato'
-        // this.buscarTipoContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        // this.cadastraContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato'
-        // this.atualizarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/'
+        this.buscarContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/contatos'
+        this.atualizaContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/contato'
+        this.buscarTipoContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/selecionartipocontato'
+        this.cadastraContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/cadastrarcontato'
+        this.atualizarContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/atualizarcontato/'
 
-        //Ambiente Produção
-        this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        this.atualizaContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato'
-        this.buscarTipoContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        this.cadastraContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato'
-        this.atualizarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/'
+        // Ambiente Produção
+        // this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.atualizaContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contato'
+        // this.buscarTipoContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.cadastraContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarcontato'
+        // this.atualizarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarcontato/'
     };
 
     async componentDidMount() {
         try {
-            this.buscarContato();
-            this.buscarTipoContato();
+            await this.buscarContato();
+            await this.buscarTipoContato();
         } catch (error) {
             this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
         }
     };
+
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.logradouro !== this.state.logradouro) {
@@ -144,20 +149,18 @@ class Contato extends React.Component {
                     this.setState({
                         contatos: dados.retorno.contatos,
                         paginaAtual: paginaRequisicao,  // Atualiza a página atual no estado
-                        carregando: false
+                        carregando: false,
                     });
-                } else {
-                    this.setState({ carregando: false });
                 }
             })
-            .catch(erro => {
-                console.error('Erro ao buscar contatos:', erro);
-                this.setState({ carregando: false });
+            .catch(error => {
+                // console.error('Erro ao buscar contatos:', error);
+                this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar contatos. Por favor, tente novamente mais tarde.' });
             });
     };
 
     handleSelecionaPagina = (pagina) => {
-        this.setState({ carregando: true });
+        this.setState({ carregando: false });
         this.buscarContato(pagina);
     };
 
@@ -182,6 +185,9 @@ class Contato extends React.Component {
                         tipoContato: item.tipoContato,
                         descricao: item.tipoContato.descricao
                     }));
+
+                    const tiposContatoCliente = contato.tiposContato.map(item => item.tipoContato.descricao);
+                    this.setState({ tiposContatoSelecionados: tiposContatoCliente });
 
                     const converterDataFormato = (data) => {
                         const [ano, mes, dia] = data.split('-');
@@ -225,22 +231,21 @@ class Contato extends React.Component {
                         limiteCredito: parseFloat(contato.limiteCredito).toFixed(2) || '',
                         dataNascimento: converterDataFormato(contato.dataNascimento) || '',
                         tiposContato: tiposContato || '',
-                        dadosCarregados: true, // Define que os dados foram carregados com sucesso
+                        carregando: false,
+                        dadosCarregados: true,
                     });
-
-                } else {
-                    this.setState({ contatos: [] })
                 }
-                this.setState({ carregando: false });
             })
             .catch(error => {
-                console.error(error);
-                this.setState({ carregando: false, dadosCarregados: false });
+                // console.error(error);
+                this.setState({ carregando: true, showModal: true, dadosCarregados: false, errorMessage: 'Erro ao buscar contato. Por favor, tente novamente mais tarde.' });
             });
     };
 
     //GET - MÉTODO PARA CONSUMO DE TIPOS DE CONTATO DO BANCO DE DADOS.
     buscarTipoContato = () => {
+        this.setState({ carregando: true });
+
         fetch(this.buscarTipoContatoEndpoint, {
             method: 'GET',
             headers: {
@@ -249,13 +254,22 @@ class Contato extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.setState({ tiposDeContato: data });
-                // console.log(data); // Adicione o console.log aqui
+                const tiposContatoOptions = data.map(item => ({
+                    descricao: item.descricao,
+                    carregando: false,
+                }));
+
+                // console.log(tiposContatoOptions)
+
+                // Adiciona todos os tipos de contato obtidos da API à lista de opções
+                this.setState({ tiposContatoOptions: tiposContatoOptions });
             })
             .catch(error => {
-                console.error('Erro ao buscar as lojas:', error);
+                // console.error(error);
+                this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar os tipos de contato. Por favor, tente novamente mais tarde.' });
             });
     };
+
 
     //POST - MÉTODO PARA INSERIR UM NOVO CONTATO NA API CONTATOS
     cadastraContato = (xmlContato) => {
@@ -808,7 +822,7 @@ class Contato extends React.Component {
     submit = (event) => {
         event.preventDefault();
 
-        //Realiza a validação dos campos obrigatorios.
+        // Realiza a validação dos campos obrigatórios.
         const form = event.currentTarget;
         const isValid = form.checkValidity();
 
@@ -816,68 +830,74 @@ class Contato extends React.Component {
             event.stopPropagation();
             this.setState({ validated: true });
             return;
-        };
+        }
 
         if (isValid === false) {
             event.preventDefault();
-            event.stopPropagation(); // se algum campo obrigatorio nãao for preenchidos o modal é travado
+            event.stopPropagation(); // Se algum campo obrigatório não for preenchido, o modal é travado.
             this.setState({ validated: true });
         } else {
-            // Verifica se o CPF é válido
+            // Verifica se o CPF é válido.
             if (this.validarCPF(this.state.cnpj) || this.validarCNPJ(this.state.cnpj)) {
                 event.preventDefault();
                 this.setState({ validated: false });
 
-                const contato = {};
-                const campos = [
-                    'id',
-                    'nome',
-                    'fantasia',
-                    'tipoPessoa',
-                    'contribuinte',
-                    'cpf_cnpj',
-                    'ie_rg',
-                    'endereco',
-                    'numero',
-                    'complemento',
-                    'bairro',
-                    'cep',
-                    'cidade',
-                    'uf',
-                    'fone',
-                    'celular',
-                    'email',
-                    'obs',
-                    'informacaoContato',
-                    'limiteCredito',
-                    'codigo',
-                    'site',
-                    'descricao',
-                    'sexo',
-                    'situacao',
-                    'emailNfe',
-                    'dataNascimento',
-                    'clienteDesde'
-                ];
+                const tiposContatos = this.state.tiposContatoSelecionados.map(descricao => ({
+                    descricao
+                }));
 
-                campos.forEach(campo => {
-                    if (this.state[campo] !== null && this.state[campo] !== '' && this.state[campo] !== undefined) {
-                        if (campo === 'site') {
-                            // Se o campo for 'site', substitua '<' por '&lt;' na URL
-                            contato[campo] = this.state[campo].replace(/</g, '&lt;');
-                        } else {
-                            contato[campo] = this.state[campo];
-                        }
-                    }
-                });
+                const createXmlNodeIfNotEmpty = (nodeName, value) => {
+                    if (value !== '' && value !== undefined) {
+                        return `<${nodeName}>${value}</${nodeName}>`;
+                    } else {
+                        return '';
+                    };
+                };
 
-                const xmlContato = parse('contato', contato);
-                // console.log(xmlContato);
+                const xml = `<?xml version="1.0"?>
+                <contato>
+                    ${createXmlNodeIfNotEmpty('id', this.state.id)}
+                    ${createXmlNodeIfNotEmpty('nome', this.state.nome)}
+                    ${createXmlNodeIfNotEmpty('fantasia', this.state.fantasia)}
+                    ${createXmlNodeIfNotEmpty('tipoPessoa', this.state.tipoPessoa)}
+                    ${createXmlNodeIfNotEmpty('contribuinte', this.state.contribuinte)}
+                    ${createXmlNodeIfNotEmpty('cpf_cnpj', this.state.cpf_cnpj)}
+                    ${createXmlNodeIfNotEmpty('ie_rg', this.state.ie_rg)}
+                    ${createXmlNodeIfNotEmpty('endereco', this.state.endereco)}
+                    ${createXmlNodeIfNotEmpty('numero', this.state.numero)}
+                    ${createXmlNodeIfNotEmpty('complemento', this.state.complemento)}
+                    ${createXmlNodeIfNotEmpty('bairro', this.state.bairro)}
+                    ${createXmlNodeIfNotEmpty('cep', this.state.cep)}
+                    ${createXmlNodeIfNotEmpty('cidade', this.state.cidade)}
+                    ${createXmlNodeIfNotEmpty('uf', this.state.uf)}
+                    ${createXmlNodeIfNotEmpty('fone', this.state.fone)}
+                    ${createXmlNodeIfNotEmpty('celular', this.state.celular)}
+                    ${createXmlNodeIfNotEmpty('email', this.state.email)}
+                    ${createXmlNodeIfNotEmpty('obs', this.state.obs)}
+                    ${createXmlNodeIfNotEmpty('informacaoContato', this.state.informacaoContato)}
+                    ${createXmlNodeIfNotEmpty('limiteCredito', this.state.limiteCredito)}
+                    ${createXmlNodeIfNotEmpty('codigo', this.state.codigo)}
+                    ${createXmlNodeIfNotEmpty('site', this.state.site)}
+                    ${createXmlNodeIfNotEmpty('descricao', this.state.descricao)}
+                    ${createXmlNodeIfNotEmpty('sexo', this.state.sexo)}
+                    ${createXmlNodeIfNotEmpty('situacao', this.state.situacao)}
+                    ${createXmlNodeIfNotEmpty('emailNfe', this.state.emailNfe)}
+                    ${createXmlNodeIfNotEmpty('dataNascimento', this.state.dataNascimento)}
+                    ${createXmlNodeIfNotEmpty('clienteDesde', this.state.clienteDesde)}
+                    <tipos_contatos>
+                        ${tiposContatos.map(tipo => `
+                        <tipo_contato>
+                            ${createXmlNodeIfNotEmpty('descricao', tipo.descricao)}
+                        </tipo_contato>`).join('')}
+                    </tipos_contatos>
+                </contato>`;
+
+                // console.log(xml);
 
                 if (this.state.id === 0) {
-                    this.cadastraContato(xmlContato)
+                    this.cadastraContato(xml)
                         .then(responseData => {
-                            if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                            if (responseData.data !== '') { // Verifique se a resposta não está vazia.
                                 this.buscarContato();
                                 this.modalSalvarContato();
                                 setTimeout(() => {
@@ -894,9 +914,9 @@ class Contato extends React.Component {
                             this.modalErro();
                         });
                 } else {
-                    this.atualizarContato(xmlContato)
+                    this.atualizarContato(xml)
                         .then(responseData => {
-                            if (responseData.data !== '') { // Verifique se a resposta não está vazia
+                            if (responseData.data !== '') { // Verifique se a resposta não está vazia.
                                 this.buscarContato();
                                 this.modalSalvarContato();
                                 setTimeout(() => {
@@ -915,9 +935,10 @@ class Contato extends React.Component {
                 }
             } else {
                 this.ModalCpfValido();
-            };
-        };
+            }
+        }
     };
+
 
     //-----------------------------------------------------------------------------------------------------------------------|
     //--------------------------------------------- SCRIPT´S DE AÇÃO DOS MODALS. --------------------------------------------|
@@ -962,6 +983,10 @@ class Contato extends React.Component {
         });
     };
 
+    closeModalErro = () => {
+        this.setState({ showModal: false, errorMessage: '' });
+    }
+
     campoBusca = (event) => {
         this.setState({ searchTerm: event.target.value });
     };
@@ -977,27 +1002,31 @@ class Contato extends React.Component {
         this.setState({ selectedListId: contato });
     };
 
-    abrirRenderTelaLista = () => {
-        this.setState({ showRenderTelaLista: true });
-    };
 
+    abrirRenderTelaLista = () => {
+        this.setState({
+            showRenderTelaLista: true
+        });
+    };
 
     render() {
 
         const { selectedListId, showRenderTelaLista, carregando, searchTerm, modalSalvarContato, contatos } = this.state
         const { paginaAtual, totalPaginas } = this.state;
+        const { showModal, errorMessage } = this.state;
+
+        const removeAccents = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
 
         if (showRenderTelaLista) {
             return this.renderTelaLista();
         }
 
         if (selectedListId) {
+            // Se selectedListId estiver definido, renderiza a nova tela
             return this.renderTelaLista();
         }
-
-        const removeAccents = (str) => {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        };
 
         if (carregando) {
             return (
@@ -1007,6 +1036,20 @@ class Contato extends React.Component {
                     </div>
                     <div >
                         <div className="text-loading text-white">Carregando contatos...</div>
+                    </div>
+                    <div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
@@ -1039,7 +1082,7 @@ class Contato extends React.Component {
                     </Container>
                     <div className="table-container-contato">
                         <Container fluid className="pb-5">
-                            <Table id="tabelaContatos" striped bordered hover responsive="xl">
+                            <Table id="tabelaContatos" bordered hover variant="warning" responsive="xl">
                                 <thead>
                                     <tr>
                                         <th title="Identificador">ID</th>
@@ -1064,7 +1107,8 @@ class Contato extends React.Component {
                                                 <tr key={contatos.contato.id}
                                                     onClick={() => {
                                                         this.atualizaContato(contatos.contato.id);
-                                                        this.novaRenderizacao(contatos.contato.id)
+                                                        this.novaRenderizacao(contatos.contato.id);
+                                                        this.buscarTipoContato()
                                                     }}
                                                     onMouseEnter={(e) => e.currentTarget.style.cursor = 'pointer'}
                                                     onMouseLeave={(e) => e.currentTarget.style.cursor = 'default'}>
@@ -1090,16 +1134,12 @@ class Contato extends React.Component {
                             </Table>
                         </Container>
 
-                        <Modal show={modalSalvarContato} onHide={this.modalSalvarContato} centered>
-                            <Modal.Body>
-                                <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
-                            </Modal.Body>
-                        </Modal>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30px' }}>
                         <div>
-                            <Pagination>
+                            <Pagination className="pagination-contato" >
                                 <Pagination.Prev
+                                    className="pagination-prev"
                                     onClick={() => {
                                         this.handleSelecionaPagina(paginaAtual - 1);
                                     }}
@@ -1107,16 +1147,17 @@ class Contato extends React.Component {
                                 />
                                 {[...Array(totalPaginas)].map((_, index) => (
                                     <Pagination.Item
+                                        className="pagination-item"
                                         key={index + 1}
-                                        active={index + 1 === paginaAtual}
                                         onClick={() => {
                                             this.handleSelecionaPagina(index + 1);
                                         }}
                                     >
-                                        {index + 1}
+                                        {"voltar | avançar"}
                                     </Pagination.Item>
                                 ))}
                                 <Pagination.Next
+                                    className="pagination-next"
                                     onClick={() => {
                                         this.handleSelecionaPagina(paginaAtual + 1);
                                     }}
@@ -1125,24 +1166,58 @@ class Contato extends React.Component {
                             </Pagination>
                         </div>
                     </div>
+                    <Modal show={modalSalvarContato} onHide={this.modalSalvarContato} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Salvando contato...</strong></span>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             );
         }
-    }
+    };
+
+    handleTipoContatoChange = (tipoContato) => {
+        const { tiposContatoSelecionados } = this.state;
+        let updatedTiposContatoSelecionados = [...tiposContatoSelecionados];
+
+        if (updatedTiposContatoSelecionados.includes(tipoContato)) {
+            updatedTiposContatoSelecionados = updatedTiposContatoSelecionados.filter(item => item !== tipoContato);
+        } else {
+            updatedTiposContatoSelecionados.push(tipoContato);
+        }
+        // console.log(updatedTiposContatoSelecionados)
+        this.setState({ tiposContatoSelecionados: updatedTiposContatoSelecionados });
+    };
 
     renderTelaLista = () => {
 
-        const { validated, cpfValido, cnpjValido, tiposContato, ModalCpfValido, modalErro, dadosCarregados, modalSalvarContato } = this.state;
+        const { validated, cpfValido, cnpjValido, tiposContato, ModalCpfValido, modalErro, modalSalvarContato, selectedTiposContato, tiposContatoSelecionados, tiposContatoOptions } = this.state;
         const { id, codigo, situacao, nome, fantasia, tipo, cnpj, ie_rg, sexo, contribuinte, limiteCredito, cep, endereco, numero, complemento, bairro, cidade, uf, fone, celular, email, site, dataAlteracao, dataNascimento, clienteDesde } = this.state;
+        const { dadosCarregados, showModal, errorMessage } = this.state;
+
 
         if (!dadosCarregados) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
-                    <div>
+                    <div >
                         <div className="text-loading text-white">Carregando contato...</div>
+                    </div>
+                    <div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
@@ -1502,23 +1577,21 @@ class Contato extends React.Component {
                                 </Col>
                                 <Col xs={12} md={4}>
                                     <Form.Group controlId="tiposContato" className="mb-3 tiposcontato">
-                                        <OverlayTrigger
-                                            placement="bottom"
-                                            overlay={
-                                                <Tooltip id="tiposContatoInfo">
-                                                    Fornecedor verificado: a ciência para as notas emitidas pelo fornecedor com essa tag será automatizada.
-                                                    Fornecedor: Classifica esse contato como fornecedor.
-                                                    Cliente: Classifica esse contato como cliente.
-                                                    Técnico: Classifica esse contato como técnico.
-                                                    Transportador: Classifica esse contato como transportador.
-                                                    Contador: Classifica esse contato como contador.
-                                                </Tooltip>
-                                            }>
-                                            <Form.Label>
-                                                Tipos de contato <BsInfoCircle className="icon-info" />
-                                            </Form.Label>
-                                        </OverlayTrigger>
-                                        <Form.Control as="input" type="text" value={tiposContato.map(item => item.descricao).join(', ')} disabled />
+                                        <Form.Label>
+                                            Tipos de contato <BsInfoCircle className="icon-info" />
+                                        </Form.Label>
+                                        <div>
+                                            {tiposContatoOptions.map(option => (
+                                                <Form.Check
+                                                    key={option.id}
+                                                    type="checkbox"
+                                                    id={`tipoContato-${option.id}`}
+                                                    label={option.descricao}
+                                                    checked={tiposContatoSelecionados.includes(option.descricao)}
+                                                    onChange={() => this.handleTipoContatoChange(option.descricao)}
+                                                />
+                                            ))}
+                                        </div>
                                     </Form.Group>
                                 </Col>
                                 {/* <Col xs={12} md={12}>
@@ -1591,7 +1664,7 @@ class Contato extends React.Component {
                             </Modal>
                         </div>
                     </Form>
-                </Container>
+                </Container >
             )
         }
     }

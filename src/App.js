@@ -61,12 +61,13 @@ class App extends Component {
                         <NavDropdown.Item as={Link} to="/Contato">Clientes e Fornecedores</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/Produto">Produtos</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/ListaPrecos">Lista Preços</NavDropdown.Item>
-                        <NavDropdown.Item as={Link} to="/Loja" >Unidade Loja</NavDropdown.Item>
                       </NavDropdown>
 
                       <NavDropdown title="Vendas" id="nav-dropdown-dark-example" menuVariant="dark">
-                        <NavDropdown.Item as={Link} to="/FrenteCaixa" >Frente de Caixa</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/ControleCaixa" >Controle de Caixa</NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/FrenteCaixa" >Frente de Caixa</NavDropdown.Item>
+                        <NavDropdown.Divider />
+                        <NavDropdown.Item as={Link} to="/Loja" >Unidade Loja</NavDropdown.Item>
                       </NavDropdown>
                     </Nav>
 

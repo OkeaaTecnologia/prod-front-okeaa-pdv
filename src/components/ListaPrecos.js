@@ -61,7 +61,9 @@ class ListaPrecos extends Component {
             produtos: [],
             codigo: 0,
             buscaProduto: '',
-            dadosCarregados: false
+            dadosCarregados: false,
+            showModal: false,
+            errorMessage: ''
         };
 
         // Ambiente Local
@@ -73,25 +75,25 @@ class ListaPrecos extends Component {
         // this.atualizarListaEndpoint = 'http://localhost:8081/api/v1/atualizarLista'
 
         // Ambiente Desenvolvimento
-        // this.buscarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-        // this.buscarListaPrecoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
-        // this.buscarIdListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarLista'
-        // this.deletarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-        // this.cadastrarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
-        // this.atualizarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/atualizarLista'
+        this.buscarProdutosEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produtos'
+        this.buscarListaPrecoEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/selecionarListas'
+        this.buscarIdListaEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/selecionarLista'
+        this.deletarListaEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/deletarLista'
+        this.cadastrarListaEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/adicionarLista'
+        this.atualizarListaEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/atualizarLista'
 
         // Ambiente Produção
-         this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-         this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
-         this.buscarIdListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarLista'
-         this.deletarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-         this.cadastrarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
-         this.atualizarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarLista'
+        // this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+        // this.buscarIdListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarLista'
+        // this.deletarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
+        // this.cadastrarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
+        // this.atualizarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarLista'
     };
 
     async componentDidMount() {
         try {
-            this.buscarListaPreco();
+            await this.buscarListaPreco();
         } catch (error) {
             this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
         }
@@ -100,9 +102,9 @@ class ListaPrecos extends Component {
     //----------------------------------------- API BUSCA LISTAS ----------------------------------------------------------
 
     buscarListaPreco = () => {
-        return new Promise((resolve, reject) => {
-            this.setState({ carregando: true, dadosCarregados: false });
+        this.setState({ carregando: true });
 
+        return new Promise((resolve, reject) => {
             fetch(this.buscarListaPrecoEndpoint, {
                 method: 'GET',
                 headers: {
@@ -112,7 +114,7 @@ class ListaPrecos extends Component {
                 .then(response => response.json())
                 .then(data => {
                     // Assume que data é um array onde cada elemento possui uma propriedade produtoLista
-                    console.log(data);
+                    // console.log(data);
                     if (data) {
                         // Calcula o número de itens em cada lista dentro de cada elemento
                         const numerosDeItens = data.map(item => item.produtoLista.length);
@@ -122,7 +124,7 @@ class ListaPrecos extends Component {
                         const fatorAplicado = primeiraInstancia ? primeiraInstancia.fatorAplicado : undefined;
                         const baseado = primeiraInstancia ? primeiraInstancia.baseado : undefined;
 
-                        console.log(numerosDeItens, fatorAplicado, baseado)
+                        // console.log(numerosDeItens, fatorAplicado, baseado)
 
                         this.setState({
                             listaspreco: data,
@@ -132,21 +134,13 @@ class ListaPrecos extends Component {
                             carregando: false,
                             dadosCarregados: true,
                         });
-                    } else {
-                        resolve();
-                        this.setState({ carregando: false });
                     }
+                    resolve();
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar as lojas:', error);
-                    reject(error);
-                    this.setState({
-                        nomeListas: [],
-                        listaspreco: [],
-                        numerosDeItens: [],
-                        carregando: false,
-                        dadosCarregados: false
-                    });
+                    // console.error('Erro ao buscar contatos:', error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar listas de preços. Por favor, tente novamente mais tarde.' });
+                    reject('API lista preço fora do ar');
                 });
         })
     };
@@ -154,9 +148,9 @@ class ListaPrecos extends Component {
     //----------------------------------------- API BUSCA IDLISTA ----------------------------------------------------------
 
     buscarIdLista = (idLista) => {
-        return new Promise((resolve, reject) => {
-            this.setState({ carregando: true, dadosCarregados: false });
+        this.setState({ carregando: true, dadosCarregados: false });
 
+        return new Promise((resolve, reject) => {
             fetch(`${this.buscarIdListaEndpoint}/${idLista}`)
                 .then(response => response.json())
                 .then(data => {
@@ -173,7 +167,7 @@ class ListaPrecos extends Component {
                     if (idLista !== undefined) {
                         const produtoLista = data.produtoLista;
 
-                        console.log("nome lista: ", nomeLista);
+                        // console.log("nome lista: ", nomeLista);
 
                         // Certifique-se de limpar a lista antes de adicionar novos produtos
                         const produtosSelecionados = produtoLista.map((produto) => ({
@@ -195,118 +189,35 @@ class ListaPrecos extends Component {
                             tipoLista: tipoLista,
                             produtoLista: produtoLista,
                             produtosSelecionados: produtosSelecionados,
+                            carregando: false,
                             dadosCarregados: true,
                         });
 
                         if (produtoLista && produtoLista.length > 0) {
-                            console.log('Produto Lista encontrada:', produtoLista[0]);
+                            // console.log('Produto Lista encontrada:', produtoLista[0]);
 
                             // Caso a loja seja encontrada, você pode atualizar o estado com a loja encontrada
                             this.setState({ listaEncontrada: produtoLista[0] });
                         } else {
-                            console.log('Lista não encontrada.');
+                            // console.log('Lista não encontrada.');
                             // Caso a loja não seja encontrada, você pode mostrar uma mensagem de erro ou fazer alguma outra tratativa
                         }
                     }
                     resolve();
-                    this.setState({ carregando: false });
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar a loja:', error);
-                    reject(error);
-                    this.setState({ carregando: false, dadosCarregados: false });
+                    // console.error(error);
+                    this.setState({ carregando: true, showModal: false, dadosCarregados: false, errorMessage: 'Erro ao buscar lista de preço. Por favor, tente novamente mais tarde.' });
+                    reject('API buscar id lista preço fora do ar');
                 });
         })
     };
 
     //----------------------------------------- API BUSCA PRODUTOS ----------------------------------------------------------
 
-    // buscarProdutos = (value) => {
-    //     return new Promise((resolve, reject) => {
-    //         this.setState({ buscaProduto: value, carregando: false, produtoNaoLocalizado: false });
-
-    //         fetch(this.buscarProdutosEndpoint)
-
-    //             .then((resposta) => {
-    //                 if (!resposta.ok) {
-    //                     throw new Error('Erro na chamada da API');
-    //                 }
-    //                 return resposta.json();
-    //             })
-    //             .then((dados) => {
-    //                 console.log("Produto: ", dados)
-    //                 if (dados.retorno.produtos) {
-    //                     const palavrasBusca = value.toLowerCase().split(' ');
-    //                     const produto = dados.retorno.produtos[0].produto;
-
-    //                     const produtosFiltrados = dados.retorno.produtos.filter((produto) => {
-    //                         const descricao = this.normalizeString(produto.produto.descricao || '').toLowerCase();
-    //                         const codigo = this.normalizeString(produto.produto.codigo || '').toLowerCase();
-    //                         const gtin = this.normalizeString(produto.produto.gtin || '').toLowerCase();
-    //                         const gtinEmbalagem = this.normalizeString(produto.produto.gtinEmbalagem || '').toLowerCase();
-    //                         const descricaoFornecedor = this.normalizeString(produto.produto.descricaoFornecedor || '').toLowerCase();
-    //                         const nomeFornecedor = this.normalizeString(produto.produto.nomeFornecedor || '').toLowerCase();
-    //                         const codigoFabricante = this.normalizeString(produto.produto.codigoFabricante || '').toLowerCase();
-
-    //                         return palavrasBusca.every((palavra) =>
-    //                             descricao.includes(palavra) ||
-    //                             codigo.includes(palavra) ||
-    //                             gtin.includes(palavra) ||
-    //                             gtinEmbalagem.includes(palavra) ||
-    //                             descricaoFornecedor.includes(palavra) ||
-    //                             nomeFornecedor.includes(palavra) ||
-    //                             codigoFabricante.includes(palavra)
-    //                         );
-    //                     });
-
-    //                     this.setState({
-    //                         preco: parseFloat(produto.preco).toFixed(2) || '',
-    //                         precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
-    //                     });
-
-    //                     if (produtosFiltrados.length === 0) {
-    //                         // Nenhum produto encontrado
-    //                         this.setState({
-    //                             produtos: [],
-    //                             produtoSelecionado: null,
-    //                             carregando: false,
-    //                             produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
-    //                         });
-    //                     } else {
-    //                         // Produtos encontrados
-    //                         this.setState({
-    //                             produtos: produtosFiltrados,
-    //                             produtoSelecionado: null,
-    //                             carregando: false,
-    //                             produtoNaoLocalizado: false // Reinicie a variável para false caso tenha sido setada anteriormente
-    //                         });
-    //                     }
-    //                 } else {
-    //                     // Nenhum produto encontrado
-    //                     this.setState({
-    //                         produtos: [],
-    //                         carregando: false,
-    //                         produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
-    //                     });
-    //                 }
-    //                 resolve();
-    //             })
-    //             .catch((error) => {
-    //                 this.setState({
-    //                     produtos: [],
-    //                     carregando: false,
-    //                     produtoNaoLocalizado: true // Adicione essa variável de estado para controlar se o produto não foi localizado
-    //                 });
-    //                 reject(error);
-    //             });
-    //     });
-    // };
-
-    // normalizeString = (str) => {
-    //     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    // };
-
     buscarProdutos = (value) => {
+        this.setState({ carregando: true, dadosCarregados: false });
+
         return new Promise((resolve, reject) => {
             const sanitizedValue = this.normalizeString(value).toLowerCase();
             let endpoint = this.buscarProdutosEndpoint;
@@ -348,6 +259,7 @@ class ListaPrecos extends Component {
                                 produtos: [],
                                 produtoSelecionado: null,
                                 carregando: false,
+                                dadosCarregados: true,
                                 produtoNaoLocalizado: true
                             });
                         } else {
@@ -356,6 +268,7 @@ class ListaPrecos extends Component {
                                 produtos: produtosFiltrados,
                                 produtoSelecionado: null,
                                 carregando: false,
+                                dadosCarregados: true,
                                 produtoNaoLocalizado: false
                             });
                         }
@@ -364,19 +277,15 @@ class ListaPrecos extends Component {
                         this.setState({
                             produtos: [],
                             carregando: false,
+                            dadosCarregados: true,
                             produtoNaoLocalizado: true
                         });
                     }
                     resolve();
                 })
                 .catch((error) => {
-                    this.setState({
-                        produtos: [],
-                        carregando: false,
-                        produtoNaoLocalizado: true
-                    });
-                    reject(error);
-                    this.setState({ carregando: false });
+                    reject('API buscar produtos fora do ar');
+                    this.setState({ carregando: false, dadosCarregados: false, showModal: true, errorMessage: 'Erro ao buscar produtos. Por favor, tente novamente mais tarde.' });
                 });
         });
     };
@@ -388,7 +297,7 @@ class ListaPrecos extends Component {
 
         const normalizedString = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-        console.log(`Original: ${str}, Normalized: ${normalizedString}`);
+        // console.log(`Original: ${str}, Normalized: ${normalizedString}`);
 
         return normalizedString;
     };
@@ -404,9 +313,15 @@ class ListaPrecos extends Component {
         })
             .then(response => {
                 return response.status; // Retorna o código de status HTTP
+            })
+            .catch(error => {
+                // console.error('Erro ao deletar a loja:', error);
+                this.setState({ showModal: true, errorMessage: 'Erro ao deletar lista de preço. Por favor, tente novamente mais tarde.' });
             });
-        console.log(statusCode)
+
+        // console.log(statusCode)
         return statusCode;
+
     };
 
     //----------------------------------------- API CADASTRAR LISTA ----------------------------------------------------------
@@ -430,8 +345,8 @@ class ListaPrecos extends Component {
                 };
 
                 // Registre o status e os dados no console
-                console.log('Status da API externa:', statusCode);
-                console.log('Dados da resposta:', data);
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
 
                 // Retorna a resposta, incluindo o status da API externa
                 return responseData;
@@ -461,8 +376,8 @@ class ListaPrecos extends Component {
                 };
 
                 // Registre o status e os dados no console
-                console.log('Status da API externa:', statusCode);
-                console.log('Dados da resposta:', data);
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
 
                 // Retorna a resposta, incluindo o status da API externa
                 return responseData;
@@ -590,7 +505,7 @@ class ListaPrecos extends Component {
 
     atualizanomeLista = (event) => {
         const nomeLista = event.target.value;
-        console.log('nomeLista: ', nomeLista);
+        // console.log('nomeLista: ', nomeLista);
         this.setState({
             nomeLista: nomeLista
         });
@@ -598,7 +513,7 @@ class ListaPrecos extends Component {
 
     atualizafatorAplicado = (event) => {
         const fatorAplicado = event.target.value;
-        console.log('fatorAplicado: ', fatorAplicado);
+        // console.log('fatorAplicado: ', fatorAplicado);
         this.setState({
             fatorAplicado: fatorAplicado
         });
@@ -606,7 +521,7 @@ class ListaPrecos extends Component {
 
     atualizaBaseado = (event) => {
         const baseado = event.target.value;
-        console.log('baseado: ', baseado);
+        // console.log('baseado: ', baseado);
         this.setState({
             baseado: baseado
         });
@@ -614,7 +529,7 @@ class ListaPrecos extends Component {
 
     atualizaRegraLista = (event) => {
         const regraLista = event.target.value;
-        console.log('regraLista: ', regraLista);
+        // console.log('regraLista: ', regraLista);
         this.setState({
             regraLista: regraLista
         });
@@ -682,7 +597,7 @@ class ListaPrecos extends Component {
 
         const listaPrecoResponse = JSON.stringify(lista);
 
-        console.log(listaPrecoResponse);
+        // console.log(listaPrecoResponse);
 
         if (this.state.idLista === '') {
             this.cadastrarLista(listaPrecoResponse)
@@ -779,6 +694,11 @@ class ListaPrecos extends Component {
         });
     };
 
+    closeModalErro = () => {
+        this.setState({ showModal: false, errorMessage: '' });
+    }
+
+
     campoBusca = (event) => {
         this.setState({ searchTerm: event.target.value });
     };
@@ -789,7 +709,8 @@ class ListaPrecos extends Component {
 
     render() {
 
-        const { carregando, listaspreco, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens } = this.state;
+        const { listaspreco, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens } = this.state;
+        const { carregando, showModal, errorMessage } = this.state;
 
         const removeAccents = (str) => {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -802,12 +723,26 @@ class ListaPrecos extends Component {
 
         if (carregando) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
+                    <div >
+                        <div className="text-loading text-white">Carregando listas preços...</div>
+                    </div>
                     <div>
-                        <div className="text-loading text-white">Carregando lista de preços...</div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
@@ -843,7 +778,7 @@ class ListaPrecos extends Component {
                     </Container >
                     <div className="table-container-produto">
                         <Container fluid className="pb-5">
-                            <Table striped bordered hover responsive="xl">
+                            <Table bordered hover variant="warning" responsive="xl">
                                 <thead>
                                     <tr>
                                         <th title="Nome da lista">Nome da lista</th>
@@ -1053,236 +988,263 @@ class ListaPrecos extends Component {
     }
 
     renderTelaLista = () => {
-
         const { produtos, produtoSelecionado, buscaProduto, produtoNaoLocalizado, codigo, preco, imagem, regraLista, tipoLista, baseado, fatorAplicado, nomeLista } = this.state;
+        const { carregando, showModal, errorMessage } = this.state;
 
-        return (
+        if (carregando) {
+            return (
+                <div className="spinner-container">
+                    <div className="d-flex align-items-center justify-content-center">
+                        <div className="custom-loader"></div>
+                    </div>
+                    <div >
+                        <div className="text-loading text-white">Carregando lista de preços...</div>
+                    </div>
+                    <div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </div>
+                </div>
+            )
+        } else {
+            return (
 
-            <Container fluid className="pb-5" >
-                <div className="grid-cadastro-listapreco">
-                    <Row className="row align-items-center mb-3">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <span className="mb-3" style={{ fontWeight: 'bold', color: 'gray', fontSize: '1.9rem', fontStyle: 'italic' }}>{nomeLista}</span>
-                            <Form.Group controlId="buttonSalvar" className="mb-3">
-                                <div className="button-container d-flex">
-                                    <button
-                                        type="submit"
-                                        onClick={() => this.submit()}
-                                        className="botao-cadastro-produto"
-                                    >
-                                        Salvar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => this.novaRenderizacao()}
-                                        className="botao-cancelar-produto"
-                                    >
-                                        Cancelar
-                                    </button>
-                                </div>
-                            </Form.Group>
-                        </div>
-                        <Row className="row align-items-center">
-                            <div className="row">
-                                <Col>
-                                    <div className="col-md-5" style={{ marginRight: '10px', display: 'inline-block' }}>
-                                        <h4>Tipo Lista</h4>
-                                        <strong>{tipoLista}</strong>
+                <Container fluid className="pb-5" >
+                    <div className="grid-cadastro-listapreco">
+                        <Row className="row align-items-center mb-3">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <span className="mb-3" style={{ fontWeight: 'bold', color: 'gray', fontSize: '1.9rem', fontStyle: 'italic' }}>{nomeLista}</span>
+                                <Form.Group controlId="buttonSalvar" className="mb-3">
+                                    <div className="button-container d-flex">
+                                        <button
+                                            type="submit"
+                                            onClick={() => this.submit()}
+                                            className="botao-cadastro-produto"
+                                        >
+                                            Salvar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => this.novaRenderizacao()}
+                                            className="botao-cancelar-produto"
+                                        >
+                                            Cancelar
+                                        </button>
                                     </div>
-                                </Col>
-                                <Col>
-                                    <div className="col-md-5" style={{ marginRight: '10px', display: 'inline-block' }}>
-                                        <h4>Baseado em:</h4>
-                                        <strong>{baseado}</strong>
-                                    </div>
-                                </Col>
-                                <Col>
-                                    <div className="col-md-5" style={{ display: 'inline-block' }}>
-                                        <h4>Fator a ser aplicado</h4>
-                                        <strong>
-                                            {regraLista === 'Desconto' && baseado === 'Porcentagem' ? `- ${fatorAplicado} %` : ''}
-                                            {regraLista === 'Desconto' && baseado === 'Valor' ? `- R$ ${fatorAplicado}` : ''}
-                                            {regraLista !== 'Desconto' && baseado === 'Porcentagem' ? `${fatorAplicado} %` : ''}
-                                            {regraLista !== 'Desconto' && baseado === 'Valor' ? `R$ ${fatorAplicado}` : ''}
-                                        </strong>
-                                    </div>
-                                </Col>
+                                </Form.Group>
                             </div>
+                            <Row className="row align-items-center">
+                                <div className="row">
+                                    <Col>
+                                        <div className="col-md-5" style={{ marginRight: '10px', display: 'inline-block' }}>
+                                            <h4>Tipo Lista</h4>
+                                            <strong>{tipoLista}</strong>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        <div className="col-md-5" style={{ marginRight: '10px', display: 'inline-block' }}>
+                                            <h4>Baseado em:</h4>
+                                            <strong>{baseado}</strong>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        <div className="col-md-5" style={{ display: 'inline-block' }}>
+                                            <h4>Fator a ser aplicado</h4>
+                                            <strong>
+                                                {regraLista === 'Desconto' && baseado === 'Porcentagem' ? `- ${fatorAplicado} %` : ''}
+                                                {regraLista === 'Desconto' && baseado === 'Valor' ? `- R$ ${fatorAplicado}` : ''}
+                                                {regraLista !== 'Desconto' && baseado === 'Porcentagem' ? `${fatorAplicado} %` : ''}
+                                                {regraLista !== 'Desconto' && baseado === 'Valor' ? `R$ ${fatorAplicado}` : ''}
+                                            </strong>
+                                        </div>
+                                    </Col>
+                                </div>
+                            </Row>
                         </Row>
-                    </Row>
-                    <Row className="row align-items-center">
-                        <Col xs={6}>
-                            <Form.Label htmlFor="produto" className="texto-campos">Adicionar produto</Form.Label>
-                            <Form.Group className="mb-3">
-                                <InputGroup>
-                                    <Form.Control type="text" className="form-control" placeholder="Busque um produto pelo (Nome ou Código ou SKU ou EAN ou Descrição/Nome Fornecedor)" value={buscaProduto || ''} onChange={this.atualizarBuscaProduto}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault(); // Evita o comportamento padrão de submit do formulário
-                                                if (buscaProduto) {
-                                                    this.buscarProdutos(buscaProduto); // Chame a função de busca aqui
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    <Button variant="secondary" onClick={() => { if (buscaProduto) { this.buscarProdutos(buscaProduto) } }}>
-                                        <FontAwesomeIcon icon={faSearch} />
-                                    </Button>
-                                </InputGroup>
-                            </Form.Group>
-                        </Col>
-                    </Row>
-
-                    {produtos.map((produto) => {
-
-                        const precoFormatado = parseFloat(produto.produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-
-                        return (
-                            <ul className="lista-produtos">
-                                <li
-                                    key={produto.produto.id}
-                                    onClick={() => this.selecionarProduto(produto)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            this.selecionarProduto(produto);
-                                        }
-                                    }}
-                                    tabIndex={0}
-                                >
-                                    Cód: {produto.produto.codigo} Produto: {produto.produto.descricao} - Preço R$ {precoFormatado}
-                                </li>
-                            </ul>
-                        );
-                    })}
-                    {produtoNaoLocalizado && (
                         <Row className="row align-items-center">
-                            <Col className="col" xs={4}>
-                                <Alert variant="danger">
-                                    <p><BsXCircle style={{ marginRight: '0.5rem', marginBottom: '-1px' }} />
-                                        Produto não localizado.</p>
-                                </Alert>
+                            <Col xs={6}>
+                                <Form.Label htmlFor="produto" className="texto-campos">Adicionar produto</Form.Label>
+                                <Form.Group className="mb-3">
+                                    <InputGroup>
+                                        <Form.Control type="text" className="form-control" placeholder="Busque um produto pelo (Nome ou Código ou SKU ou EAN ou Descrição/Nome Fornecedor)" value={buscaProduto || ''} onChange={this.atualizarBuscaProduto}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault(); // Evita o comportamento padrão de submit do formulário
+                                                    if (buscaProduto) {
+                                                        this.buscarProdutos(buscaProduto); // Chame a função de busca aqui
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <Button variant="secondary" onClick={() => { if (buscaProduto) { this.buscarProdutos(buscaProduto) } }}>
+                                            <FontAwesomeIcon icon={faSearch} />
+                                        </Button>
+                                    </InputGroup>
+                                </Form.Group>
                             </Col>
                         </Row>
-                    )}
-                    {produtoSelecionado && (
-                        <div className="produto-selecionado">
-                            <div className="d-flex justify-content-end mb-2">
-                                <CloseButton
-                                    onClick={() => this.setState({ produtoSelecionado: null })}
-                                    className="close-button"
-                                />
-                            </div>
-                            <h2>Nome do Produto: </h2>
-                            <h2>{produtoSelecionado.produto.descricao}</h2>
-                            <Row className="row">
-                                <Col className="col">
-                                    <Form.Group className="mb-3">
-                                        <Row>
-                                            <Col>
-                                                {imagem ? (
-                                                    <Image src={imagem} className="imagem-preview" style={{ width: '171px', height: '180px' }} rounded />
-                                                ) : (
-                                                    <Image src="https://www.bling.com.br/images/imagePdv.svg" className="imagem-preview" style={{ width: '171px', height: '180px' }} rounded />
-                                                )}
-                                            </Col>
-                                        </Row>
-                                    </Form.Group>
-                                </Col>
-                                <Col className="col">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label htmlFor="preco" className="texto-campos">Preço no sistema:</Form.Label>
-                                        <Form.Control type="number" id="preco" className="form-control no-spinners" name="preco" placeholder="00,00" value={preco || ''} readOnly />
-                                    </Form.Group>
-                                </Col>
-                                <Col className="col">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label htmlFor="valorTotal" className="texto-campos">SKU</Form.Label>
-                                        <Form.Control type="text" id="valorTotal" className="form-control" name="valorTotal" placeholder="00,00" value={codigo || ''} readOnly />
-                                    </Form.Group>
+
+                        {produtos.map((produto) => {
+
+                            const precoFormatado = parseFloat(produto.produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                            return (
+                                <ul className="lista-produtos">
+                                    <li
+                                        key={produto.produto.id}
+                                        onClick={() => this.selecionarProduto(produto)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                this.selecionarProduto(produto);
+                                            }
+                                        }}
+                                        tabIndex={0}
+                                    >
+                                        Cód: {produto.produto.codigo} Produto: {produto.produto.descricao} - Preço R$ {precoFormatado}
+                                    </li>
+                                </ul>
+                            );
+                        })}
+                        {produtoNaoLocalizado && (
+                            <Row className="row align-items-center">
+                                <Col className="col" xs={4}>
+                                    <Alert variant="danger">
+                                        <p><BsXCircle style={{ marginRight: '0.5rem', marginBottom: '-1px' }} />
+                                            Produto não localizado.</p>
+                                    </Alert>
                                 </Col>
                             </Row>
-                            <div className="text-end">
-                                <Button variant="secondary" onClick={() => this.adicionarProdutoSelecionado(produtoSelecionado)}>
-                                    <BsListCheck style={{ marginRight: '0.5rem' }} />
-                                    Inserir produto
-                                </Button>
+                        )}
+                        {produtoSelecionado && (
+                            <div className="produto-selecionado">
+                                <div className="d-flex justify-content-end mb-2">
+                                    <CloseButton
+                                        onClick={() => this.setState({ produtoSelecionado: null })}
+                                        className="close-button"
+                                    />
+                                </div>
+                                <h2>Nome do Produto: </h2>
+                                <h2>{produtoSelecionado.produto.descricao}</h2>
+                                <Row className="row">
+                                    <Col className="col">
+                                        <Form.Group className="mb-3">
+                                            <Row>
+                                                <Col>
+                                                    {imagem ? (
+                                                        <Image src={imagem} className="imagem-preview" style={{ width: '171px', height: '180px' }} rounded />
+                                                    ) : (
+                                                        <Image src="https://www.bling.com.br/images/imagePdv.svg" className="imagem-preview" style={{ width: '171px', height: '180px' }} rounded />
+                                                    )}
+                                                </Col>
+                                            </Row>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col className="col">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label htmlFor="preco" className="texto-campos">Preço no sistema:</Form.Label>
+                                            <Form.Control type="number" id="preco" className="form-control no-spinners" name="preco" placeholder="00,00" value={preco || ''} readOnly />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col className="col">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label htmlFor="valorTotal" className="texto-campos">SKU</Form.Label>
+                                            <Form.Control type="text" id="valorTotal" className="form-control" name="valorTotal" placeholder="00,00" value={codigo || ''} readOnly />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <div className="text-end">
+                                    <Button variant="secondary" onClick={() => this.adicionarProdutoSelecionado(produtoSelecionado)}>
+                                        <BsListCheck style={{ marginRight: '0.5rem' }} />
+                                        Inserir produto
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    <div className="table-container-produto row align-items-center">
-                        <Container fluid className="pb-5">
-                            <Table striped bordered hover responsive="xl" value>
-                                <thead>
-                                    <tr>
-                                        <th>Produto</th>
-                                        <th>SKU</th>
-                                        <th>EAN</th>
-                                        <th>R$ Preço no Bling</th>
-                                        <th>Fator</th>
-                                        <th>R$ Preço da lista</th>
-                                        <th>Opções</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.state.produtosSelecionados.map((produto, index) => (
-                                        <tr key={index}>
-                                            <td>{produto.produto.descricao}</td>
-                                            <td>{produto.produto.codigo}</td>
-                                            <td>{produto.produto.gtin}</td>
-                                            <td style={{ color: '#363636', fontWeight: 'bold' }}>R$ {produto.preco}</td>
-                                            <td>
-                                                {regraLista === 'Desconto' && baseado === 'Porcentagem' ? `- ${parseFloat(fatorAplicado).toFixed(2)} %` : ''}
-                                                {regraLista === 'Desconto' && baseado === 'Valor' ? `- R$ ${parseFloat(fatorAplicado).toFixed(2)}` : ''}
-                                                {regraLista !== 'Desconto' && baseado === 'Porcentagem' ? `${parseFloat(fatorAplicado).toFixed(2)} %` : ''}
-                                                {regraLista !== 'Desconto' && baseado === 'Valor' ? `R$ ${parseFloat(fatorAplicado).toFixed(2)}` : ''}
-                                            </td>
-                                            <td style={{ color: '#483D8B', fontWeight: 'bold' }}>R$ {parseFloat(produto.precoLista).toFixed(2)}</td>
-                                            <td>
-                                                <Button variant="light" title="Excluir produto" className="transparent-button" onClick={() => this.excluirProdutoSelecionado(index)}>
-                                                    <BsTrashFill className="red-icon" />
-                                                </Button>
-                                            </td>
+                        <div className="table-container-produto row align-items-center">
+                            <Container fluid className="pb-5">
+                                <Table striped bordered hover responsive="xl" value>
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>SKU</th>
+                                            <th>EAN</th>
+                                            <th>R$ Preço no Bling</th>
+                                            <th>Fator</th>
+                                            <th>R$ Preço da lista</th>
+                                            <th>Opções</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        </Container>
-                    </div>
+                                    </thead>
+                                    <tbody>
+                                        {this.state.produtosSelecionados.map((produto, index) => (
+                                            <tr key={index}>
+                                                <td>{produto.produto.descricao}</td>
+                                                <td>{produto.produto.codigo}</td>
+                                                <td>{produto.produto.gtin}</td>
+                                                <td style={{ color: '#363636', fontWeight: 'bold' }}>R$ {produto.preco}</td>
+                                                <td>
+                                                    {regraLista === 'Desconto' && baseado === 'Porcentagem' ? `- ${parseFloat(fatorAplicado).toFixed(2)} %` : ''}
+                                                    {regraLista === 'Desconto' && baseado === 'Valor' ? `- R$ ${parseFloat(fatorAplicado).toFixed(2)}` : ''}
+                                                    {regraLista !== 'Desconto' && baseado === 'Porcentagem' ? `${parseFloat(fatorAplicado).toFixed(2)} %` : ''}
+                                                    {regraLista !== 'Desconto' && baseado === 'Valor' ? `R$ ${parseFloat(fatorAplicado).toFixed(2)}` : ''}
+                                                </td>
+                                                <td style={{ color: '#483D8B', fontWeight: 'bold' }}>R$ {parseFloat(produto.precoLista).toFixed(2)}</td>
+                                                <td>
+                                                    <Button variant="light" title="Excluir produto" className="transparent-button" onClick={() => this.excluirProdutoSelecionado(index)}>
+                                                        <BsTrashFill className="red-icon" />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </Container>
+                        </div>
 
-                    <Modal show={this.state.modalExcluirProduto} onHide={this.modalExcluirProduto} centered>
-                        <Modal.Header closeButton className="bg-warning text-white">
-                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
-                            <Modal.Title>Atenção </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body style={{ padding: '20px' }}>
-                            Deseja excluir o produto? Essa ação não poderá ser desfeita.
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>Não</Button>
-                            <Button variant="secondary" onClick={this.deleteProduto}>Sim</Button>
-                        </Modal.Footer>
-                    </Modal>
+                        <Modal show={this.state.modalExcluirProduto} onHide={this.modalExcluirProduto} centered>
+                            <Modal.Header closeButton className="bg-warning text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                                <Modal.Title>Atenção </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body style={{ padding: '20px' }}>
+                                Deseja excluir o produto? Essa ação não poderá ser desfeita.
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>Não</Button>
+                                <Button variant="secondary" onClick={this.deleteProduto}>Sim</Button>
+                            </Modal.Footer>
+                        </Modal>
 
-                    <Modal show={this.state.modalProdutoExistente} onHide={this.modalProdutoExistente} centered>
-                        <Modal.Header closeButton className="bg-warning text-white">
-                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
-                            <Modal.Title>Atenção </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            Este produto Cód: {codigo} encontra-se na lista, adicione outro produto.
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={this.modalProdutoExistente}>
-                                Fechar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                </div >
-            </Container >
-        );
-    };
+                        <Modal show={this.state.modalProdutoExistente} onHide={this.modalProdutoExistente} centered>
+                            <Modal.Header closeButton className="bg-warning text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                                <Modal.Title>Atenção </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                Este produto Cód: {codigo} encontra-se na lista, adicione outro produto.
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.modalProdutoExistente}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    </div >
+                </Container >
+            );
+        };
+    }
 }
 
 export default ListaPrecos;

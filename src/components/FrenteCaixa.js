@@ -205,30 +205,30 @@ class FrenteCaixa extends React.Component {
 
 
         // Ambiente Desenvolvimento
-        // this.buscarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-        // this.buscarListaPrecoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
-        // this.buscarContatoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        // this.buscarVendedorEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-        // this.buscarPedidoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos'
-        // this.buscarFormaDePagamentoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
-        // this.buscarLojaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
-        // this.cadastrarPedidoEndpoint = 'hhttps://dev-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido'
-        // this.buscarListasCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
-        // this.buscarIdListaCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
-        // this.cadastrarListaCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
+        this.buscarProdutosEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produtos'
+        this.buscarListaPrecoEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/selecionarListas'
+        this.buscarContatoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/contatos'
+        this.buscarVendedorEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/contatos'
+        this.buscarPedidoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/pedidos'
+        this.buscarFormaDePagamentoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/formaspagamento'
+        this.buscarLojaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/selecionarLojas'
+        this.cadastrarPedidoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/cadastrarpedido'
+        this.buscarListasCaixaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/controleCaixas'
+        this.buscarIdListaCaixaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/controleCaixa'
+        this.cadastrarListaCaixaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/adicionarControleCaixa'
 
-         // Ambiente Produção
-         this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-         this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
-         this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-         this.buscarVendedorEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
-         this.buscarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos'
-         this.buscarFormaDePagamentoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
-         this.buscarLojaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
-         this.cadastrarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido'
-         this.buscarListasCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
-         this.buscarIdListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
-         this.cadastrarListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
+        // // Ambiente Produção
+        // this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+        // this.buscarListaPrecoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/selecionarListas'
+        // this.buscarContatoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.buscarVendedorEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/contatos'
+        // this.buscarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/pedidos'
+        // this.buscarFormaDePagamentoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
+        // this.buscarLojaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
+        // this.cadastrarPedidoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/cadastrarpedido'
+        // this.buscarListasCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
+        // this.buscarIdListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
+        // this.cadastrarListaCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
 
     };
 
@@ -326,8 +326,6 @@ class FrenteCaixa extends React.Component {
             this.buscarFormaDePagamento()
             this.buscarPedido()
             this.buscarListaPreco();
-
-            this.setState({ carregado: true }); //APAGAR (GAMBIARRA)
         } catch (error) {
             this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
         }
@@ -437,7 +435,7 @@ class FrenteCaixa extends React.Component {
     // };
 
 
-    buscarProdutos = (value) => {
+    buscarProdutos = async (value) => {
         return new Promise((resolve, reject) => {
             const sanitizedValue = this.normalizeString(value).toLowerCase();
             let endpoint = this.buscarProdutosEndpoint;
@@ -456,7 +454,7 @@ class FrenteCaixa extends React.Component {
             } else {
                 // Caso nenhum dos casos anteriores se aplique, você pode lidar com a situação conforme necessário
                 // Por exemplo, lançar um erro, definir um valor padrão, etc.
-                console.error("Entrada inválida. Pelo menos um dos parâmetros (código, GTIN, descrição) deve ser fornecido.");
+                // console.error("Entrada inválida. Pelo menos um dos parâmetros (código, GTIN, descrição) deve ser fornecido.");
                 reject(new Error("Entrada inválida"));
                 return;
             }
@@ -506,7 +504,7 @@ class FrenteCaixa extends React.Component {
                         carregando: false,
                         produtoNaoLocalizado: true
                     });
-                    reject(error);
+                    reject('API produtos fora do ar');
                 });
         });
     };
@@ -624,7 +622,7 @@ class FrenteCaixa extends React.Component {
                         carregando: false,
                         contatoNaoLocalizado: true
                     });
-                    reject(error);
+                    reject('API contatos fora do ar');
                 });
         });
     };
@@ -711,7 +709,7 @@ class FrenteCaixa extends React.Component {
                         carregando: false,
                         vendedorNaoLocalizado: true
                     });
-                    reject(error);
+                    reject('API contatos (vendedor) fora do ar');
                 });
         });
     };
@@ -755,7 +753,7 @@ class FrenteCaixa extends React.Component {
 
     //----------------------------------------- API BUSCA PEDIDO ----------------------------------------------------------
 
-    buscarPedido = (value) => {
+    buscarPedido = async (value) => {
         return new Promise((resolve, reject) => {
             this.setState({ buscaPedido: value, carregando: true });
 
@@ -792,23 +790,18 @@ class FrenteCaixa extends React.Component {
                         pedidos: [],
                         carregando: false,
                     });
-                    reject(error); // Rejeite a Promise se ocorrer um erro na chamada da API
+                    reject('API pedidos fora do ar');
                 });
         });
     };
 
     //----------------------------------------- API BUSCA FORMA DE PAGAMENTO ----------------------------------------------------------
 
-    buscarFormaDePagamento = () => {
+    buscarFormaDePagamento = async () => {
         return new Promise((resolve, reject) => {
 
             fetch(this.buscarFormaDePagamentoEndpoint)
-                .then((resposta) => {
-                    if (!resposta.ok) {
-                        throw new Error("Erro na chamada da API");
-                    }
-                    return resposta.json();
-                })
+                .then((resposta) => resposta.json())
                 .then((dados) => {
                     if (dados.retorno.formaspagamento) {
                         // console.log("Forma de pagamento objeto retornado:", dados);
@@ -831,23 +824,18 @@ class FrenteCaixa extends React.Component {
                         formaspagamento: [],
                         carregando: false,
                     });
-                    reject(error); // Rejeite a Promise se ocorrer um erro na chamada da API
+                    reject('API forma de pagamento fora do ar');
                 });
         });
     };
 
     //----------------------------------------- API BUSCA LOJA ----------------------------------------------------------
 
-    buscarLoja = () => {
+    buscarLoja = async () => {
         return new Promise((resolve, reject) => {
             // Primeiro fetch para buscar os dados da loja
             fetch(this.buscarLojaEndpoint)
-                .then((resposta) => {
-                    if (!resposta.ok) {
-                        throw new Error("Erro na chamada da API");
-                    }
-                    return resposta.json();
-                })
+                .then((resposta) => resposta.json())
                 .then((dados) => {
                     // console.log('Fetch 1', dados)
 
@@ -895,13 +883,12 @@ class FrenteCaixa extends React.Component {
                                         carregando: false,
                                     });
                                 }
+                                resolve();
                             })
                             .catch(error => {
-                                // Trate os erros do segundo fetch aqui
-                                console.error('Erro ao buscar as listas de caixa:', error);
-                                this.setState({
-                                    carregando: false,
-                                });
+                                // console.error('Erro ao buscar as listas de caixa:', error);
+                                this.setState({ carregando: false });
+                                reject('API seleciona loja fora do ar');
                             });
                     } else {
                         this.setState({
@@ -918,7 +905,7 @@ class FrenteCaixa extends React.Component {
                     resolve();
                 })
                 .catch(error => {
-                    console.error(error);
+                    // console.error(error);
                     this.setState({
                         carregando: false,
                         idLoja: null,
@@ -926,7 +913,7 @@ class FrenteCaixa extends React.Component {
                         objeto: [],
                         dadosCarregados: false,
                     });
-                    resolve();
+                    reject('API seleciona loja fora do ar');
                 });
         });
     };
@@ -958,7 +945,7 @@ class FrenteCaixa extends React.Component {
                 });
             })
             .catch(error => {
-                console.error(error);
+                // console.error(error);
                 this.setState({
                     descricaoLoja: null,
                     situacao: null,
@@ -968,8 +955,8 @@ class FrenteCaixa extends React.Component {
     };
 
     atualizaIdLoja = (idLoja) => {
-        console.log("idLoja: ", idLoja);
-        console.log("idLoja: ", this.state.idLoja);
+        // console.log("idLoja: ", idLoja);
+        // console.log("idLoja: ", this.state.idLoja);
         const lojaSelecionada = this.state.objeto.find(obj => obj.idLoja === idLoja);
         if (lojaSelecionada) {
             let endpoint = this.buscarListasCaixaEndpoint;
@@ -981,7 +968,7 @@ class FrenteCaixa extends React.Component {
             })
                 .then(response => response.json())
                 .then(dadosSegundoFetch => {
-                    console.log('Fetch 2', dadosSegundoFetch);
+                    // console.log('Fetch 2', dadosSegundoFetch);
 
                     // Encontra os dados do segundo fetch que correspondem ao idLoja do primeiro fetch
                     const dadosCorrespondentes = dadosSegundoFetch.find(item => item.idLoja === lojaSelecionada.idLoja && item.situacao === "Aberto");
@@ -1007,7 +994,7 @@ class FrenteCaixa extends React.Component {
                     }
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar as listas de caixa:', error);
+                    // console.error('Erro ao buscar as listas de caixa:', error);
                     this.setState({
                         carregando: false,
                     });
@@ -1024,40 +1011,45 @@ class FrenteCaixa extends React.Component {
 
     //----------------------------------------- API BUSCA LISTA DE PREÇO ----------------------------------------------------------
 
-    buscarListaPreco = () => {
-        fetch(this.buscarListaPrecoEndpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Assume que data é um array onde cada elemento possui uma propriedade produtoLista
-                // console.log(data);
+    buscarListaPreco = async () => {
+        return new Promise((resolve, reject) => {
 
-                // Extrai a primeira instância de fatorAplicado e baseado
-                const primeiraInstancia = data[0];
-                const fatorAplicado = primeiraInstancia ? primeiraInstancia.fatorAplicado : undefined;
-                const baseado = primeiraInstancia ? primeiraInstancia.baseado : undefined;
-
-                //console.log(fatorAplicado, baseado)
-
-                this.setState({
-                    listaspreco: data,
-                    fatorAplicado: fatorAplicado,
-                    baseado: baseado
-                });
+            fetch(this.buscarListaPrecoEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch(error => {
-                console.error('Erro ao buscar as lojas:', error);
+                .then(response => response.json())
+                .then(data => {
+                    // Assume que data é um array onde cada elemento possui uma propriedade produtoLista
+                    // console.log(data);
 
-                this.setState({
-                    nomeListas: [],
-                    listaspreco: [],
-                    numerosDeItens: []
+                    // Extrai a primeira instância de fatorAplicado e baseado
+                    const primeiraInstancia = data[0];
+                    const fatorAplicado = primeiraInstancia ? primeiraInstancia.fatorAplicado : undefined;
+                    const baseado = primeiraInstancia ? primeiraInstancia.baseado : undefined;
+
+                    //console.log(fatorAplicado, baseado)
+
+                    this.setState({
+                        listaspreco: data,
+                        fatorAplicado: fatorAplicado,
+                        baseado: baseado
+                    });
+                    resolve();
+                })
+                .catch(error => {
+                    // console.error('Erro ao buscar as lojas:', error);
+
+                    this.setState({
+                        nomeListas: [],
+                        listaspreco: [],
+                        numerosDeItens: []
+                    });
+                    reject('API lista de preço fora do ar');
                 });
-            });
+        });
     };
 
     //----------------------------------------- API CADASTRAR PEDIDO ----------------------------------------------------------
@@ -1121,8 +1113,8 @@ class FrenteCaixa extends React.Component {
                 };
 
                 // Registre o status e os dados no console
-                console.log('Status da API externa:', statusCode);
-                console.log('Dados da resposta:', data);
+                // console.log('Status da API externa:', statusCode);
+                // console.log('Dados da resposta:', data);
 
                 // Retorna a resposta, incluindo o status da API externa
                 return responseData;
@@ -2044,7 +2036,7 @@ class FrenteCaixa extends React.Component {
 
             const controleCaixa = JSON.stringify(lista);
 
-            console.log(controleCaixa);
+            // console.log(controleCaixa);
 
             if (this.state.idLista === '') {
                 this.cadastrarLista(controleCaixa)
@@ -2056,7 +2048,7 @@ class FrenteCaixa extends React.Component {
                         }
                     })
                     .catch(error => {
-                        console.error('Erro na chamada da API:', error);
+                        // console.error('Erro na chamada da API:', error);
                         this.modalErro();
                     });
             }
@@ -2377,7 +2369,7 @@ class FrenteCaixa extends React.Component {
               </parcelas>
             </pedido>`;
 
-        console.log(xml);
+        // console.log(xml);
 
         const xmlContato = ('xml', xml);
 
@@ -2564,8 +2556,8 @@ class FrenteCaixa extends React.Component {
         const parcelas = [...this.state.parcelas];
         parcelas[index].forma = formaId;
 
-        console.log('Forma ID selecionada:', formaId);
-        console.log('Dados da parcela atualizados:', parcelas[index]);
+        // console.log('Forma ID selecionada:', formaId);
+        // console.log('Dados da parcela atualizados:', parcelas[index]);
 
         this.setState({
             parcelas
@@ -2576,8 +2568,8 @@ class FrenteCaixa extends React.Component {
         const parcelas = [...this.state.parcelas];
         parcelas[index].descricaoForma = descricao;
 
-        console.log('Descrição selecionada:', descricao);
-        console.log('Dados da parcela atualizados:', parcelas[index]);
+        // console.log('Descrição selecionada:', descricao);
+        // console.log('Dados da parcela atualizados:', parcelas[index]);
 
         this.setState({
             parcelas
@@ -2890,12 +2882,12 @@ class FrenteCaixa extends React.Component {
 
         if (!dadosCarregados) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
-                    <div>
-                        <div className="text-loading text-white">Carregando Frente de caixa...</div>
+                    <div >
+                        <div className="text-loading text-white">Carregando frente de caixa...</div>
                     </div>
                 </div>
             )
@@ -3183,7 +3175,7 @@ class FrenteCaixa extends React.Component {
 
                                     <div className="divisa"></div>
                                     <div className="table-container-produto">
-                                        <Table responsive="lg" className="table table-sm table-transparent" >
+                                        <Table bordered hover variant="secondary" responsive="xl"  >
                                             <thead>
                                                 <tr>
                                                     <th>Produto</th>
@@ -3783,7 +3775,7 @@ class FrenteCaixa extends React.Component {
                                             </Form.Group>
                                         </Col>
                                         <div className="table-container-produto">
-                                            <Table responsive="lg" className="table table-sm" striped>
+                                            <Table bordered hover variant="secondary" responsive="xl" className="table table-sm">
                                                 <thead>
                                                     <tr>
                                                         <th>Dias</th>

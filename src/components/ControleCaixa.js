@@ -83,8 +83,9 @@ class ControleCaixa extends Component {
             CalculoTotalInformado: '',
             idPagamento: '',
             totalCalculado: '',
-            dadosCarregados: ''
-
+            dadosCarregados: '',
+            showModal: false,
+            errorMessage: ''
         };
 
         // Ambiente Local
@@ -98,29 +99,29 @@ class ControleCaixa extends Component {
 
 
         // Ambiente Desenvolvimento
-        // this.buscarListasCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
-        // this.buscarIdCaixaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
-        // this.cadastrarListaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarControleCaixa'
-        // this.buscarLojaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
-        // this.buscarFormaDePagamentoEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
-        // this.atualizarListaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarControleCaixa'
-        // this.deletarListaEndpoint = 'https://dev-api-okeaa-pdv.azurewebsites.net/api/v1/deletarControleCaixa'
+        this.buscarListasCaixaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/controleCaixas'
+        this.buscarIdCaixaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/controleCaixa'
+        this.cadastrarListaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/adicionarControleCaixa'
+        this.buscarLojaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/selecionarLojas'
+        this.buscarFormaDePagamentoEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/formaspagamento'
+        this.atualizarListaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/atualizarControleCaixa'
+        this.deletarListaEndpoint = 'http://okeaaerphost.ddns.net:8080/api/v1/deletarControleCaixa'
 
-         // Ambiente Produção
-         this.buscarListasCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
-         this.buscarIdCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
-         this.cadastrarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarLista'
-         this.buscarLojaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
-         this.buscarFormaDePagamentoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
-         this.atualizarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarControleCaixa'
-         this.deletarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/deletarControleCaixa'
+        // // Ambiente Produção
+        // this.buscarListasCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixas'
+        // this.buscarIdCaixaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/controleCaixa'
+        // this.cadastrarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/adicionarLista'
+        // this.buscarLojaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/selecionarLojas'
+        // this.buscarFormaDePagamentoEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/formaspagamento'
+        // this.atualizarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/atualizarControleCaixa'
+        // this.deletarListaEndpoint = 'https://prod-api-okeaa-pdv.azurewebsites.net/api/v1/deletarControleCaixa'
     };
 
     async componentDidMount() {
         try {
-            this.buscarLoja();
-            this.buscarListasCaixa();
-            this.buscarFormaDePagamento()
+            await this.buscarLoja();
+            await this.buscarListasCaixa();
+            await this.buscarFormaDePagamento()
         } catch (error) {
             this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
         }
@@ -131,9 +132,8 @@ class ControleCaixa extends Component {
 
 
     buscarListasCaixa = () => {
+        this.setState({ carregando: true });
         return new Promise((resolve, reject) => {
-            this.setState({ carregando: true, dadosCarregados: false });
-
             let endpoint = this.buscarListasCaixaEndpoint;
 
             fetch(endpoint, {
@@ -150,22 +150,14 @@ class ControleCaixa extends Component {
                         this.setState({
                             listasCaixa: data,
                             carregando: false,
-                            dadosCarregados: true,
                         });
-                    } else {
-                        resolve();
-                        this.setState({ carregando: false });
                     }
+                    resolve();
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar as lojas:', error);
+                    // console.error('Erro ao buscar as lojas:', error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar listas de controle de caixa. Por favor, tente novamente mais tarde.' });
                     reject(error);
-                    this.setState({
-                        nomeListas: [],
-                        listasCaixa: [],
-                        carregando: false,
-                        dadosCarregados: false
-                    });
                 });
         })
     };
@@ -199,7 +191,6 @@ class ControleCaixa extends Component {
                         totalInformado: item.totalInformado
                     }));
 
-
                     const valoresInformados = totalInformadoCaixa.map(item => ({
                         idPagamento: item.idPagamento,
                         descricaoPagamento: item.descricaoPagamento,
@@ -229,9 +220,7 @@ class ControleCaixa extends Component {
                         maximumFractionDigits: 2
                     });
 
-
                     // console.log('CalculoTotalInformado:', totalInformadoFormatado);
-
                     // console.log(formaPagamentoCaixa)
 
                     this.setState({
@@ -251,23 +240,24 @@ class ControleCaixa extends Component {
                         CalculoTotalRegistrado: totalRegistradoFormatado,
                         totalInformadoCaixa: totalInformadoCaixa,
                         valoresInformados: valoresInformados,
+                        carregando: false,
                         dadosCarregados: true,
                     });
                     resolve();
-                    this.setState({ carregando: false });
                 })
                 .catch(error => {
                     console.error('Erro ao buscar a loja:', error);
                     reject(error);
-                    this.setState({ carregando: false, dadosCarregados: false });
+                    this.setState({ carregando: true, dadosCarregados: false, showModal: true, errorMessage: 'Erro ao buscar controle de caixa. Por favor, tente novamente mais tarde.' });
                 });
         });
     };
 
 
     buscarLoja = () => {
-        return new Promise((resolve, reject) => {
+        this.setState({ carregando: true });
 
+        return new Promise((resolve, reject) => {
             fetch(this.buscarLojaEndpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
@@ -284,38 +274,22 @@ class ControleCaixa extends Component {
                             idLoja: primeiraLoja.idLoja,
                             nomeLoja: primeiraLoja.nomeLoja,
                             objeto: dados,
-                            dadosCarregados: true,
-                        });
-                    } else {
-                        this.setState({
-                            idLoja: null,
-                            nomeLoja: null,
-                            unidadLoja: null,
-                            objeto: [],
-                            dadosCarregados: false,
+                            carregando: false,
                         });
                     }
-                    this.setState({
-                        carregando: false,
-                    });
                     resolve();
                 })
                 .catch(error => {
-                    console.error(error);
-                    this.setState({
-                        carregando: false,
-                        idLoja: null,
-                        nomeLoja: null,
-                        objeto: [],
-                        dadosCarregados: false,
-                    });
+                    // console.error(error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar lojas. Por favor, tente novamente mais tarde.' });
                 });
         });
     };
 
     buscarFormaDePagamento = () => {
-        return new Promise((resolve, reject) => {
+        this.setState({ carregando: true });
 
+        return new Promise((resolve, reject) => {
             fetch(this.buscarFormaDePagamentoEndpoint)
                 .then((resposta) => {
                     if (!resposta.ok) {
@@ -328,23 +302,14 @@ class ControleCaixa extends Component {
                         // console.log("Forma de pagamento objeto retornado:", dados);
                         this.setState({
                             formaspagamento: dados.retorno.formaspagamento,
-                        });
-                    } else {
-                        this.setState({
-                            formaspagamento: [],
+                            carregando: false,
                         });
                     }
-                    this.setState({
-                        carregando: false,
-                    });
                     resolve(); // Resolva a Promise quando a chamada da API for concluída com sucesso
                 })
-                .catch((error) => {
-                    // console.log("Erro ao buscar forma de pagamento:", error);
-                    this.setState({
-                        formaspagamento: [],
-                        carregando: false,
-                    });
+                .catch(error => {
+                    // console.error('Erro ao buscar contatos:', error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar produtos. Por favor, tente novamente mais tarde.' });
                     reject(error); // Rejeite a Promise se ocorrer um erro na chamada da API
                 });
         });
@@ -360,7 +325,7 @@ class ControleCaixa extends Component {
             .then(response => {
                 return response.status; // Retorna o código de status HTTP
             });
-        console.log(statusCode)
+        // console.log(statusCode)
         return statusCode;
     };
 
@@ -578,8 +543,6 @@ class ControleCaixa extends Component {
         });
     };
 
-
-
     campoBusca = (event) => {
         this.setState({ searchTerm: event.target.value });
     };
@@ -605,6 +568,10 @@ class ControleCaixa extends Component {
             }, 1000);
         });
     };
+
+    closeModalErro = () => {
+        this.setState({ showModal: false, errorMessage: '' });
+    }
 
     deletarCaixa = () => {
         this.modalExcluirProduto()
@@ -641,7 +608,7 @@ class ControleCaixa extends Component {
     handleidPagamentoChange = (index, event) => {
         const novosValoresInformados = [...this.state.valoresInformados];
         novosValoresInformados[index].idPagamento = event.target.value;
-        console.log('Novo valor de descrição:', novosValoresInformados[index].idPagamento); // Imprime o novo valor de descrição
+        // console.log('Novo valor de descrição:', novosValoresInformados[index].idPagamento); // Imprime o novo valor de descrição
         this.setState({ valoresInformados: novosValoresInformados });
     };
 
@@ -649,8 +616,8 @@ class ControleCaixa extends Component {
         const novosValoresInformados = [...this.state.valoresInformados];
         novosValoresInformados[index].descricaoPagamento = descricaoPagamento;
 
-        console.log('Descrição selecionada:', descricaoPagamento);
-        console.log('Dados da parcela atualizados:', novosValoresInformados[index]);
+        // console.log('Descrição selecionada:', descricaoPagamento);
+        // console.log('Dados da parcela atualizados:', novosValoresInformados[index]);
 
         this.setState({ valoresInformados: novosValoresInformados });
 
@@ -659,15 +626,15 @@ class ControleCaixa extends Component {
     handleTotalInformadoChange = (index, event) => {
         const novosValoresInformados = [...this.state.valoresInformados];
         novosValoresInformados[index].totalInformado = event.target.value;
-        console.log('Novo valor de total informado:', novosValoresInformados[index].totalInformado); // Imprime o novo valor de total informado
+        // console.log('Novo valor de total informado:', novosValoresInformados[index].totalInformado); // Imprime o novo valor de total informado
         this.setState({ valoresInformados: novosValoresInformados });
     };
 
 
     render() {
 
-        const { listasCaixa, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens, modalSelecionarLoja, objeto, idLoja, trocoCaixa, carregando, modalExcluirProduto, codigoProdutoParaExcluir } = this.state;
-
+        const { listasCaixa, selectedListId, regraLista, nomeLista, baseado, fatorAplicado, numerosDeItens, modalSelecionarLoja, objeto, idLoja, trocoCaixa, modalExcluirProduto, codigoProdutoParaExcluir } = this.state;
+        const { carregando, showModal, errorMessage } = this.state;
 
         if (selectedListId) {
             // Se selectedListId estiver definido, renderiza a nova tela
@@ -676,12 +643,26 @@ class ControleCaixa extends Component {
 
         if (carregando) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
+                    <div >
+                        <div className="text-loading text-white">Carregando listas de controle de caixa...</div>
+                    </div>
                     <div>
-                        <div className="text-loading text-white">Carregando controle de caixa...</div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
@@ -717,7 +698,7 @@ class ControleCaixa extends Component {
                     </Container >
                     <div className="table-container-produto">
                         <Container fluid className="pb-5">
-                            <Table striped bordered hover responsive="xl">
+                            <Table bordered hover variant="warning" responsive="xl">
                                 <thead>
                                     <tr>
                                         <th title="Loja">Loja</th>
@@ -869,18 +850,31 @@ class ControleCaixa extends Component {
 
         // Calcula a diferença entre o total registrado e o total informado
         const diferencaTotal = CalculoTotalRegistrado - CalculoTotalInformado;
+        const { carregando, showModal, errorMessage } = this.state;
 
 
-
-
-        if (!dadosCarregados) {
+        if (carregando) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
+                    <div >
+                        <div className="text-loading text-white">Carregando controle de caixa...</div>
+                    </div>
                     <div>
-                        <div className="text-loading text-white">Carregando contato...</div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )

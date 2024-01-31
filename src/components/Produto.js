@@ -115,7 +115,9 @@ class Produto extends React.Component {
             produtosSelecionados: [],
             dadosCarregados: false,
             paginaAtual: 1,
-            totalPaginas: ''
+            totalPaginas: '',
+            showModal: false,
+            errorMessage: ''
         };
 
         // Ambiente Local
@@ -131,33 +133,33 @@ class Produto extends React.Component {
         // this.atualizarProdutoFornecedorEndpoint = 'http://localhost:8081/api/v1/atualizarprodutofornecedor/'
 
         // Ambiente Desenvolvimento
-        // this.buscarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-        // this.carregarProdutosEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-        // this.carregarProdutoFornecedorEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produtosfornecedores'
-        // this.buscarCategoriasEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/categorias'
-        // this.excluirProdutoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-        // this.cadastraProdutoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto'
-        // this.cadastrarListaEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
-        // this.cadastraProdutoFornecedorEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor'
-        // this.atualizarProdutoEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor/'
-        // this.atualizarProdutoFornecedorEndpoint = 'https://dev-api-okeaa-produto.azurewebsites.net/api/v1/atualizarprodutofornecedor/'
+        this.buscarProdutosEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produtos'
+        this.carregarProdutosEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produto'
+        this.carregarProdutoFornecedorEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produtosfornecedores'
+        this.buscarCategoriasEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/categorias'
+        this.excluirProdutoEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/produto'
+        this.cadastraProdutoEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/cadastrarproduto'
+        this.cadastrarListaEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/adicionarLista'
+        this.cadastraProdutoFornecedorEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/cadastrarprodutofornecedor'
+        this.atualizarProdutoEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/atualizarproduto/'
+        this.atualizarProdutoFornecedorEndpoint = 'http://okeaaerphost.ddns.net:8081/api/v1/atualizarprodutofornecedor/'
 
         // Ambiente Produção
-         this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
-         this.carregarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-         this.carregarProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtosfornecedores'
-         this.buscarCategoriasEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/categorias'
-         this.excluirProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
-         this.cadastraProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto'
-         this.cadastrarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
-         this.cadastraProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor'
-         this.atualizarProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor/'
-         this.atualizarProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarprodutofornecedor/' 
+        //   this.buscarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtos'
+        // this.carregarProdutosEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
+        // this.carregarProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produtosfornecedores'
+        // this.buscarCategoriasEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/categorias'
+        // this.excluirProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/produto'
+        // this.cadastraProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarproduto'
+        // this.cadastrarListaEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/adicionarLista'
+        // this.cadastraProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/cadastrarprodutofornecedor'
+        // this.atualizarProdutoEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarproduto/'
+        // this.atualizarProdutoFornecedorEndpoint = 'https://prod-api-okeaa-produto.azurewebsites.net/api/v1/atualizarprodutofornecedor/' 
     };
 
     async componentDidMount() {
         try {
-            this.buscarProdutos();
+            await this.buscarProdutos();
             this.buscarCategorias();
         } catch (error) {
             this.setState({ erro: `Erro ao conectar a API: ${error.message}` });
@@ -185,131 +187,136 @@ class Produto extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DE PRODUTOS
     buscarProdutos = (pagina) => {
-        // Se a página não for fornecida, utilize a página atual do estado
-        const paginaRequisicao = pagina !== undefined ? pagina : this.state.paginaAtual;
+        return new Promise((resolve, reject) => {
+            // Se a página não for fornecida, utilize a página atual do estado
+            const paginaRequisicao = pagina !== undefined ? pagina : this.state.paginaAtual;
 
-        fetch(`${this.buscarProdutosEndpoint}/page=${paginaRequisicao}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((resposta) => resposta.json())
-            .then((dados) => {
-                // console.log(dados)
-                if (dados.retorno.produtos) {
-                    this.setState({
-                        produtos: dados.retorno.produtos,
-                        paginaAtual: paginaRequisicao,  // Atualiza a página atual no estado
-                        carregando: false
-                    });
-                } else {
-                    this.setState({ carregando: false });
+            fetch(`${this.buscarProdutosEndpoint}/page=${paginaRequisicao}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
             })
-            .catch(erro => {
-                console.error('Erro ao buscar contatos:', erro);
-                this.setState({ carregando: false });
-            });
+                .then((resposta) => resposta.json())
+                .then((dados) => {
+                    // console.log(dados)
+                    if (dados.retorno.produtos) {
+                        this.setState({
+                            produtos: dados.retorno.produtos,
+                            paginaAtual: paginaRequisicao,  // Atualiza a página atual no estado
+                            carregando: false,
+                        });
+                    }
+                    resolve();
+                })
+                .catch(error => {
+                    // console.error('Erro ao buscar contatos:', error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar produtos. Por favor, tente novamente mais tarde.' });
+                    reject('API produtos fora do ar');
+                });
+        })
+
     };
 
     handleSelecionaPagina = (pagina) => {
-        this.setState({ carregando: true });
+        this.setState({ carregando: false });
         this.buscarProdutos(pagina);
     };
 
     //GET - MÉTODO PARA CONSUMO DE UM PRODUTO PELO ID
     carregarProdutos = (codigo) => {
-        this.setState({ carregando: true, dadosCarregados: false });
+        return new Promise((resolve, reject) => {
 
-        fetch(`${this.carregarProdutosEndpoint}/${codigo}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(resposta => resposta.json())
-            .then(dados => {
-                // console.log("produto: ", dados);
-                if (dados.retorno.produtos) {
+            this.setState({ carregando: true, dadosCarregados: false });
 
-                    const produto = dados.retorno.produtos[0].produto;
-                    const categoria = produto.categoria;
-
-                    const converterDataFormato = (data) => {
-                        const [ano, mes, dia] = data.split('-');
-                        return `${dia}/${mes}/${ano}`;
-                    };
-
-                    this.setState({
-                        id: produto.id || '',
-                        codigo: produto.codigo || '',
-                        descricao: produto.descricao || '',
-                        tipo: produto.tipo || '',
-                        situacao: produto.situacao || '',
-                        unidade: produto.unidade || '',
-                        un: produto.unidade || '',
-                        preco: parseFloat(produto.preco).toFixed(2) || '',
-                        precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
-                        preco_custo: produto.precoCusto || '',
-                        descricaoCurta: produto.descricaoCurta || '',
-                        descricaoComplementar: produto.descricaoComplementar || '',
-                        dataInclusao: produto.dataInclusao || '',
-                        dataAlteracao: converterDataFormato(produto.dataAlteracao) || '',
-                        imageThumbnail: produto.imageThumbnail || '',
-                        urlVideo: produto.urlVideo || '',
-                        nomeFornecedor: produto.nomeFornecedor || '',
-                        codigoFabricante: produto.codigoFabricante || '',
-                        marca: produto.marca || '',
-                        class_fiscal: produto.class_fiscal || '',
-                        cest: produto.cest || '',
-                        origem: produto.origem || '',
-                        idGrupoProduto: produto.idGrupoProduto || '',
-                        linkExterno: produto.linkExterno || '',
-                        observacoes: produto.observacoes || '',
-                        grupoProduto: produto.grupoProduto || '',
-                        garantia: produto.garantia || '',
-                        descricaoFornecedor: produto.descricaoFornecedor || '',
-                        idFabricante: produto.idFabricante || '',
-                        pesoLiq: parseFloat(produto.pesoLiq).toFixed(2) || '',
-                        peso_liq: produto.pesoLiq || '',
-                        pesoBruto: parseFloat(produto.pesoBruto).toFixed(2) || '',
-                        peso_bruto: produto.pesoBruto || '',
-                        estoqueMinimo: parseFloat(produto.estoqueMinimo).toFixed(2) || '',
-                        estoqueMaximo: parseFloat(produto.estoqueMaximo).toFixed(2) || '',
-                        gtin: produto.gtin || '',
-                        gtinEmbalagem: produto.gtinEmbalagem || '',
-                        larguraProduto: produto.larguraProduto || '',
-                        largura: produto.larguraProduto || '',
-                        alturaProduto: produto.alturaProduto || '',
-                        altura: produto.alturaProduto || '',
-                        profundidadeProduto: produto.profundidadeProduto || '',
-                        profundidade: produto.profundidadeProduto || '',
-                        unidadeMedida: produto.unidadeMedida || '',
-                        itensPorCaixa: produto.itensPorCaixa || '',
-                        volumes: produto.volumes || '',
-                        localizacao: produto.localizacao || '',
-                        crossdocking: produto.crossdocking || '',
-                        condicao: produto.condicao || '',
-                        freteGratis: produto.freteGratis || '',
-                        producao: produto.producao || '',
-                        dataValidade: converterDataFormato(produto.dataValidade) || '',
-                        spedTipoItem: produto.spedTipoItem || '',
-                        descricaoCategoria: categoria ? categoria.descricao : '' || '',
-                        idCategoria: categoria ? categoria.id : '' || '',
-                        idProdutoCarregado: produto.id || '',
-                        dadosCarregados: true, // Define que os dados foram carregados com sucesso
-                    });
-
-                } else {
-                    this.setState({ produtos: [] });
+            fetch(`${this.carregarProdutosEndpoint}/${codigo}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-                this.setState({ carregando: false });
             })
-            .catch(error => {
-                console.error(error);
-                this.setState({ carregando: false, dadosCarregados: false });
-            });
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    // console.log("produto: ", dados);
+                    if (dados.retorno.produtos) {
+
+                        const produto = dados.retorno.produtos[0].produto;
+                        const categoria = produto.categoria;
+
+                        const converterDataFormato = (data) => {
+                            const [ano, mes, dia] = data.split('-');
+                            return `${dia}/${mes}/${ano}`;
+                        };
+
+                        this.setState({
+                            id: produto.id || '',
+                            codigo: produto.codigo || '',
+                            descricao: produto.descricao || '',
+                            tipo: produto.tipo || '',
+                            situacao: produto.situacao || '',
+                            unidade: produto.unidade || '',
+                            un: produto.unidade || '',
+                            preco: parseFloat(produto.preco).toFixed(2) || '',
+                            precoCusto: parseFloat(produto.precoCusto).toFixed(2) || '',
+                            preco_custo: produto.precoCusto || '',
+                            descricaoCurta: produto.descricaoCurta || '',
+                            descricaoComplementar: produto.descricaoComplementar || '',
+                            dataInclusao: produto.dataInclusao || '',
+                            dataAlteracao: converterDataFormato(produto.dataAlteracao) || '',
+                            imageThumbnail: produto.imageThumbnail || '',
+                            urlVideo: produto.urlVideo || '',
+                            nomeFornecedor: produto.nomeFornecedor || '',
+                            codigoFabricante: produto.codigoFabricante || '',
+                            marca: produto.marca || '',
+                            class_fiscal: produto.class_fiscal || '',
+                            cest: produto.cest || '',
+                            origem: produto.origem || '',
+                            idGrupoProduto: produto.idGrupoProduto || '',
+                            linkExterno: produto.linkExterno || '',
+                            observacoes: produto.observacoes || '',
+                            grupoProduto: produto.grupoProduto || '',
+                            garantia: produto.garantia || '',
+                            descricaoFornecedor: produto.descricaoFornecedor || '',
+                            idFabricante: produto.idFabricante || '',
+                            pesoLiq: parseFloat(produto.pesoLiq).toFixed(2) || '',
+                            peso_liq: produto.pesoLiq || '',
+                            pesoBruto: parseFloat(produto.pesoBruto).toFixed(2) || '',
+                            peso_bruto: produto.pesoBruto || '',
+                            estoqueMinimo: parseFloat(produto.estoqueMinimo).toFixed(2) || '',
+                            estoqueMaximo: parseFloat(produto.estoqueMaximo).toFixed(2) || '',
+                            gtin: produto.gtin || '',
+                            gtinEmbalagem: produto.gtinEmbalagem || '',
+                            larguraProduto: produto.larguraProduto || '',
+                            largura: produto.larguraProduto || '',
+                            alturaProduto: produto.alturaProduto || '',
+                            altura: produto.alturaProduto || '',
+                            profundidadeProduto: produto.profundidadeProduto || '',
+                            profundidade: produto.profundidadeProduto || '',
+                            unidadeMedida: produto.unidadeMedida || '',
+                            itensPorCaixa: produto.itensPorCaixa || '',
+                            volumes: produto.volumes || '',
+                            localizacao: produto.localizacao || '',
+                            crossdocking: produto.crossdocking || '',
+                            condicao: produto.condicao || '',
+                            freteGratis: produto.freteGratis || '',
+                            producao: produto.producao || '',
+                            dataValidade: converterDataFormato(produto.dataValidade) || '',
+                            spedTipoItem: produto.spedTipoItem || '',
+                            descricaoCategoria: categoria ? categoria.descricao : '' || '',
+                            idCategoria: categoria ? categoria.id : '' || '',
+                            idProdutoCarregado: produto.id || '',
+                            carregando: false,
+                            dadosCarregados: true,
+                        });
+                    }
+                    resolve();
+                })
+                .catch(error => {
+                    // console.error(error);
+                    this.setState({ carregando: true, dadosCarregados: false, showModal: true, errorMessage: 'Erro ao buscar contatos. Por favor, tente novamente mais tarde.' });
+                    reject('API lista preço fora do ar');
+                });
+        })
     };
 
     carregarProdutoFornecedor = (idProduto) => {
@@ -321,7 +328,7 @@ class Produto extends React.Component {
         })
             .then((resposta) => resposta.json())
             .then((dados) => {
-                console.log("Resposta da API de Produtos Fornecedores: ", dados);
+                // console.log("Resposta da API de Produtos Fornecedores: ", dados);
 
                 if (dados.retorno.produtosfornecedores && dados.retorno.produtosfornecedores.length > 0) {
                     const produtoFornecedorEncontrado = dados.retorno.produtosfornecedores.find(
@@ -329,7 +336,7 @@ class Produto extends React.Component {
                     );
 
                     if (produtoFornecedorEncontrado) {
-                        console.log("Produto Fornecedor Encontrado: ", produtoFornecedorEncontrado);
+                        // console.log("Produto Fornecedor Encontrado: ", produtoFornecedorEncontrado);
 
                         const listaProdutosFornecedores = produtoFornecedorEncontrado.produtofornecedores.fornecedores;
 
@@ -338,11 +345,11 @@ class Produto extends React.Component {
                             idProdutoSelecionado: idProduto,
                         });
                     } else {
-                        console.log("Nenhum produto do fornecedor encontrado.");
+                        // console.log("Nenhum produto do fornecedor encontrado.");
                         this.setState({ produtosFornecedores: [], idProdutoSelecionado: null });
                     }
                 } else {
-                    console.log("Nenhum produto do fornecedor encontrado.");
+                    // console.log("Nenhum produto do fornecedor encontrado.");
                     this.setState({ produtosFornecedores: [], idProdutoSelecionado: null });
                 }
             })
@@ -427,193 +434,236 @@ class Produto extends React.Component {
 
     //GET - MÉTODO PARA CONSUMO DE CATEGORIAS
     buscarCategorias = () => {
-        fetch(this.buscarCategoriasEndpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((resposta) => resposta.json())
-            .then((dados) => {
-                // console.log("Categoria: ", dados);
-                const categorias = dados.retorno.categorias || [];
-                this.setState({ categorias, carregando: false });
+        this.setState({ carregando: true })
+        return new Promise((resolve, reject) => {
+            fetch(this.buscarCategoriasEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch((erro) => {
-                console.error(erro);
-                this.setState({ carregando: false });
-            });
+                .then((resposta) => resposta.json())
+                .then((dados) => {
+                    // console.log("Categoria: ", dados);
+                    const categorias = dados.retorno.categorias || [];
+                    this.setState({ categorias, carregando: false });
+                    resolve();
+                })
+                .catch(error => {
+                    // console.error('Erro ao buscar contatos:', error);
+                    this.setState({ carregando: true, showModal: true, errorMessage: 'Erro ao buscar categorias. Por favor, tente novamente mais tarde.' });
+                    reject('API categorias fora do ar');
+                });
+        })
     };
 
     //DELETE - MÉTODO PARA DELETAR UM PRODUTO
     excluirProduto(codigo) {
-        const statusCode = fetch(`${this.excluirProdutoEndpoint}/${codigo}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                return response.status; // Retorna o código de status HTTP
-            });
-        // console.log(statusCode)
-        return statusCode;
+        return new Promise((resolve, reject) => {
+            fetch(`${this.excluirProdutoEndpoint}/${codigo}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    const statusCode = response.status; // Obtém o status da resposta
+
+                    // Verifica se a exclusão foi bem-sucedida com base no código de status HTTP
+                    if (statusCode === 200 || statusCode === 204) {
+                        // Resolve a Promise com o código de status
+                        resolve(statusCode);
+                    } else {
+                        // Rejeita a Promise com uma mensagem de erro caso a exclusão tenha falhado
+                        reject(new Error(`Erro ao excluir produto. Código de status: ${statusCode}`));
+                    }
+                })
+                .catch(error => {
+                    // Rejeita a Promise com o erro ocorrido durante a requisição
+                    reject(error);
+                });
+        });
     };
 
     //POST - MÉTODO PARA INSERIR UM NOVO PRODUTO
     cadastraProduto = (xmlProduto) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlProduto, 'text/xml');
-        const stringXml = new XMLSerializer().serializeToString(xml);
+        return new Promise((resolve, reject) => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlProduto, 'text/xml');
+            const stringXml = new XMLSerializer().serializeToString(xml);
 
-        return fetch(this.cadastraProdutoEndpoint, {
-            method: 'POST',
-            body: stringXml,
-            headers: {
-                'Content-Type': 'application/xml'
-            }
-        })
-            .then(async response => {
-                const statusCode = response.status; // Obtém o status da API externa
-                const data = await response.text(); // Obtém os dados da resposta
+            fetch(this.cadastraProdutoEndpoint, {
+                method: 'POST',
+                body: stringXml,
+                headers: {
+                    'Content-Type': 'application/xml'
+                }
+            })
+                .then(async response => {
+                    const statusCode = response.status; // Obtém o status da API externa
+                    const data = await response.text(); // Obtém os dados da resposta
 
-                // Crie um objeto que inclui o status e os dados da API externa
-                const responseData = {
-                    statusCode,
-                    data,
-                };
+                    // Crie um objeto que inclui o status e os dados da API externa
+                    const responseData = {
+                        statusCode,
+                        data,
+                    };
 
-                // Registre o status e os dados no console
-                // console.log('Status da API externa:', statusCode);
-                // console.log('Dados da resposta:', data);
+                    // Registre o status e os dados no console
+                    // console.log('Status da API externa:', statusCode);
+                    // console.log('Dados da resposta:', data);
 
-                // Retorna a resposta, incluindo o status da API externa
-                return responseData;
-            });
+                    // Resolve a Promise com os dados da resposta, incluindo o status da API externa
+                    resolve(responseData);
+                })
+                .catch(error => {
+                    // Em caso de erro, rejeita a Promise com o erro
+                    reject(error);
+                });
+        });
     };
 
     cadastrarLista = (listaPrecoResponse) => {
-        return fetch(this.cadastrarListaEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: listaPrecoResponse,
-        })
-            .then(async response => {
-                const statusCode = response.status; // Obtém o status da API externa
-                const data = await response.text(); // Obtém os dados da resposta
+        return new Promise((resolve, reject) => {
+            fetch(this.cadastrarListaEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: listaPrecoResponse,
+            })
+                .then(async response => {
+                    const statusCode = response.status; // Obtém o status da API externa
+                    const data = await response.text(); // Obtém os dados da resposta
 
-                // Crie um objeto que inclui o status e os dados da API externa
-                const responseData = {
-                    statusCode,
-                    data,
-                };
+                    // Crie um objeto que inclui o status e os dados da API externa
+                    const responseData = {
+                        statusCode,
+                        data,
+                    };
 
-                // Registre o status e os dados no console
-                // console.log('Status da API externa:', statusCode);
-                // console.log('Dados da resposta:', data);
+                    // Registre o status e os dados no console
+                    // console.log('Status da API externa:', statusCode);
+                    // console.log('Dados da resposta:', data);
 
-                // Retorna a resposta, incluindo o status da API externa
-                return responseData;
-            });
+                    // Resolve a Promise com os dados da resposta, incluindo o status da API externa
+                    resolve(responseData);
+                })
+                .catch(error => {
+                    // Em caso de erro, rejeita a Promise com o erro
+                    reject(error);
+                });
+        });
     };
 
-    cadastraProdutoFornecedor = (xmlProdutoFornecedor) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
-        const stringXml = new XMLSerializer().serializeToString(xml);
+    // cadastraProdutoFornecedor = (xmlProdutoFornecedor) => {
+    //     const parser = new DOMParser();
+    //     const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
+    //     const stringXml = new XMLSerializer().serializeToString(xml);
 
-        return fetch(this.cadastraProdutoFornecedorEndpoint, {
-            method: 'POST',
-            body: stringXml,
-            headers: {
-                'Content-Type': 'application/xml'
-            }
-        })
-            .then(async response => {
-                const statusCode = response.status; // Obtém o status da API externa
-                const data = await response.text(); // Obtém os dados da resposta
+    //     return fetch(this.cadastraProdutoFornecedorEndpoint, {
+    //         method: 'POST',
+    //         body: stringXml,
+    //         headers: {
+    //             'Content-Type': 'application/xml'
+    //         }
+    //     })
+    //         .then(async response => {
+    //             const statusCode = response.status; // Obtém o status da API externa
+    //             const data = await response.text(); // Obtém os dados da resposta
 
-                // Crie um objeto que inclui o status e os dados da API externa
-                const responseData = {
-                    statusCode,
-                    data,
-                };
+    //             // Crie um objeto que inclui o status e os dados da API externa
+    //             const responseData = {
+    //                 statusCode,
+    //                 data,
+    //             };
 
-                // Registre o status e os dados no console
-                // console.log('Status da API externa:', statusCode);
-                // console.log('Dados da resposta:', data);
+    //             // Registre o status e os dados no console
+    //             // console.log('Status da API externa:', statusCode);
+    //             // console.log('Dados da resposta:', data);
 
-                // Retorna a resposta, incluindo o status da API externa
-                return responseData;
-            });
-    };
+    //             // Retorna a resposta, incluindo o status da API externa
+    //             return responseData;
+    //         });
+    // };
 
     //PUT - MÉTODO PARA ATUALIZAR UM PRODUTO EXISTENTE
     atualizarProduto = (xmlProduto) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlProduto, 'text/xml');
-        const stringXml = new XMLSerializer().serializeToString(xml);
-        const codigo = xml.querySelector('codigo').textContent;
+        return new Promise((resolve, reject) => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlProduto, 'text/xml');
+            const stringXml = new XMLSerializer().serializeToString(xml);
+            const codigo = xml.querySelector('codigo').textContent;
 
-        return fetch(this.atualizarProdutoEndpoint + codigo, {
-            method: 'POST',
-            body: stringXml,
-            headers: {
-                'Content-Type': 'application/xml'
-            }
-        })
-            .then(async response => {
-                const statusCode = response.status; // Obtém o status da API externa
-                const data = await response.text(); // Obtém os dados da resposta
+            fetch(this.atualizarProdutoEndpoint + codigo, {
+                method: 'POST',
+                body: stringXml,
+                headers: {
+                    'Content-Type': 'application/xml'
+                }
+            })
+                .then(async response => {
+                    const statusCode = response.status; // Obtém o status da API externa
+                    const data = await response.text(); // Obtém os dados da resposta
 
-                // Crie um objeto que inclui o status e os dados da API externa
-                const responseData = {
-                    statusCode,
-                    data,
-                };
+                    // Crie um objeto que inclui o status e os dados da API externa
+                    const responseData = {
+                        statusCode,
+                        data,
+                    };
 
-                // Registre o status e os dados no console
-                // console.log('Status da API externa:', statusCode);
-                // console.log('Dados da resposta:', data);
+                    // Registre o status e os dados no console
+                    // console.log('Status da API externa:', statusCode);
+                    // console.log('Dados da resposta:', data);
 
-                // Retorna a resposta, incluindo o status da API externa
-                return responseData;
-            });
+                    // Resolve a Promise com os dados da resposta, incluindo o status da API externa
+                    resolve(responseData);
+                })
+                .catch(error => {
+                    // Em caso de erro, rejeita a Promise com o erro
+                    reject(error);
+                });
+        });
     };
 
     atualizarProdutoFornecedor = (xmlProdutoFornecedor) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
-        const stringXml = new XMLSerializer().serializeToString(xml);
-        const idProdutoFornecedor = xml.querySelector('idProdutoFornecedor').textContent;
+        return new Promise((resolve, reject) => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlProdutoFornecedor, 'text/xml');
+            const stringXml = new XMLSerializer().serializeToString(xml);
+            const idProdutoFornecedor = xml.querySelector('idProdutoFornecedor').textContent;
 
-        return fetch(this.atualizarProdutoFornecedorEndpoint + idProdutoFornecedor, {
-            method: 'POST',
-            body: stringXml,
-            headers: {
-                'Content-Type': 'application/xml'
-            }
-        })
-            .then(async response => {
-                const statusCode = response.status; // Obtém o status da API externa
-                const data = await response.text(); // Obtém os dados da resposta
+            fetch(this.atualizarProdutoFornecedorEndpoint + idProdutoFornecedor, {
+                method: 'POST',
+                body: stringXml,
+                headers: {
+                    'Content-Type': 'application/xml'
+                }
+            })
+                .then(async response => {
+                    const statusCode = response.status; // Obtém o status da API externa
+                    const data = await response.text(); // Obtém os dados da resposta
 
-                // Crie um objeto que inclui o status e os dados da API externa
-                const responseData = {
-                    statusCode,
-                    data,
-                };
+                    // Crie um objeto que inclui o status e os dados da API externa
+                    const responseData = {
+                        statusCode,
+                        data,
+                    };
 
-                // Registre o status e os dados no console
-                // console.log('Status da API externa:', statusCode);
-                // console.log('Dados da resposta:', data);
+                    // Registre o status e os dados no console
+                    // console.log('Status da API externa:', statusCode);
+                    // console.log('Dados da resposta:', data);
 
-                // Retorna a resposta, incluindo o status da API externa
-                return responseData;
-            });
+                    // Resolve a Promise com os dados da resposta, incluindo o status da API externa
+                    resolve(responseData);
+                })
+                .catch(error => {
+                    // Em caso de erro, rejeita a Promise com o erro
+                    reject(error);
+                });
+        });
     };
+
 
     //-----------------------------------------------------------------------------------------------------------------------|
     //---------------------- SCRIPT´S DE AÇÕES PARA CADA UM DOS CAMPOS DE CADASTRO E ATUALIZAÇÃO. ---------------------------|
@@ -1249,6 +1299,10 @@ class Produto extends React.Component {
         });
     };
 
+    closeModalErro = () => {
+        this.setState({ showModal: false, errorMessage: '' });
+    }
+
     handleSituacaoChange = () => {
         this.setState((prevState) => ({
             situacao: prevState.situacao === 'Ativo' ? 'Inativo' : 'Ativo'
@@ -1281,6 +1335,11 @@ class Produto extends React.Component {
     render() {
 
         const { selectedListId, showRenderTelaLista, carregando, searchTerm, produtos, modalSalvarProduto, modalExcluirProduto, codigoProdutoParaExcluir, modalExcluindoProduto, paginaAtual, totalPaginas } = this.state
+        const { showModal, errorMessage } = this.state;
+
+        const removeAccents = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
 
         if (showRenderTelaLista) {
             return this.renderTelaLista();
@@ -1291,18 +1350,28 @@ class Produto extends React.Component {
             return this.renderTelaLista();
         }
 
-        const removeAccents = (str) => {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        };
-
         if (carregando) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
-                    <div>
+                    <div >
                         <div className="text-loading text-white">Carregando produtos...</div>
+                    </div>
+                    <div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
@@ -1336,7 +1405,7 @@ class Produto extends React.Component {
                     </Container >
                     <div className="table-container-produto">
                         <Container fluid className="pb-5">
-                            <Table striped bordered hover responsive="xl">
+                            <Table bordered hover variant="warning" responsive="xl">
                                 <thead>
                                     <tr>
                                         <th title="Identificador">ID</th>
@@ -1420,68 +1489,70 @@ class Produto extends React.Component {
                                 </tbody>
                             </Table>
                         </Container>
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
-                            <div>
-                                <Pagination>
-                                    <Pagination.Prev
-                                        onClick={() => {
-                                            this.handleSelecionaPagina(paginaAtual - 1);
-                                        }}
-                                        disabled={paginaAtual === 1}
-                                    />
-                                    {[...Array(totalPaginas)].map((_, index) => (
-                                        <Pagination.Item
-                                            key={index + 1}
-                                            active={index + 1 === paginaAtual}
-                                            onClick={() => {
-                                                this.handleSelecionaPagina(index + 1);
-                                            }}
-                                        >
-                                            {index + 1}
-                                        </Pagination.Item>
-                                    ))}
-                                    <Pagination.Next
-                                        onClick={() => {
-                                            this.handleSelecionaPagina(paginaAtual + 1);
-                                        }}
-                                        disabled={paginaAtual === totalPaginas}
-                                    />
-                                </Pagination>
-                            </div>
-                        </div>
-
-                        <Modal show={modalSalvarProduto} onHide={this.modalSalvarProduto} centered>
-                            <Modal.Body>
-                                <span style={{ display: 'block' }}><strong>Salvando produto...</strong></span>
-                            </Modal.Body>
-                        </Modal>
-
-                        <Modal show={modalExcluirProduto} onHide={this.modalExcluirProduto} centered>
-                            <Modal.Header closeButton className="bg-danger text-white">
-                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
-                                <Modal.Title>Atenção </Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body style={{ padding: '20px' }}>
-                                Deseja excluir o produto? Essa ação não poderá ser desfeita.
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>
-                                    Não
-                                </Button>
-                                <Button type="button" variant="secondary" onClick={() => {
-                                    this.delete(codigoProdutoParaExcluir);
-                                }}>
-                                    Sim
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
-
-                        <Modal show={modalExcluindoProduto} onHide={this.modalExcluindoProduto} centered>
-                            <Modal.Body>
-                                <span style={{ display: 'block' }}><strong>Excluindo produto...</strong></span>
-                            </Modal.Body>
-                        </Modal>
                     </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30px' }}>
+                        <div>
+                            <Pagination className="pagination-produto" >
+                                <Pagination.Prev
+                                    className="pagination-prev"
+                                    onClick={() => {
+                                        this.handleSelecionaPagina(paginaAtual - 1);
+                                    }}
+                                    disabled={paginaAtual === 1}
+                                />
+                                {[...Array(totalPaginas)].map((_, index) => (
+                                    <Pagination.Item
+                                        className="pagination-item"
+                                        key={index + 1}
+                                        onClick={() => {
+                                            this.handleSelecionaPagina(index + 1);
+                                        }}
+                                    >
+                                        {"voltar | avançar"}
+                                    </Pagination.Item>
+                                ))}
+                                <Pagination.Next
+                                    className="pagination-next"
+                                    onClick={() => {
+                                        this.handleSelecionaPagina(paginaAtual + 1);
+                                    }}
+                                    disabled={paginaAtual === totalPaginas}
+                                />
+                            </Pagination>
+                        </div>
+                    </div>
+
+                    <Modal show={modalSalvarProduto} onHide={this.modalSalvarProduto} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Salvando produto...</strong></span>
+                        </Modal.Body>
+                    </Modal>
+
+                    <Modal show={modalExcluirProduto} onHide={this.modalExcluirProduto} centered>
+                        <Modal.Header closeButton className="bg-danger text-white">
+                            <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
+                            <Modal.Title>Atenção </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body style={{ padding: '20px' }}>
+                            Deseja excluir o produto? Essa ação não poderá ser desfeita.
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button type="button" className="botao-finalizarvenda" variant="outline-secondary" onClick={this.modalExcluirProduto}>
+                                Não
+                            </Button>
+                            <Button type="button" variant="secondary" onClick={() => {
+                                this.delete(codigoProdutoParaExcluir);
+                            }}>
+                                Sim
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={modalExcluindoProduto} onHide={this.modalExcluindoProduto} centered>
+                        <Modal.Body>
+                            <span style={{ display: 'block' }}><strong>Excluindo produto...</strong></span>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             )
         }
@@ -1493,15 +1564,31 @@ class Produto extends React.Component {
         const { id, descricao, imageThumbnail, codigo, tipo, situacao, preco, unidade, condicao, marca, producao, dataValidade, freteGratis, pesoLiq, pesoBruto, larguraProduto, alturaProduto, profundidadeProduto,
             volumes, itensPorCaixa, unidadeMedida, gtin, gtinEmbalagem, descricaoCurta, descricaoComplementar, linkExterno, urlVideo, observacoes, idCategoria, categorias, estoqueMinimo, estoqueMaximo,
             crossdocking, localizacao, dataAlteracao, baseado } = this.state;
+        const { showModal, errorMessage } = this.state;
+
 
         if (!dadosCarregados) {
             return (
-                <div className="spinner-container" >
+                <div className="spinner-container">
                     <div className="d-flex align-items-center justify-content-center">
                         <div className="custom-loader"></div>
                     </div>
-                    <div>
+                    <div >
                         <div className="text-loading text-white">Carregando produto...</div>
+                    </div>
+                    <div>
+                        {/* Modal de erro */}
+                        <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Erro</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>{errorMessage}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={this.closeModalErro}>
+                                    Fechar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             )
