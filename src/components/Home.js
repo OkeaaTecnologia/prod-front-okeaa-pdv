@@ -15,7 +15,10 @@ function Home() {
     return (
         <div className="cards-container">
             <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/carrinho.png" />
+                <Card.Img
+                    variant="top"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/carrinho.png" />
                 <Card.Body>
                     <Card.Title>Frente de Caixa</Card.Title>
                     <Card.Text>
@@ -26,9 +29,12 @@ function Home() {
             </Card>
 
             <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Img
+                    variant="top"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/cadastroCliente.png" />
                 <Card.Body>
-                    <Card.Title>Cadastro de cliente e fornecedor</Card.Title>
+                    <Card.Title>Clientes e Fornecedores</Card.Title>
                     <Card.Text>
                         Melhore suas relações comerciais. Acesse o cadastro de clientes e fornecedores aqui.
                     </Card.Text>
@@ -37,9 +43,12 @@ function Home() {
             </Card>
 
             <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Img
+                    variant="top"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/cadastroProduto.png" />
                 <Card.Body>
-                    <Card.Title>Cadastro de produto</Card.Title>
+                    <Card.Title>Produtos</Card.Title>
                     <Card.Text>
                         Aperfeiçoe seu controle de estoque. Acesse o cadastro de produtos aqui.
                     </Card.Text>
@@ -48,9 +57,14 @@ function Home() {
             </Card>
 
             <Card border="success" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Img
+                    variant="top"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/listaPreco.png"
+                    alt="Imagem"
+                />
                 <Card.Body>
-                    <Card.Title>Cadastro de Listas de Preços</Card.Title>
+                    <Card.Title>Listas de Preços</Card.Title>
                     <Card.Text>
                         Aprimore o controle das suas listas de preços. Acesse agora o cadastro e otimize a gestão de produtos.
                     </Card.Text>
@@ -60,7 +74,11 @@ function Home() {
 
 
             <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Img
+                    variant="top"
+                    alt="Imagem"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/cadastroLoja.png" />
                 <Card.Body>
                     <Card.Title>Cadastro de loja</Card.Title>
                     <Card.Text>
@@ -72,7 +90,11 @@ function Home() {
             </Card>
 
             <Card border="sucess" className="custom-card">
-                <Card.Img variant="top" src="/assets/cadastro.png" />
+                <Card.Img
+                    variant="top"
+                    alt="Imagem"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    src="/assets/controleCaixa.png" />
                 <Card.Body>
                     <Card.Title>Controle de caixa</Card.Title>
                     <Card.Text>
@@ -81,7 +103,7 @@ function Home() {
                 </Card.Body>
                 <Button variant="secondary" onClick={() => handleRedirect('/ControleCaixa')}>Acessar</Button>
             </Card>
-        </div>
+        </div >
     );
 }
 

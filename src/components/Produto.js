@@ -15,11 +15,12 @@ import { Image } from 'react-bootstrap';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BsInfoCircle } from 'react-icons/bs';
 
-import { FaTrash } from 'react-icons/fa';
+import { IoTrash } from 'react-icons/io5';
 import { parse } from 'js2xmlparser';
 import { BsPersonAdd } from 'react-icons/bs';
 import { BsShieldFillExclamation } from 'react-icons/bs';
 import { BsPencilSquare } from 'react-icons/bs';
+import { TbTrashXFilled } from "react-icons/tb";
 
 
 class Produto extends React.Component {
@@ -1362,7 +1363,8 @@ class Produto extends React.Component {
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
@@ -1455,7 +1457,7 @@ class Produto extends React.Component {
                                                                 <BsPencilSquare />
                                                             </Button> */}
                                                             <Button
-                                                                variant="danger"
+                                                                variant="light"
                                                                 title="Excluir produto"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
@@ -1465,7 +1467,7 @@ class Produto extends React.Component {
                                                                     });
                                                                 }}
                                                             >
-                                                                <FaTrash />
+                                                                <IoTrash className="red-icon" />
                                                             </Button>
                                                         </div>
                                                     </td>
@@ -1482,7 +1484,7 @@ class Produto extends React.Component {
                                                     <BsPencilSquare />
                                                 </Button>
                                                 <Button variant="danger" title="Excluir produto" onClick={() => this.modalExcluirProduto} disabled>
-                                                    <FaTrash />
+                                                    <IoTrash />
                                                 </Button>
                                             </div>
                                         </td></tr>}
@@ -1579,7 +1581,8 @@ class Produto extends React.Component {
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>

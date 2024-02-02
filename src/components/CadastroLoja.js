@@ -11,7 +11,7 @@ import { Table } from "react-bootstrap";
 
 import { BsShieldFillExclamation } from 'react-icons/bs';
 import { BsPersonAdd } from 'react-icons/bs';
-import { FaTrash } from 'react-icons/fa';
+import { IoTrash } from "react-icons/io5";
 import { BsPencilSquare } from 'react-icons/bs';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -403,12 +403,13 @@ class CadastroLoja extends Component {
             <div className="custom-loader"></div>
           </div>
           <div >
-            <div className="text-loading text-white">Carregando cadastro de lojas...</div>
+            <div className="text-loading text-white">Carregando unidades de loja...</div>
           </div>
           <div>
             {/* Modal de erro */}
             <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-              <Modal.Header closeButton>
+              <Modal.Header closeButton className="bg-danger text-white">
+                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                 <Modal.Title>Erro</Modal.Title>
               </Modal.Header>
               <Modal.Body>{errorMessage}</Modal.Body>
@@ -485,7 +486,7 @@ class CadastroLoja extends Component {
                               {/* <Button variant="warning" title="Editar loja" onClick={(e) => { e.stopPropagation(); this.modalCadastrarLoja(listaLojas) }}>
                                 <BsPencilSquare />
                               </Button> */}
-                              <Button variant="danger" title="Excluir loja" onClick={(e) => {
+                              <Button variant="light" title="Excluir loja" onClick={(e) => {
                                 e.stopPropagation();
                                 this.setState({
                                   codigoLojaParaExcluir: listaLojas.idLoja,
@@ -493,7 +494,7 @@ class CadastroLoja extends Component {
                                 });
                               }}
                               >
-                                <FaTrash />
+                                <IoTrash className="red-icon" />
                               </Button>
                             </div>
                           </td>
@@ -509,7 +510,7 @@ class CadastroLoja extends Component {
                           <BsPencilSquare />
                         </Button>
                         <Button variant="danger" title="Excluir produto" disabled>
-                          <FaTrash />
+                          <IoTrash />
                         </Button>
                       </div>
                     </td></tr>}

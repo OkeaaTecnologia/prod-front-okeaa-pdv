@@ -28,9 +28,10 @@ import { BsPersonAdd } from 'react-icons/bs';
 import { BsClipboardCheck } from 'react-icons/bs';
 import { BsListCheck } from 'react-icons/bs';
 import { BsXCircle } from 'react-icons/bs';
-import { BsTrashFill } from 'react-icons/bs';
+import { IoTrash } from "react-icons/io5";
 import { BsPencilSquare } from 'react-icons/bs';
 import { BsArrowDown } from "react-icons/bs";
+import { FaExchangeAlt } from "react-icons/fa";
 
 import Zoom from 'react-medium-image-zoom';
 
@@ -2898,9 +2899,16 @@ class FrenteCaixa extends React.Component {
                         <Row className="d-flex">
                             <Col md={6} className="">
                                 <div className="grid-pdv-1">
-                                    <div className="mb-3">
-                                        <h5>Vendedor - Loja selecionada: {nomeLoja}</h5>
+                                    <div className="mb-3 d-flex justify-content-between align-items-center">
+                                        <h5>Vendedor</h5>
+                                        <div className="custom-container d-flex align-items-center">
+                                            <span className="me-2"><strong>Loja:</strong> {nomeLoja}</span>
+                                            <Button variant="outline-light" onClick={() => this.setState({ modalSelecionarLoja: true })}>
+                                                <FaExchangeAlt style={{ fontSize: '1.25em' }} />
+                                            </Button>
+                                        </div>
                                     </div>
+
                                     <Row className="row align-items-center">
                                         <Col className="col" xs={4}>
                                             <Form.Group className="mb-3">
@@ -3231,7 +3239,7 @@ class FrenteCaixa extends React.Component {
                                                                 <BsPencilSquare className="blue-icon" />
                                                             </Button>
                                                             <Button variant="light" title="Excluir produto" className="transparent-button" onClick={this.modalExcluirProduto}>
-                                                                <BsTrashFill className="red-icon" />
+                                                                <IoTrash className="red-icon" />
                                                             </Button>
                                                         </td>
                                                     </tr>
@@ -3320,30 +3328,22 @@ class FrenteCaixa extends React.Component {
                                         </Col>
                                         <Col className="col" xs={3}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label htmlFor="desconto" className="texto-campos">Desconto (Total)</Form.Label>
-                                                <Form.Control type="number" className="form-control no-spinners" name="desconto" placeholder="00,00" value={valorDesconto || ''} onChange={this.atualizaDesconto} onBlur={this.formatarDesconto} step="0.01" />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col className="col" xs={3}>
-                                            <Form.Group className="mb-3">
                                                 <Form.Label htmlFor="totaldavenda" className="texto-campos">Total da venda</Form.Label>
                                                 <Form.Control type="text" id="totaldavenda" className="form-control" name="totaldavenda" placeholder="00,00" defaultValue={subTotalGeral ? subTotalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 }).replace('.', ',') : ''} disabled />
                                             </Form.Group>
                                         </Col>
-                                        <Row className="row align-items-center">
-                                            <Col className="col" xs={3}>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label htmlFor="desconto" className="texto-campos">Valor fora lista (Total)</Form.Label>
-                                                    <Form.Control type="text" className="form-control no-spinners" name="desconto" placeholder="00,00" value={this.calcularTotalLista().totalForaDesconto.toFixed(2).replace('.', ',')} disabled />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col className="col" xs={3}>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label htmlFor="desconto" className="texto-campos">Valor lista de desconto (Total)</Form.Label>
-                                                    <Form.Control type="text" className="form-control no-spinners" name="desconto" placeholder="00,00" value={this.calcularTotalLista().totalNaListaDesconto.toFixed(2).replace('.', ',')} disabled />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
+                                        <Col className="col" xs={3}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label htmlFor="desconto" className="texto-campos">Valor fora lista (Total)</Form.Label>
+                                                <Form.Control type="text" className="form-control no-spinners" name="desconto" placeholder="00,00" value={this.calcularTotalLista().totalForaDesconto.toFixed(2).replace('.', ',')} disabled />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col className="col" xs={3}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label htmlFor="desconto" className="texto-campos">Valor lista de desconto (Total)</Form.Label>
+                                                <Form.Control type="text" className="form-control no-spinners" name="desconto" placeholder="00,00" value={this.calcularTotalLista().totalNaListaDesconto.toFixed(2).replace('.', ',')} disabled />
+                                            </Form.Group>
+                                        </Col>
                                     </Row>
                                 </div>
                             </Col>
@@ -3648,10 +3648,16 @@ class FrenteCaixa extends React.Component {
                                             </Col>
                                             <Col className="col" xs={3}>
                                                 <Form.Group className="mb-3">
+                                                    <Form.Label htmlFor="desconto" className="texto-campos">Desconto (Total)</Form.Label>
+                                                    <Form.Control type="number" className="form-control no-spinners" name="desconto" placeholder="00,00" value={valorDesconto || ''} onChange={this.atualizaDesconto} onBlur={this.formatarDesconto} step="0.01" />
+                                                </Form.Group>
+                                            </Col>
+                                            {/* <Col className="col" xs={3}>
+                                                <Form.Group className="mb-3">
                                                     <Form.Label htmlFor="totaldavenda" className="texto-campos">Total da venda</Form.Label>
                                                     <Form.Control type="text" id="totaldavenda" className="form-control" name="totaldavenda" placeholder="00,00" defaultValue={subTotalGeral ? subTotalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 }).replace('.', ',') : ''} disabled />
                                                 </Form.Group>
-                                            </Col>
+                                            </Col> */}
                                             <Col className="col" xs={3}>
                                                 <Form.Group controlId="dataprevista" className="mb-3">
                                                     <Form.Label>Data prevista</Form.Label>
@@ -3849,7 +3855,7 @@ class FrenteCaixa extends React.Component {
                                                             </td>
                                                             <td>
                                                                 <Button variant="light" onClick={() => this.handleDeleteParcela(index)}>
-                                                                    <BsTrashFill className="red-icon" />
+                                                                    <IoTrash className="red-icon" />
                                                                 </Button>
                                                             </td>
                                                         </tr>
@@ -3868,7 +3874,7 @@ class FrenteCaixa extends React.Component {
                                         <div className="d-flex justify-content-between">
                                             <div className="botao-excluirvenda">
                                                 <div>
-                                                    <Button variant="secondary" onClick={this.modalExcluirPedido}>Excluir pedido</Button>
+                                                    <Button variant="dark" onClick={this.modalExcluirPedido}>Excluir pedido</Button>
                                                 </div>
                                             </div>
                                             <div className="botao-finalizarvenda">
@@ -4161,14 +4167,13 @@ class FrenteCaixa extends React.Component {
                                         ))}
                                     </Form.Select>
                                 </Form.Group>
-
                                 <Form.Group className="mb-3">
                                     <Form.Label htmlFor="trocoCaixa" className="texto-campos">Troco</Form.Label>
                                     <Form.Control type="text"
                                         className="form-control"
                                         id="trocoCaixa"
                                         name="trocoCaixa"
-                                        value={this.state.trocoCaixa || ''}
+                                        value={this.state.trocoCaixa || '0,00'}
                                         onChange={this.atualizaTrocoCaixa}
                                         onBlur={this.formatarTrocoCaixa}
                                         disabled={this.state.situacaoCaixa === "Aberto"}

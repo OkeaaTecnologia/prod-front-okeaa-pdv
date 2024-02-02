@@ -15,7 +15,7 @@ import { CloseButton } from 'react-bootstrap';
 
 
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FaTrash } from 'react-icons/fa';
+import { IoTrash } from 'react-icons/io5';
 import { BsListCheck } from 'react-icons/bs';
 import { BsXCircle } from 'react-icons/bs';
 import { BsPersonAdd } from 'react-icons/bs';
@@ -648,12 +648,13 @@ class ControleCaixa extends Component {
                         <div className="custom-loader"></div>
                     </div>
                     <div >
-                        <div className="text-loading text-white">Carregando listas de controle de caixa...</div>
+                        <div className="text-loading text-white">Carregando controles de caixa...</div>
                     </div>
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
@@ -734,7 +735,7 @@ class ControleCaixa extends Component {
                                                                 <BsPencilSquare />
                                                             </Button> */}
                                                         <Button
-                                                            variant="danger"
+                                                            variant="light"
                                                             title="Excluir produto"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -744,7 +745,7 @@ class ControleCaixa extends Component {
                                                                 });
                                                             }}
                                                         >
-                                                            <FaTrash />
+                                                            <IoTrash className="red-icon" />
                                                         </Button>
                                                     </div>
                                                 </td>
@@ -860,12 +861,13 @@ class ControleCaixa extends Component {
                         <div className="custom-loader"></div>
                     </div>
                     <div >
-                        <div className="text-loading text-white">Carregando controle de caixa...</div>
+                        <div className="text-loading text-white">Carregando controles de caixa...</div>
                     </div>
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
@@ -967,7 +969,7 @@ class ControleCaixa extends Component {
                                                     onClick={() => this.removerCampo(index)}
                                                     disabled={this.state.situacao === "Fechado"}
                                                 >
-                                                    <FaTrash />
+                                                    <IoTrash />
                                                 </Button>
                                             </Col>
                                         </Row>

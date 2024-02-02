@@ -15,7 +15,7 @@ import { CloseButton } from 'react-bootstrap';
 
 
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FaTrash } from 'react-icons/fa';
+import { IoTrash } from "react-icons/io5";
 import { BsListCheck } from 'react-icons/bs';
 import { BsXCircle } from 'react-icons/bs';
 import { BsPersonAdd } from 'react-icons/bs';
@@ -728,12 +728,13 @@ class ListaPrecos extends Component {
                         <div className="custom-loader"></div>
                     </div>
                     <div >
-                        <div className="text-loading text-white">Carregando listas preços...</div>
+                        <div className="text-loading text-white">Carregando listas de preços...</div>
                     </div>
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
@@ -821,12 +822,12 @@ class ListaPrecos extends Component {
                                                     <td>
                                                         <div className="button-container-table">
 
-                                                            <Button variant="warning" title="Editar produto" onClick={() => this.handleEditarProduto(listaspreco.idLista)}>
+                                                            {/* <Button variant="warning" title="Editar produto" onClick={() => this.handleEditarProduto(listaspreco.idLista)}>
                                                                 <BsPencilSquare />
-                                                            </Button>
+                                                            </Button> */}
 
                                                             <Button
-                                                                variant="danger"
+                                                                variant="light"
                                                                 title="Excluir produto"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
@@ -836,7 +837,7 @@ class ListaPrecos extends Component {
                                                                     });
                                                                 }}
                                                             >
-                                                                <FaTrash />
+                                                                <IoTrash className="red-icon" />
                                                             </Button>
                                                         </div>
                                                     </td>
@@ -853,7 +854,7 @@ class ListaPrecos extends Component {
                                                     <BsPencilSquare />
                                                 </Button>
                                                 <Button variant="danger" title="Excluir produto" disabled>
-                                                    <FaTrash />
+                                                    <IoTrash />
                                                 </Button>
                                             </div>
                                         </td></tr>}
@@ -998,12 +999,13 @@ class ListaPrecos extends Component {
                         <div className="custom-loader"></div>
                     </div>
                     <div >
-                        <div className="text-loading text-white">Carregando lista de preços...</div>
+                        <div className="text-loading text-white">Carregando listas de preços...</div>
                     </div>
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>

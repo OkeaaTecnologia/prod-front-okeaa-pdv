@@ -57,7 +57,7 @@ class Login extends React.Component {
     render() {
         return (
             <div>
-                <img src="/assets/logo.png" alt="Logo" className="login-logo" />
+                <img src="/assets/logoLogin.png" alt="Logo" className="login-logo" />
                 <div className="text">
                     ERP
                 </div>

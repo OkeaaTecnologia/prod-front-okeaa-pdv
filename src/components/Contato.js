@@ -1040,7 +1040,8 @@ class Contato extends React.Component {
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
@@ -1208,7 +1209,8 @@ class Contato extends React.Component {
                     <div>
                         {/* Modal de erro */}
                         <Modal className="modal-erro" show={showModal} onHide={this.closeModalErro}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton className="bg-danger text-white">
+                                <BsShieldFillExclamation className="mr-2 fa-2x" style={{ marginRight: '10px' }} />
                                 <Modal.Title>Erro</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>{errorMessage}</Modal.Body>
